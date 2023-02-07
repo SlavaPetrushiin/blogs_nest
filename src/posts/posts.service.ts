@@ -26,9 +26,7 @@ export class PostsService {
   async createPost(post: CreatePostDto): Promise<PostDocument> {
     const { blogId, content, shortDescription, title } = post;
 
-    const foundedBlog = await this.blogsRepository.findBlog(
-      new Types.ObjectId(blogId),
-    );
+    const foundedBlog = await this.blogsRepository.findBlog(blogId);
 
     if (!foundedBlog) {
       return null;
@@ -48,9 +46,7 @@ export class PostsService {
   async updatePost(post: UpdatePostDto, id: string) {
     const { blogId } = post;
 
-    const foundedBlog = await this.blogsRepository.findBlog(
-      new Types.ObjectId(blogId),
-    );
+    const foundedBlog = await this.blogsRepository.findBlog(blogId);
 
     if (!foundedBlog) {
       return null;

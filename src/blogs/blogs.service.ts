@@ -17,7 +17,7 @@ export class BlogsService {
     return this.blogsRepository.findAllBlogs(query);
   }
 
-  async getBlog(id: Types.ObjectId): Promise<BlogDocument> {
+  async getBlog(id: string): Promise<BlogDocument> {
     return this.blogsRepository.findBlog(id);
   }
 
@@ -26,11 +26,11 @@ export class BlogsService {
     return this.blogsRepository.save(cratedBlog);
   }
 
-  async updateBlog(blog: UpdateBlogDto, id: Types.ObjectId) {
+  async updateBlog(blog: UpdateBlogDto, id: string) {
     return this.blogsRepository.updateBlog(blog, id);
   }
 
-  async removeBlog(id: Types.ObjectId): Promise<boolean> {
+  async removeBlog(id: string): Promise<boolean> {
     return this.blogsRepository.removeBlog(id);
   }
 }

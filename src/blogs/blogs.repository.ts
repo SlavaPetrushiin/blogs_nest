@@ -39,16 +39,15 @@ export class BlogsRepository {
     };
   }
 
-  findBlog(id: Types.ObjectId): Promise<BlogDocument> {
-    return this.BlogModel.findById(id, DEFAULT_PROJECTION).exec();
+  findBlog(id: string): Promise<BlogDocument> {
+    return this.BlogModel.findOne({ id }, DEFAULT_PROJECTION).exec();
   }
 
   async createBlog(blog: CreateBlogDto): Promise<BlogDocument> {
-    const createdAt = new Date().toISOString();
-    return new this.BlogModel({ ...blog, createdAt });
+    return new this.BlogModel({ ...blog });
   }
 
-  async updateBlog(blog: UpdateBlogDto, id: Types.ObjectId): Promise<boolean> {
+  async updateBlog(blog: UpdateBlogDto, id: string): Promise<boolean> {
     const { description, name, websiteUrl } = blog;
     const result = await this.BlogModel.updateOne(
       { _id: id },
@@ -60,7 +59,7 @@ export class BlogsRepository {
     return !!result.matchedCount;
   }
 
-  async removeBlog(id: Types.ObjectId): Promise<boolean> {
+  async removeBlog(id: string): Promise<boolean> {
     const res = await this.BlogModel.deleteOne({ _id: id });
     return res.deletedCount > 0 ? true : false;
   }

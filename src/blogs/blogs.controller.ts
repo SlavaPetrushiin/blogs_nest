@@ -18,7 +18,6 @@ import { Body } from '@nestjs/common/decorators';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { BlogsService } from './blogs.service';
-import { Types } from 'mongoose';
 import { Response } from 'express';
 import { SortDirectionType } from 'src/types/types';
 
@@ -52,7 +51,7 @@ export class BlogsController {
   @Get(':id')
   async getBlog(@Param('id') id: string, @Res() res: Response) {
     try {
-      const result = await this.blogsService.getBlog(new Types.ObjectId(id));
+      const result = await this.blogsService.getBlog(id);
       if (!result) {
         res.status(HttpStatus.NOT_FOUND).send();
       }
@@ -63,7 +62,6 @@ export class BlogsController {
   }
 
   @Post()
-  @HttpCode(201)
   async createBlog(@Body() createBlogDto: CreateBlogDto, @Res() res: Response) {
     try {
       const createdBlog = await this.blogsService.createBlog(createBlogDto);
@@ -78,19 +76,19 @@ export class BlogsController {
   }
 
   @Put(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
     @Param('id') id: string,
     @Body() updateBlogDTO: UpdateBlogDto,
   ) {
-    return this.blogsService.updateBlog(updateBlogDTO, new Types.ObjectId(id));
+    return this.blogsService.updateBlog(updateBlogDTO, id);
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async removeBlog(@Param('id') id: string, @Res() res: Response) {
     try {
-      const result = await this.blogsService.removeBlog(new Types.ObjectId(id));
+      const result = await this.blogsService.removeBlog(id);
       if (!result) {
         res.status(HttpStatus.NOT_FOUND).send();
       }

@@ -19,8 +19,6 @@ import { Body } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
-import { Types } from 'mongoose';
-import { Response } from 'express';
 import { SortDirectionType } from 'src/types/types';
 
 @Controller('posts')
@@ -64,7 +62,6 @@ export class PostsController {
   }
 
   @Post()
-  @HttpCode(201)
   async createPost(@Body() createPostDto: CreatePostDto) {
     try {
       const createdPost = await this.postsService.createPost(createPostDto);
@@ -80,7 +77,7 @@ export class PostsController {
   }
 
   @Put(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
@@ -98,7 +95,7 @@ export class PostsController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async removePost(@Param('id') id: string) {
     try {
       const result = await this.postsService.removePost(id);

@@ -14,8 +14,8 @@ import {
   HttpCode,
   NotFoundException,
   BadRequestException,
+  HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -51,7 +51,6 @@ export class UsersController {
   }
 
   @Post()
-  @HttpCode(201)
   async createUser(@Body() createUserDto: CreateUserDto) {
     const createdUser = await this.usersService.createUser(createUserDto);
     if (!createdUser) {
@@ -61,7 +60,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string) {
     const isRemoved = await this.usersService.removeUser(id);
     if (!isRemoved) {
