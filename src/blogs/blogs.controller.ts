@@ -64,7 +64,7 @@ export class BlogsController {
 
   @Post()
   @HttpCode(201)
-  async createPost(@Body() createBlogDto: CreateBlogDto, @Res() res: Response) {
+  async createBlog(@Body() createBlogDto: CreateBlogDto, @Res() res: Response) {
     try {
       const createdBlog = await this.blogsService.createBlog(createBlogDto);
       if (!createdBlog) {
