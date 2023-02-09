@@ -17,11 +17,16 @@ interface INewPostDto extends CreatePostDto {
 export class PostsRepository {
   constructor(@InjectModel(Post.name) private PostModel: Model<PostDocument>) {}
 
-  async findAllPosts(query: AllEntitiesPost) {
+  async findAllPosts(query: AllEntitiesPost, blogId: string = null) {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
     const skip = (+pageNumber - 1) * +pageSize;
+    const postFilter: any = {};
 
-    const result = await this.PostModel.find({}, DEFAULT_PROJECTION)
+    if (blogId) {
+      postFilter.blogId = blogId;
+    }
+
+    const result = await this.PostModel.find(postFilter, DEFAULT_PROJECTION)
       .skip(+skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
@@ -64,7 +69,16 @@ export class PostsRepository {
     return res.deletedCount > 0 ? true : false;
   }
 
+  async removePostByBlogId(blogId: string): Promise<boolean> {
+    const res = await this.PostModel.deleteMany({ blogId });
+    return res.deletedCount > 0 ? true : false;
+  }
+
   async save(post: PostDocument) {
     return post.save();
+  }
+
+  async deleteMany() {
+    return this.PostModel.deleteMany({});
   }
 }

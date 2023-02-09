@@ -1,3 +1,5 @@
+import { AllEntitiesComment } from './../comments/dto/allEntitiesComment';
+import { CommentsRepository } from './../comments/comments.repository';
 import { BlogsRepository } from './../blogs/blogs.repository';
 import { PostDocument } from './schemas/post.schema';
 import { Types } from 'mongoose';
@@ -13,6 +15,7 @@ export class PostsService {
   constructor(
     private postsRepository: PostsRepository,
     private blogsRepository: BlogsRepository,
+    private commentsRepository: CommentsRepository,
   ) {}
 
   async getPosts(query: AllEntitiesPost) {
@@ -57,5 +60,14 @@ export class PostsService {
 
   async removePost(id: string): Promise<boolean> {
     return this.postsRepository.removePost(id);
+  }
+
+  async getCommentsByPostId(query: AllEntitiesComment, postId: string) {
+    const foundedPost = await this.postsRepository.findPost(postId);
+    if (!foundedPost) {
+      return null;
+    }
+
+    return this.commentsRepository.getCommentsByPostId(query, postId);
   }
 }

@@ -67,4 +67,8 @@ export class BlogsRepository {
   async save(blog: BlogDocument) {
     return blog.save();
   }
+
+  async deleteMany() {
+    return this.BlogModel.deleteMany({});
+  }
 }

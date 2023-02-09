@@ -27,7 +27,6 @@ export class PostsController {
 
   @Get()
   async getPosts(
-    @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm: string,
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
     pageNumber: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe)
@@ -67,12 +66,12 @@ export class PostsController {
       const createdPost = await this.postsService.createPost(createPostDto);
 
       if (!createdPost) {
-        throw new ForbiddenException();
+        throw new NotFoundException();
       }
       return createdPost;
     } catch (error) {
       console.error(error);
-      throw new ForbiddenException();
+      throw new NotFoundException();
     }
   }
 
@@ -103,6 +102,38 @@ export class PostsController {
         throw new NotFoundException();
       }
       return result;
+    } catch (error) {
+      console.error(error);
+      throw new NotFoundException();
+    }
+  }
+
+  @Get(':postId/comments')
+  async getCommentsByPostId(
+    @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
+    pageNumber: number,
+    @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe)
+    pageSize: number,
+    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
+    @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
+    sortDirection: SortDirectionType,
+    @Param('postId') postId: string,
+  ) {
+    try {
+      const query = {
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+      };
+      const comments = await this.postsService.getCommentsByPostId(
+        query,
+        postId,
+      );
+      if (!comments) {
+        throw new NotFoundException();
+      }
+      return comments;
     } catch (error) {
       console.error(error);
       throw new NotFoundException();
