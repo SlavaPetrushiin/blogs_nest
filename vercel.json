@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"name": "blogs_nest",
+	"name": "blogsNest",
 	"builds": [
 		{ "src": "src/app.module.ts", "use": "@vercel/node" }
 	],
