@@ -19,7 +19,7 @@ import { Body } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
-import { SortDirectionType } from 'src/types/types';
+import { SortDirectionType } from './../types/types';
 
 @Controller('posts')
 export class PostsController {

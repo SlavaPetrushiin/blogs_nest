@@ -1,4 +1,4 @@
-import { SortDirectionType } from 'src/types/types';
+import { SortDirectionType } from './../types/types';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import {

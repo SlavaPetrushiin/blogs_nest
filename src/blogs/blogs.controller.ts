@@ -19,7 +19,7 @@ import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { BlogsService } from './blogs.service';
 import { Response } from 'express';
-import { SortDirectionType } from 'src/types/types';
+import { SortDirectionType } from './../types/types';
 import {
   CreatePostByBlogIdDto,
   CreatePostDto,
