@@ -31,7 +31,6 @@ export class UsersService {
   }
 
   async removeUser(id: string): Promise<boolean> {
-    console.log('e: ', id);
     return this.usersRepository.removeUser(id);
   }
 }
