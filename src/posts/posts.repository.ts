@@ -6,7 +6,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { AllEntitiesPost } from './dto/AllEntitiesPost';
 import { UpdatePostDto } from './dto/update-post.dto';
 
-const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
+const DEFAULT_PROJECTION = { _id: 0, __v: 0, updatedAt: 0 };
 
 interface INewPostDto extends CreatePostDto {
   blogName: string;
@@ -29,7 +29,8 @@ export class PostsRepository {
     const result = await this.PostModel.find(postFilter, DEFAULT_PROJECTION)
       .skip(+skip)
       .limit(+pageSize)
-      .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
+      .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 })
+      .lean();
 
     const totalCount = await this.PostModel.countDocuments({});
     const pageCount = Math.ceil(totalCount / +pageSize);

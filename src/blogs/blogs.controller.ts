@@ -66,12 +66,10 @@ export class BlogsController {
     @Body() createBlogDto: CreateBlogDto,
     // @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('createBlogDto', createBlogDto);
     const createdBlog = await this.blogsService.createBlog(createBlogDto);
     if (!createdBlog) {
       throw new NotFoundException();
     }
-    console.log('createdBlog', createdBlog);
     return createdBlog;
   }
 

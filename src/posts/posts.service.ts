@@ -38,7 +38,8 @@ export class PostsService {
     const { blogId, content, shortDescription, title } = post;
 
     const foundedBlog = await this.blogsRepository.findBlog(blogId);
-
+    console.log('blogId: ', blogId);
+    console.log('foundedBlog: ', foundedBlog);
     if (!foundedBlog) {
       return null;
     }
