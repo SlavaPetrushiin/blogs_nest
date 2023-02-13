@@ -5,7 +5,6 @@ import { PostDocument } from './schemas/post.schema';
 import { Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
-import { IBlog } from './interfaces/blog.interface';
 import { AllEntitiesPost } from './dto/allEntitiesPost';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsRepository } from './posts.repository';
@@ -22,8 +21,17 @@ export class PostsService {
     return this.postsRepository.findAllPosts(query);
   }
 
-  async getPost(id: string): Promise<PostDocument> {
-    return this.postsRepository.findPost(id);
+  async getPost(id: string) {
+    const foundedPost = await this.postsRepository.findPost(id);
+    return {
+      ...foundedPost,
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    };
   }
 
   async createPost(post: CreatePostDto): Promise<PostDocument> {

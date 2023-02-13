@@ -1,4 +1,3 @@
-import { IBlog } from './interfaces/blog.interface';
 import {
   Controller,
   Get,
@@ -53,16 +52,13 @@ export class BlogsController {
   }
 
   @Get(':id')
-  async getBlog(@Param('id') id: string, @Res() res: Response) {
-    try {
-      const result = await this.blogsService.getBlog(id);
-      if (!result) {
-        res.status(HttpStatus.NOT_FOUND).send();
-      }
-      return result;
-    } catch (error) {
-      res.status(HttpStatus.NOT_FOUND).send();
+  async getBlog(@Param('id') id: string) {
+    const result = await this.blogsService.getBlog(id);
+    console.log(result);
+    if (!result) {
+      throw new NotFoundException();
     }
+    return result;
   }
 
   @Post()
@@ -90,16 +86,12 @@ export class BlogsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async removeBlog(@Param('id') id: string, @Res() res: Response) {
-    try {
-      const result = await this.blogsService.removeBlog(id);
-      if (!result) {
-        res.status(HttpStatus.NOT_FOUND).send();
-      }
-      res.sendStatus(HttpStatus.NO_CONTENT);
-    } catch (error) {
-      res.status(HttpStatus.NOT_FOUND).send();
+  async removeBlog(@Param('id') id: string) {
+    const result = await this.blogsService.removeBlog(id);
+    if (!result) {
+      throw new NotFoundException();
     }
+    return result;
   }
 
   /* Get posts by blogId */
