@@ -23,7 +23,7 @@ import { SortDirectionType } from './../types/types';
 import {
   CreatePostByBlogIdDto,
   CreatePostDto,
-} from 'src/posts/dto/create-post.dto';
+} from './../posts/dto/create-post.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -66,17 +66,17 @@ export class BlogsController {
   }
 
   @Post()
-  async createBlog(@Body() createBlogDto: CreateBlogDto, @Res() res: Response) {
-    try {
-      const createdBlog = await this.blogsService.createBlog(createBlogDto);
-      if (!createdBlog) {
-        res.status(HttpStatus.BAD_REQUEST).send();
-      }
-
-      res.send(createdBlog);
-    } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).send();
+  async createBlog(
+    @Body() createBlogDto: CreateBlogDto,
+    // @Res({ passthrough: true }) res: Response,
+  ) {
+    console.log('createBlogDto', createBlogDto);
+    const createdBlog = await this.blogsService.createBlog(createBlogDto);
+    if (!createdBlog) {
+      throw new NotFoundException();
     }
+    console.log('createdBlog', createdBlog);
+    return createdBlog;
   }
 
   @Put(':id')
