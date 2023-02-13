@@ -114,22 +114,17 @@ export class BlogsController {
     sortDirection: SortDirectionType,
     @Param('blogId') blogId: string,
   ) {
-    try {
-      const query = {
-        pageNumber,
-        pageSize,
-        sortBy,
-        sortDirection,
-      };
-      const result = await this.blogsService.getPostsByBlogId(query, blogId);
-      if (!result) {
-        throw new NotFoundException();
-      }
-      return result;
-    } catch (error) {
-      console.error(error);
+    const query = {
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    };
+    const result = await this.blogsService.getPostsByBlogId(query, blogId);
+    if (!result) {
       throw new NotFoundException();
     }
+    return result;
   }
 
   @Post(':blogId/posts')

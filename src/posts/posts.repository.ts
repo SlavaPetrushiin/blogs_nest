@@ -39,7 +39,15 @@ export class PostsRepository {
       page: +pageNumber,
       pageSize: +pageSize,
       totalCount: totalCount,
-      items: result,
+      items: result.map((post) => ({
+        ...post,
+        extendedLikesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
+        },
+      })),
     };
   }
 

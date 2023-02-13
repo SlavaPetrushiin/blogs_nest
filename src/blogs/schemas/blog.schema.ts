@@ -34,6 +34,12 @@ export class Blog {
 
   @Prop({ required: true })
   description: string;
+
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isMembership: boolean;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

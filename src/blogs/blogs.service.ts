@@ -73,6 +73,16 @@ export class BlogsService {
       blogName: foundedBlog.name,
     });
 
-    return this.postsRepository.save(cratedPost);
+    await this.postsRepository.save(cratedPost);
+
+    return {
+      ...cratedPost,
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    };
   }
 }
