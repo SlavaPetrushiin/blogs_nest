@@ -60,7 +60,7 @@ export class BlogsRepository {
   }
 
   async removeBlog(id: string): Promise<boolean> {
-    const res = await this.BlogModel.deleteOne({ _id: id });
+    const res = await this.BlogModel.deleteOne({ id });
     return res.deletedCount > 0 ? true : false;
   }
 

@@ -178,4 +178,10 @@ describe('AppController', () => {
       });
     });
   });
+
+  it('deleted blog', () => {
+    return request(server)
+      .delete('/blogs/' + first_blog.id)
+      .expect(HttpStatus.NO_CONTENT);
+  });
 });
