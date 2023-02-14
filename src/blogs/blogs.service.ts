@@ -72,11 +72,16 @@ export class BlogsService {
       blogId: foundedBlog.id,
       blogName: foundedBlog.name,
     });
-
     await this.postsRepository.save(cratedPost);
 
     return {
-      ...cratedPost,
+      id: cratedPost.id,
+      title: cratedPost.title,
+      shortDescription: cratedPost.shortDescription,
+      content: cratedPost.content,
+      blogId: cratedPost.blogId,
+      blogName: cratedPost.blogName,
+      createdAt: cratedPost.createdAt,
       extendedLikesInfo: {
         dislikesCount: 0,
         likesCount: 0,

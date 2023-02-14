@@ -54,7 +54,6 @@ export class BlogsController {
   @Get(':id')
   async getBlog(@Param('id') id: string) {
     const result = await this.blogsService.getBlog(id);
-    console.log(result);
     if (!result) {
       throw new NotFoundException();
     }
@@ -122,18 +121,13 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Body() createPostDto: CreatePostByBlogIdDto,
   ) {
-    try {
-      const result = await this.blogsService.createPostByBlogId(
-        createPostDto,
-        blogId,
-      );
-      if (!result) {
-        throw new NotFoundException();
-      }
-      return result;
-    } catch (error) {
-      console.error(error);
+    const result = await this.blogsService.createPostByBlogId(
+      createPostDto,
+      blogId,
+    );
+    if (!result) {
       throw new NotFoundException();
     }
+    return result;
   }
 }

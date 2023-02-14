@@ -50,7 +50,7 @@ export class BlogsRepository {
   async updateBlog(blog: UpdateBlogDto, id: string): Promise<boolean> {
     const { description, name, websiteUrl } = blog;
     const result = await this.BlogModel.updateOne(
-      { _id: id },
+      { id },
       {
         $set: { name, websiteUrl, description },
       },
