@@ -24,7 +24,13 @@ export class PostsService {
   async getPost(id: string) {
     const foundedPost = await this.postsRepository.findPost(id);
     return {
-      ...foundedPost,
+      id: foundedPost.id,
+      title: foundedPost.title,
+      shortDescription: foundedPost.shortDescription,
+      content: foundedPost.content,
+      blogId: foundedPost.blogId,
+      blogName: foundedPost.blogName,
+      createdAt: foundedPost.createdAt,
       extendedLikesInfo: {
         dislikesCount: 0,
         likesCount: 0,
@@ -38,8 +44,6 @@ export class PostsService {
     const { blogId, content, shortDescription, title } = post;
 
     const foundedBlog = await this.blogsRepository.findBlog(blogId);
-    console.log('blogId: ', blogId);
-    console.log('foundedBlog: ', foundedBlog);
     if (!foundedBlog) {
       return null;
     }

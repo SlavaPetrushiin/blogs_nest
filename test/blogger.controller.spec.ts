@@ -157,14 +157,25 @@ describe('AppController', () => {
     });
   });
 
-  // describe('blogger-controller', () => {
-  //   it('should delete all data', async () => {
-  //     const blog = await request(server).post('/blogs').send({
-  //       name: 'React',
-  //       description: 'React supe',
-  //       websiteUrl: 'sssss',
-  //     });
-  //     expect(blog.body).toStrictEqual(1);
-  //   });
-  // });
+  describe('post-controller', () => {
+    it('/posts Get post by post id', async () => {
+      const response = await request(server).get('/posts/' + first_post.id);
+
+      expect(response.body).toStrictEqual({
+        title: first_post.title,
+        shortDescription: first_post.shortDescription,
+        content: first_post.content,
+        blogId: first_blog.id,
+        blogName: first_post.blogName,
+        id: first_post.id,
+        createdAt: first_post.createdAt,
+        extendedLikesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
+        },
+      });
+    });
+  });
 });
