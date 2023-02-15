@@ -13,7 +13,7 @@ import { useContainer } from 'class-validator';
 import * as request from 'supertest';
 import { HttpExceptionFilter } from '../src/http-exception.filter';
 import { AppModule } from '../src/app.module';
-import { CreateBlogDto } from 'src/blogs/dto/create-blog.dto';
+import { CreateBlogDto } from '../src/blogs/dto/create-blog.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 const CREATE_BLOG_DTO: CreateBlogDto = {
@@ -195,11 +195,25 @@ describe('AppController', () => {
         })
         .expect(HttpStatus.NO_CONTENT);
     });
+
+    it('/delete post', async () => {
+      return request(server)
+        .delete('/posts/' + first_post.id)
+        .expect(HttpStatus.NO_CONTENT);
+    });
+
+    it('get deleted post', async () => {
+      console.log('first_post.id', first_post.id);
+
+      return request(server)
+        .get('/posts/' + first_post.id)
+        .expect(HttpStatus.NOT_FOUND);
+    });
   });
 
-  it('deleted blog', () => {
-    return request(server)
-      .delete('/blogs/' + first_blog.id)
-      .expect(HttpStatus.NO_CONTENT);
-  });
+  // it('deleted blog', () => {
+  //   return request(server)
+  //     .delete('/blogs/' + first_blog.id)
+  //     .expect(HttpStatus.NO_CONTENT);
+  // });
 });

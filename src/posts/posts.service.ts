@@ -1,8 +1,6 @@
 import { AllEntitiesComment } from './../comments/dto/allEntitiesComment';
 import { CommentsRepository } from './../comments/comments.repository';
 import { BlogsRepository } from './../blogs/blogs.repository';
-import { PostDocument } from './schemas/post.schema';
-import { Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AllEntitiesPost } from './dto/allEntitiesPost';
@@ -23,6 +21,11 @@ export class PostsService {
 
   async getPost(id: string) {
     const foundedPost = await this.postsRepository.findPost(id);
+
+    if (!foundedPost) {
+      return null;
+    }
+
     return {
       id: foundedPost.id,
       title: foundedPost.title,
@@ -88,6 +91,7 @@ export class PostsService {
   }
 
   async removePost(id: string): Promise<boolean> {
+    console.log('removePost: ', id);
     return this.postsRepository.removePost(id);
   }
 
