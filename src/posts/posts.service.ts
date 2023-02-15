@@ -57,7 +57,7 @@ export class PostsService {
     });
 
     await this.postsRepository.save(cratedPost);
-    console.log(cratedPost);
+
     return {
       id: cratedPost.id,
       title: cratedPost.title,

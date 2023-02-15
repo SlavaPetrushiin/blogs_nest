@@ -1,3 +1,4 @@
+import { UpdatePostDto } from './../src/comments/dto/update-comment.dto';
 import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 import { UpdateBlogDto } from './../src/blogs/dto/update-blog.dto';
 import {
@@ -31,6 +32,13 @@ const CREATE_POST_DTO: CreatePostByBlogIdDto = {
   content: 'test post content',
   shortDescription: 'test post shortDescription',
   title: 'Test post title',
+};
+
+const UPDATE_POST_DTO: UpdatePostDto = {
+  content: 'test post content update',
+  shortDescription: 'test post shortDescription update',
+  title: 'Test post title update',
+  blogId: '',
 };
 
 jest.setTimeout(15000);
@@ -176,6 +184,16 @@ describe('AppController', () => {
           newestLikes: [],
         },
       });
+    });
+
+    it('/update post', async () => {
+      return request(server)
+        .put('/posts/' + first_post.id)
+        .send({
+          ...UPDATE_POST_DTO,
+          blogId: first_blog.id,
+        })
+        .expect(HttpStatus.NO_CONTENT);
     });
   });
 
