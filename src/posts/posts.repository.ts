@@ -32,7 +32,7 @@ export class PostsRepository {
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 })
       .lean();
 
-    const totalCount = await this.PostModel.countDocuments({});
+    const totalCount = await this.PostModel.countDocuments(postFilter, {});
     const pageCount = Math.ceil(totalCount / +pageSize);
 
     return {
