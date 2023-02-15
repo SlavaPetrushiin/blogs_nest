@@ -31,12 +31,12 @@ export class PostsService {
       blogId: foundedPost.blogId,
       blogName: foundedPost.blogName,
       createdAt: foundedPost.createdAt,
-      // extendedLikesInfo: {
-      //   dislikesCount: 0,
-      //   likesCount: 0,
-      //   myStatus: 'None',
-      //   newestLikes: [],
-      // },
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
     };
   }
 

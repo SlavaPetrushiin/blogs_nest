@@ -42,12 +42,12 @@ export class PostsRepository {
       totalCount: totalCount,
       items: result.map((post) => ({
         ...post,
-        // extendedLikesInfo: {
-        //   dislikesCount: 0,
-        //   likesCount: 0,
-        //   myStatus: 'None',
-        //   newestLikes: [],
-        // },
+        extendedLikesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
+        },
       })),
     };
   }
