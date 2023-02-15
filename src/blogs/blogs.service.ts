@@ -1,5 +1,4 @@
 import { PostsRepository } from './../posts/posts.repository';
-import { Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { IBlog } from './interfaces/blog.interface';
@@ -8,15 +7,10 @@ import { BlogsRepository } from './blogs.repository';
 import { AllEntitiesBlog } from './dto/AllEntitiesBlog';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { AllEntitiesPost } from 'src/posts/dto/AllEntitiesPost';
-import {
-  CreatePostByBlogIdDto,
-  CreatePostDto,
-} from 'src/posts/dto/create-post.dto';
+import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 
 @Injectable()
 export class BlogsService {
-  private readonly blogs: IBlog[] = [];
-
   constructor(
     private blogsRepository: BlogsRepository,
     private postsRepository: PostsRepository,
