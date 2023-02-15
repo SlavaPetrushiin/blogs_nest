@@ -35,44 +35,32 @@ export class PostsController {
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
   ) {
-    try {
-      const result = await this.postsService.getPosts({
-        pageNumber,
-        pageSize,
-        sortBy,
-        sortDirection,
-      });
-      return result;
-    } catch (error) {}
+    const result = await this.postsService.getPosts({
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    });
+    return result;
   }
 
   @Get(':id')
   async getPost(@Param('id') id: string) {
-    try {
-      const result = await this.postsService.getPost(id);
-      if (!result) {
-        throw new NotFoundException();
-      }
-      return result;
-    } catch (error) {
-      console.error(error);
+    const result = await this.postsService.getPost(id);
+    if (!result) {
       throw new NotFoundException();
     }
+    return result;
   }
 
   @Post()
   async createPost(@Body() createPostDto: CreatePostDto) {
-    try {
-      const createdPost = await this.postsService.createPost(createPostDto);
+    const createdPost = await this.postsService.createPost(createPostDto);
 
-      if (!createdPost) {
-        throw new NotFoundException();
-      }
-      return createdPost;
-    } catch (error) {
-      console.error(error);
+    if (!createdPost) {
       throw new NotFoundException();
     }
+    return createdPost;
   }
 
   @Put(':id')
@@ -81,31 +69,21 @@ export class PostsController {
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    try {
-      const result = await this.postsService.updatePost(updatePostDto, id);
-      if (!result) {
-        throw new NotFoundException();
-      }
-      return result;
-    } catch (error) {
-      console.error(error);
+    const result = await this.postsService.updatePost(updatePostDto, id);
+    if (!result) {
       throw new NotFoundException();
     }
+    return result;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removePost(@Param('id') id: string) {
-    try {
-      const result = await this.postsService.removePost(id);
-      if (!result) {
-        throw new NotFoundException();
-      }
-      return result;
-    } catch (error) {
-      console.error(error);
+    const result = await this.postsService.removePost(id);
+    if (!result) {
       throw new NotFoundException();
     }
+    return result;
   }
 
   @Get(':postId/comments')
@@ -119,24 +97,16 @@ export class PostsController {
     sortDirection: SortDirectionType,
     @Param('postId') postId: string,
   ) {
-    try {
-      const query = {
-        pageNumber,
-        pageSize,
-        sortBy,
-        sortDirection,
-      };
-      const comments = await this.postsService.getCommentsByPostId(
-        query,
-        postId,
-      );
-      if (!comments) {
-        throw new NotFoundException();
-      }
-      return comments;
-    } catch (error) {
-      console.error(error);
+    const query = {
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    };
+    const comments = await this.postsService.getCommentsByPostId(query, postId);
+    if (!comments) {
       throw new NotFoundException();
     }
+    return comments;
   }
 }
