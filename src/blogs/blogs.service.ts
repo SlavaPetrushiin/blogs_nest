@@ -1,7 +1,6 @@
 import { PostsRepository } from './../posts/posts.repository';
 import { Injectable } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
-import { IBlog } from './interfaces/blog.interface';
 import { BlogDocument } from './schemas/blog.schema';
 import { BlogsRepository } from './blogs.repository';
 import { AllEntitiesBlog } from './dto/AllEntitiesBlog';

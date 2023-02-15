@@ -78,7 +78,12 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() updateBlogDTO: UpdateBlogDto,
   ) {
-    return this.blogsService.updateBlog(updateBlogDTO, id);
+    const updatedBlog = await this.blogsService.updateBlog(updateBlogDTO, id);
+    if (!updatedBlog) {
+      throw new NotFoundException();
+    }
+
+    return updatedBlog;
   }
 
   @Delete(':id')
