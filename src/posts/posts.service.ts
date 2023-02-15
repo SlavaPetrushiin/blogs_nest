@@ -56,8 +56,8 @@ export class PostsService {
       blogName: foundedBlog.name,
     });
 
-    this.postsRepository.save(cratedPost);
-
+    await this.postsRepository.save(cratedPost);
+    console.log(cratedPost);
     return {
       id: cratedPost.id,
       title: cratedPost.title,
