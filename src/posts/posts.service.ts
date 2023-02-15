@@ -40,7 +40,7 @@ export class PostsService {
     };
   }
 
-  async createPost(post: CreatePostDto): Promise<PostDocument> {
+  async createPost(post: CreatePostDto) {
     const { blogId, content, shortDescription, title } = post;
 
     const foundedBlog = await this.blogsRepository.findBlog(blogId);
@@ -56,7 +56,23 @@ export class PostsService {
       blogName: foundedBlog.name,
     });
 
-    return this.postsRepository.save(cratedPost);
+    this.postsRepository.save(cratedPost);
+
+    return {
+      id: cratedPost.id,
+      title: cratedPost.title,
+      shortDescription: cratedPost.shortDescription,
+      content: cratedPost.content,
+      blogId: cratedPost.blogId,
+      blogName: cratedPost.blogName,
+      createdAt: cratedPost.createdAt,
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    };
   }
 
   async updatePost(post: UpdatePostDto, id: string) {
