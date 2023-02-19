@@ -51,6 +51,11 @@ const UPDATE_POST_DTO: UpdatePostDto = {
   blogId: '',
 };
 
+const BASIC_AUTH = {
+  headerName: 'Authorization',
+  payload: 'Basic YWRtaW46cXdlcnR5',
+};
+
 jest.setTimeout(15000);
 describe('AppController', () => {
   let app: INestApplication;
@@ -107,7 +112,7 @@ describe('AppController', () => {
     it('Create valid user', async () => {
       const response = await request(server)
         .post('/users')
-        .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send(CREATE_USER_DTO);
 
       user = response.body;
@@ -123,7 +128,7 @@ describe('AppController', () => {
     it('Get all created users', async () => {
       const response = await request(server)
         .get('/users')
-        .set('Authorization', `Basic YWRtaW46cXdlcnR5`);
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload);
 
       expect(response.body).toStrictEqual({
         page: 1,
@@ -143,6 +148,7 @@ describe('AppController', () => {
     it('/blogs Create blog.', async () => {
       const response = await request(server)
         .post('/blogs')
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send(CREATE_BLOG_DTO);
 
       first_blog = response.body;
@@ -156,6 +162,7 @@ describe('AppController', () => {
     it('/blogs Update created blog', async () => {
       await request(server)
         .put(`/blogs/${first_blog.id}`)
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send(UPDATE_BLOG_DTO)
         .expect(HttpStatus.NO_CONTENT);
     });
@@ -178,6 +185,7 @@ describe('AppController', () => {
     it('/blogs/:blogId/posts create post by blogId ', async () => {
       const response = await request(server)
         .post(`/blogs/${first_blog.id}/posts`)
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send(CREATE_POST_DTO);
 
       first_post = response.body;
@@ -238,6 +246,7 @@ describe('AppController', () => {
     it('/update post', async () => {
       return request(server)
         .put('/posts/' + first_post.id)
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send({
           ...UPDATE_POST_DTO,
           blogId: first_blog.id,
@@ -248,6 +257,7 @@ describe('AppController', () => {
     it('/delete post', async () => {
       return request(server)
         .delete('/posts/' + first_post.id)
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .expect(HttpStatus.NO_CONTENT);
     });
 

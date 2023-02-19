@@ -1,3 +1,4 @@
+import { AuthBasicGuard } from './../auth/auth_basic.guard';
 import {
   Controller,
   Get,
@@ -8,21 +9,16 @@ import {
   HttpCode,
   Query,
   HttpStatus,
-  Res,
   DefaultValuePipe,
   ParseIntPipe,
   NotFoundException,
 } from '@nestjs/common';
-import { Body } from '@nestjs/common/decorators';
+import { Body, UseGuards } from '@nestjs/common/decorators';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { BlogsService } from './blogs.service';
-import { Response } from 'express';
 import { SortDirectionType } from './../types/types';
-import {
-  CreatePostByBlogIdDto,
-  CreatePostDto,
-} from './../posts/dto/create-post.dto';
+import { CreatePostByBlogIdDto } from './../posts/dto/create-post.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -60,6 +56,7 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(AuthBasicGuard)
   @Post()
   async createBlog(
     @Body() createBlogDto: CreateBlogDto,
@@ -72,6 +69,7 @@ export class BlogsController {
     return createdBlog;
   }
 
+  @UseGuards(AuthBasicGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
@@ -86,6 +84,7 @@ export class BlogsController {
     return updatedBlog;
   }
 
+  @UseGuards(AuthBasicGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeBlog(@Param('id') id: string) {
@@ -121,6 +120,7 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(AuthBasicGuard)
   @Post(':blogId/posts')
   async createPostByBlogId(
     @Param('blogId') blogId: string,

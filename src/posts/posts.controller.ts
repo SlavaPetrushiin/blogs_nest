@@ -1,3 +1,4 @@
+import { AuthBasicGuard } from './../auth/auth_basic.guard';
 import {
   Controller,
   Get,
@@ -7,15 +8,12 @@ import {
   Param,
   HttpCode,
   Query,
-  HttpException,
   HttpStatus,
-  Res,
   DefaultValuePipe,
   ParseIntPipe,
-  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
-import { Body } from '@nestjs/common/decorators';
+import { Body, UseGuards } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
@@ -53,6 +51,7 @@ export class PostsController {
     return result;
   }
 
+  @UseGuards(AuthBasicGuard)
   @Post()
   async createPost(@Body() createPostDto: CreatePostDto) {
     const createdPost = await this.postsService.createPost(createPostDto);
@@ -63,6 +62,7 @@ export class PostsController {
     return createdPost;
   }
 
+  @UseGuards(AuthBasicGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
@@ -76,6 +76,7 @@ export class PostsController {
     return result;
   }
 
+  @UseGuards(AuthBasicGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removePost(@Param('id') id: string) {
