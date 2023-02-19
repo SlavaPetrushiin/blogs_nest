@@ -7,7 +7,6 @@ const optionsValidationPipe = {
   stopAtFirstError: true,
   transform: true,
   exceptionFactory: (errors) => {
-    console.log('error', errors);
     const objectErrors = [];
 
     errors.forEach((error) => {

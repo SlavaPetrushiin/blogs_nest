@@ -1,4 +1,4 @@
-import { SortDirectionType } from './../types/types';
+import { AllEntitiesUser } from './dto/allEntitiesUser';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import {
@@ -9,12 +9,11 @@ import {
   Delete,
   Param,
   Query,
-  DefaultValuePipe,
-  ParseIntPipe,
   HttpCode,
   NotFoundException,
   BadRequestException,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 
 @Controller('users')
@@ -22,32 +21,11 @@ export class UsersController {
   constructor(protected usersService: UsersService) {}
 
   @Get()
-  async getUsers(
-    @Query('searchLoginTerm', new DefaultValuePipe('')) searchLoginTerm: string,
-    @Query('searchEmailTerm', new DefaultValuePipe('')) searchEmailTerm: string,
-    @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
-    pageNumber: number,
-    @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe)
-    pageSize: number,
-    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
-    @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
-    sortDirection: SortDirectionType,
-  ) {
-    try {
-      const users = await this.usersService.getUsers({
-        searchEmailTerm,
-        searchLoginTerm,
-        pageNumber,
-        pageSize,
-        sortBy,
-        sortDirection,
-      });
-      if (!users) throw new BadRequestException();
-      return users;
-    } catch (error) {
-      console.error(error);
-      throw new BadRequestException();
-    }
+  async getUsers(@Query() allEntitiesUser: AllEntitiesUser) {
+    console.log(allEntitiesUser);
+    const users = await this.usersService.getUsers(allEntitiesUser);
+    if (!users) throw new BadRequestException();
+    return users;
   }
 
   @Post()
@@ -59,10 +37,10 @@ export class UsersController {
     return createdUser;
   }
 
-  @Delete(':id')
+  @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: string) {
-    const isRemoved = await this.usersService.removeUser(id);
+  async deleteUser(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    const isRemoved = await this.usersService.removeUser(uuid);
     if (!isRemoved) {
       throw new NotFoundException();
     }
