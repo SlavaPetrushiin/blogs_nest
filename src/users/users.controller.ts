@@ -1,3 +1,4 @@
+import { AuthBasicGuard } from './../auth/auth_basic.guard';
 import { AllEntitiesUser } from './dto/allEntitiesUser';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
@@ -14,15 +15,16 @@ import {
   BadRequestException,
   HttpStatus,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 
+@UseGuards(AuthBasicGuard)
 @Controller('users')
 export class UsersController {
   constructor(protected usersService: UsersService) {}
 
   @Get()
   async getUsers(@Query() allEntitiesUser: AllEntitiesUser) {
-    console.log(allEntitiesUser);
     const users = await this.usersService.getUsers(allEntitiesUser);
     if (!users) throw new BadRequestException();
     return users;

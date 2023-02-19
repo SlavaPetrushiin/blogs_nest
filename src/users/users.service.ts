@@ -6,11 +6,7 @@ import { UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-  usersRepository: UsersRepository;
-
-  constructor(usersRepository: UsersRepository) {
-    this.usersRepository = usersRepository;
-  }
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   async getUsers(query: AllEntitiesUser) {
     return this.usersRepository.findAllUsers(query);

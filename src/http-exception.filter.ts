@@ -15,7 +15,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
-    console.log('response', status);
+    console.log('response!', status);
+
+    if (status === HttpStatus.UNAUTHORIZED) {
+      const errorResponse = {
+        errors: [
+          {
+            field: 'UNAUTHORIZED',
+            message: 'UNAUTHORIZED',
+          },
+        ],
+      };
+
+      return response.status(status).json(errorResponse);
+    }
+
     if (status === HttpStatus.BAD_REQUEST) {
       const errorResponse = {
         errors: [],

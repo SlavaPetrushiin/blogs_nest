@@ -1,3 +1,4 @@
+import { CreateUserDto } from './../src/users/dto/create-user.dto';
 import { UpdatePostDto } from './../src/comments/dto/update-comment.dto';
 import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 import { UpdateBlogDto } from './../src/blogs/dto/update-blog.dto';
@@ -15,6 +16,15 @@ import { HttpExceptionFilter } from '../src/http-exception.filter';
 import { AppModule } from '../src/app.module';
 import { CreateBlogDto } from '../src/blogs/dto/create-blog.dto';
 import { v4 as uuidv4 } from 'uuid';
+
+const BASIC_NAME = 'admin';
+const BASIC_PASSWORD = 'qwerty';
+
+const CREATE_USER_DTO: CreateUserDto = {
+  login: 'slava',
+  password: '123456',
+  email: 'test@yandex.ru',
+};
 
 const CREATE_BLOG_DTO: CreateBlogDto = {
   name: 'First blog',
@@ -82,8 +92,48 @@ describe('AppController', () => {
     app.close();
   });
 
+  let user;
   let first_blog;
   let first_post;
+
+  describe('Create user. Check the existence of the created user.', () => {
+    it('Get status UnauthorizedException in create user', async () => {
+      return request(server)
+        .post('/users')
+        .send(CREATE_USER_DTO)
+        .expect(HttpStatus.UNAUTHORIZED);
+    });
+
+    it('Create valid user', async () => {
+      const response = await request(server)
+        .post('/users')
+        .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
+        .send(CREATE_USER_DTO);
+
+      user = response.body;
+
+      expect(user).toStrictEqual({
+        id: expect.any(String),
+        login: CREATE_USER_DTO.login,
+        email: CREATE_USER_DTO.email,
+        createdAt: expect.any(String),
+      });
+    });
+
+    it('Get all created users', async () => {
+      const response = await request(server)
+        .get('/users')
+        .set('Authorization', `Basic YWRtaW46cXdlcnR5`);
+
+      expect(response.body).toStrictEqual({
+        page: 1,
+        pageSize: 10,
+        pagesCount: 1,
+        totalCount: 1,
+        items: [user],
+      });
+    });
+  });
 
   describe('blogger-controller', () => {
     it('should delete all data', async () => {
@@ -138,7 +188,6 @@ describe('AppController', () => {
         `/blogs/${first_blog.id}/posts`,
       );
       const posts = response.body;
-      console.log(first_post);
       expect(posts).toStrictEqual({
         page: 1,
         pageSize: 10,
@@ -203,17 +252,9 @@ describe('AppController', () => {
     });
 
     it('get deleted post', async () => {
-      console.log('first_post.id', first_post.id);
-
       return request(server)
         .get('/posts/' + first_post.id)
         .expect(HttpStatus.NOT_FOUND);
     });
   });
-
-  // it('deleted blog', () => {
-  //   return request(server)
-  //     .delete('/blogs/' + first_blog.id)
-  //     .expect(HttpStatus.NO_CONTENT);
-  // });
 });

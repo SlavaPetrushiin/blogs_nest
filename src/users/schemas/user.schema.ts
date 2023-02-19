@@ -19,11 +19,12 @@ class EmailConfirmation {
 const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
 
 @Schema({
-  versionKey: false,
   timestamps: true,
   toJSON: {
     transform: function (doc: any, ret: any) {
+      delete ret.__v;
       delete ret._id;
+      delete ret.updatedAt;
       return ret;
     },
   },
