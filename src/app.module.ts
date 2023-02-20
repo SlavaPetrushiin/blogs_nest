@@ -1,3 +1,9 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+const configModule = ConfigModule.forRoot({
+  isGlobal: true,
+});
+
 import { TestingController } from './testing/testing.controller';
 import { CommentsService } from './comments/comments.service';
 import { Post, PostSchema } from './posts/schemas/post.schema';
@@ -20,12 +26,10 @@ import { CommentsController } from './comments/comments.controller';
 import { CommentsRepository } from './comments/comments.repository';
 import { Comment, CommentSchema } from './comments/schemas/comment.schema';
 
-const mongoUrl =
-  'mongodb+srv://admin:Atg-CC6-y2A-B5H@cluster0.uk9jguo.mongodb.net/blogs-production-nest?retryWrites=true&w=majority';
-
 @Module({
   imports: [
-    MongooseModule.forRoot(mongoUrl),
+    configModule,
+    MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
