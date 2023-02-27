@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { SortDirectionType } from './../../types/types';
+import { SortDirectionType } from '../../types/types';
 import { Type } from 'class-transformer';
 
 export class AllEntitiesUser {

@@ -1,4 +1,4 @@
-import { AuthBasicGuard } from './../auth/auth_basic.guard';
+import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import {
   Controller,
   Get,

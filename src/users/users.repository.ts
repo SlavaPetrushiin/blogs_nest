@@ -1,11 +1,9 @@
-import { PasswordService } from './schemas/Password';
+import { FindUserByEmailOrLogin } from './users.service';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { AllEntitiesUser } from './dto/allEntitiesUser';
+import { AllEntitiesUser } from './dto/allEntitiesUser.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
-import { v4 as uuidv4 } from 'uuid';
 
 const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
@@ -60,20 +58,49 @@ export class UsersRepository {
     };
   }
 
-  async createUser(user: CreateUserDto): Promise<UserDocument> {
-    const hashPassword = await PasswordService.hashPassword(user.password);
-    const emailConfirmation = {
-      code: uuidv4(),
-      expirationData: new Date(),
-      isConfirmed: false,
-    };
+  async createUser(user): Promise<UserDocument> {
+    return new this.UserModel(user);
+  }
 
-    return new this.UserModel({
-      password: hashPassword,
-      login: user.login,
-      email: user.email,
-      emailConfirmation: { ...emailConfirmation },
-    });
+  async findUser(payload: FindUserByEmailOrLogin): Promise<UserDocument> {
+    return this.UserModel.findOne(payload).exec();
+  }
+
+  async findUserByCode(code): Promise<UserDocument> {
+    return this.UserModel.findOne(
+      { 'emailConfirmation.code': code },
+      { projection: { ...DEFAULT_PROJECTION } },
+    ).exec();
+  }
+
+  async findUserById(userId: string) {
+    return this.UserModel.findOne({ id: userId }).exec();
+  }
+
+  async updateConfirmationStatus(userId: string) {
+    return this.UserModel.findOneAndUpdate(
+      { id: userId },
+      { $set: { 'emailConfirmation.isConfirmed': true } },
+    );
+  }
+
+  async updateConfirmationCode(id: string, code: string, expirationData: Date) {
+    return this.UserModel.findOneAndUpdate(
+      { id },
+      {
+        $set: {
+          'emailConfirmation.code': code,
+          'emailConfirmation.expirationData': expirationData,
+        },
+      },
+    );
+  }
+
+  async updatePassword(id: string, newPassword: string) {
+    return this.UserModel.findOneAndUpdate(
+      { id },
+      { $set: { hasPassword: newPassword } },
+    );
   }
 
   async save(user: UserDocument) {
@@ -81,7 +108,6 @@ export class UsersRepository {
   }
 
   async removeUser(id: string): Promise<boolean> {
-    console.log(id);
     const res = await this.UserModel.deleteOne({ id });
     return res.deletedCount > 0 ? true : false;
   }

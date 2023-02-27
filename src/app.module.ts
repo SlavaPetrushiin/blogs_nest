@@ -1,9 +1,19 @@
+import { PasswordRecoveryRepository } from './auth/password-recovery.repository';
+import {
+  PasswordRecovery,
+  PasswordRecoverySchema,
+} from './auth/schemas/password-recovery.schema';
+import { Email } from './email/email.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
 const configModule = ConfigModule.forRoot({
   isGlobal: true,
 });
-
+import { Auth, AuthSchema } from './auth/schemas/auth.schema';
+import { JwtModule } from '@nestjs/jwt';
+import { RefreshTokenStrategy } from './auth/strategies/refreshToken.strategy';
+import { AccessTokenStrategy } from './auth/strategies/accessToken.strategy';
+import { LocalStrategy } from './auth/strategies/local.strategy';
+import { AuthService } from './auth/auth.service';
 import { TestingController } from './testing/testing.controller';
 import { CommentsService } from './comments/comments.service';
 import { Post, PostSchema } from './posts/schemas/post.schema';
@@ -25,6 +35,10 @@ import { PostsController } from './posts/posts.controller';
 import { CommentsController } from './comments/comments.controller';
 import { CommentsRepository } from './comments/comments.repository';
 import { Comment, CommentSchema } from './comments/schemas/comment.schema';
+import { AuthController } from './auth/auth.controller';
+import { PassportModule } from '@nestjs/passport';
+import { AuthRepository } from './auth/auth.repository';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -35,9 +49,24 @@ import { Comment, CommentSchema } from './comments/schemas/comment.schema';
       { name: Post.name, schema: PostSchema },
       { name: User.name, schema: UserSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: Auth.name, schema: AuthSchema },
+      { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
     ]),
+    MailerModule.forRoot({
+      transport: {
+        service: 'gmail',
+        auth: {
+          user: process.env.NODEMAILER_EMAIL,
+          pass: process.env.NODEMAILER_PASS,
+        },
+        tls: { rejectUnauthorized: false },
+        secure: false,
+      },
+    }),
+    JwtModule.register({}),
   ],
   controllers: [
+    AuthController,
     AppController,
     UsersController,
     BlogsController,
@@ -46,7 +75,11 @@ import { Comment, CommentSchema } from './comments/schemas/comment.schema';
     TestingController,
   ],
   providers: [
+    AuthService,
     AppService,
+    AuthRepository,
+    Email,
+    PasswordRecoveryRepository,
     UsersService,
     UsersRepository,
     BlogsRepository,
@@ -55,6 +88,10 @@ import { Comment, CommentSchema } from './comments/schemas/comment.schema';
     PostsRepository,
     CommentsService,
     CommentsRepository,
+    PassportModule,
+    LocalStrategy,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
   ],
 })
 export class AppModule {}

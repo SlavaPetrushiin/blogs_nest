@@ -15,7 +15,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
-    console.log('response!', status);
 
     if (status === HttpStatus.UNAUTHORIZED) {
       const errorResponse = {
@@ -37,6 +36,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       const responseException: any = exception.getResponse();
       const messages = responseException.message;
+
       messages.forEach((m) => errorResponse.errors.push(m));
 
       response.status(status).json(errorResponse);

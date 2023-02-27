@@ -49,12 +49,19 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true })
+  @Prop({
+    required: true,
+    type: {
+      code: String,
+      expirationData: Date,
+      isConfirmed: Boolean,
+    },
+  })
   emailConfirmation: {
     code: string;
     expirationData: Date;
     isConfirmed: boolean;
-  }[];
+  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

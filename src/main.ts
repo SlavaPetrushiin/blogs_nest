@@ -2,13 +2,14 @@ import { HttpExceptionFilter } from './http-exception.filter';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 const optionsValidationPipe = {
   stopAtFirstError: true,
   transform: true,
   exceptionFactory: (errors) => {
     const objectErrors = [];
-
+    console.log('errors: ', errors);
     errors.forEach((error) => {
       for (const key in error.constraints) {
         objectErrors.push({
@@ -24,6 +25,7 @@ const optionsValidationPipe = {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe(optionsValidationPipe));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors();

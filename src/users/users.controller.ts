@@ -1,5 +1,5 @@
-import { AuthBasicGuard } from './../auth/auth_basic.guard';
-import { AllEntitiesUser } from './dto/allEntitiesUser';
+import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
+import { AllEntitiesUser } from './dto/allEntitiesUser.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import {
@@ -32,11 +32,7 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
-    const createdUser = await this.usersService.createUser(createUserDto);
-    if (!createdUser) {
-      throw new BadRequestException();
-    }
-    return createdUser;
+    return this.usersService.createUser(createUserDto);
   }
 
   @Delete(':uuid')
