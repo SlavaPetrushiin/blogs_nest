@@ -91,7 +91,6 @@ export class PostsService {
   }
 
   async removePost(id: string): Promise<boolean> {
-    console.log('removePost: ', id);
     return this.postsRepository.removePost(id);
   }
 

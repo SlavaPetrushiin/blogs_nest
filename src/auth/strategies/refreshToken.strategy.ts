@@ -27,7 +27,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
     if (payload === null) {
       throw new UnauthorizedException();
     }
-    console.log('payload: ', payload);
     return payload;
   }
 }

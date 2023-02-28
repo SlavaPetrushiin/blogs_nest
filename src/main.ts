@@ -9,7 +9,7 @@ const optionsValidationPipe = {
   transform: true,
   exceptionFactory: (errors) => {
     const objectErrors = [];
-    console.log('errors: ', errors);
+
     errors.forEach((error) => {
       for (const key in error.constraints) {
         objectErrors.push({

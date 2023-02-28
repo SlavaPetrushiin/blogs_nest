@@ -96,11 +96,13 @@ export class UsersRepository {
     );
   }
 
-  async updatePassword(id: string, newPassword: string) {
-    return this.UserModel.findOneAndUpdate(
+  async updatePassword(id: string, newPassword: string): Promise<boolean> {
+    const result = await this.UserModel.updateOne(
       { id },
-      { $set: { hasPassword: newPassword } },
+      { $set: { password: newPassword } },
     );
+
+    return result.matchedCount > 0;
   }
 
   async save(user: UserDocument) {

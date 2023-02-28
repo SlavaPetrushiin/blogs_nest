@@ -104,7 +104,7 @@ export class UsersService {
     );
   }
 
-  async updatePassword(id: string, newPassword: string) {
+  async updatePassword(id: string, newPassword: string): Promise<boolean> {
     return this.usersRepository.updatePassword(id, newPassword);
   }
 

@@ -80,7 +80,6 @@ export class PostsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removePost(@Param('id') id: string) {
-    console.log('ID: ', id);
     const result = await this.postsService.removePost(id);
     if (!result) {
       throw new NotFoundException();

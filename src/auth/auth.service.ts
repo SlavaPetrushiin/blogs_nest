@@ -121,9 +121,9 @@ export class AuthService {
       );
     }
 
-    if (user.emailConfirmation.isConfirmed) {
+    if (!user.emailConfirmation.isConfirmed) {
       throw new BadRequestException(
-        getArrayErrors('email', 'Email подтвержден'),
+        getArrayErrors('email', 'Email не подтвержден'),
       );
     }
 
@@ -166,6 +166,7 @@ export class AuthService {
     const user = await this.usersService.findUserByEmail(
       foundedRecoveryObject.email,
     );
+
     if (!user) {
       getArrayErrors('email', 'Не удалось обновить пароль');
     }
