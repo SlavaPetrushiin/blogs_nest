@@ -63,7 +63,9 @@ export class UsersRepository {
   }
 
   async findUser(payload: FindUserByEmailOrLogin): Promise<UserDocument> {
-    return this.UserModel.findOne(payload).exec();
+    return this.UserModel.findOne({
+      $or: [{ email: payload.email }, { login: payload.login }],
+    }).exec();
   }
 
   async findUserByCode(code): Promise<UserDocument> {

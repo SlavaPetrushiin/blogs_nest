@@ -33,7 +33,6 @@ export class UsersService {
       email,
       login,
     });
-
     if (oldUser) {
       throw new BadRequestException(
         getArrayErrors('emailOrLogin', 'Пользователь уже существует'),
