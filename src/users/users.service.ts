@@ -29,13 +29,17 @@ export class UsersService {
     const { email, login, password } = createUserDto;
     const code = uuidv4();
 
-    const oldUser = await this.findUserByEmailOrLogin({
-      email,
-      login,
-    });
-    if (oldUser) {
+    const oldUserByEmail = await this.findUserByEmail(email);
+    const oldUserByLogin = await this.findUserByLogin(login);
+    if (oldUserByEmail) {
       throw new BadRequestException(
-        getArrayErrors('emailOrLogin', 'Пользователь уже существует'),
+        getArrayErrors('email', 'Пользователь уже существует'),
+      );
+    }
+
+    if (oldUserByLogin) {
+      throw new BadRequestException(
+        getArrayErrors('login', 'Пользователь уже существует'),
       );
     }
 
