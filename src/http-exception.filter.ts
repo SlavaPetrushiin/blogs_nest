@@ -18,7 +18,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (status === HttpStatus.UNAUTHORIZED) {
       const errorResponse = {
-        errors: [
+        errorsMessages: [
           {
             field: 'UNAUTHORIZED',
             message: 'UNAUTHORIZED',
@@ -31,13 +31,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (status === HttpStatus.BAD_REQUEST) {
       const errorResponse = {
-        errors: [],
+        errorsMessages: [],
       };
 
       const responseException: any = exception.getResponse();
       const messages = responseException.message;
 
-      messages.forEach((m) => errorResponse.errors.push(m));
+      messages.forEach((m) => errorResponse.errorsMessages.push(m));
 
       response.status(status).json(errorResponse);
     } else {
