@@ -20,6 +20,7 @@ export class Email {
   constructor(private readonly mailerService: MailerService) {}
 
   async sendEmail(email: string, url: string) {
+    console.log(email);
     this.mailerService
       .sendMail({
         to: email, // list of receivers
@@ -27,7 +28,7 @@ export class Email {
         html: url, // HTML body content
       })
       .then((res) => {
-        console.log('Email sending');
+        console.log('Email sending: ', res);
       });
   }
 
