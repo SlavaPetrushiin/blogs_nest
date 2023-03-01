@@ -1,3 +1,4 @@
+import { SecurityController } from './security/security.controller';
 import { PasswordRecoveryRepository } from './auth/password-recovery.repository';
 import {
   PasswordRecovery,
@@ -73,6 +74,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     PostsController,
     CommentsController,
     TestingController,
+    SecurityController,
   ],
   providers: [
     AuthService,

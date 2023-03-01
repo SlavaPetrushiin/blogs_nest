@@ -5,7 +5,13 @@ import { JwtService } from '@nestjs/jwt';
 import { PasswordService } from './../users/schemas/Password';
 import { FindUserByEmailOrLogin } from './../users/users.service';
 import { UsersService } from './../users/users.service';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import { PasswordRecoveryRepository } from './password-recovery.repository';
@@ -237,6 +243,41 @@ export class AuthService {
     }
 
     return { accessToken, refreshToken };
+  }
+
+  async findAllSessions(userId: string) {
+    return this.authRepository.findAllSessions(userId);
+  }
+
+  async removeAllSessionsUserNotCurrent(userId: string, deviceId: string) {
+    return this.authRepository.removeAllSessionsUserNotCurrent(
+      userId,
+      deviceId,
+    );
+  }
+
+  async removeCurrentDevice(
+    userId: string,
+    deviceId: string,
+  ): Promise<boolean> {
+    const foundedDevice = await this.authRepository.getDevice(deviceId);
+
+    if (!foundedDevice) {
+      throw new NotFoundException();
+    }
+
+    if (userId != foundedDevice.userId) {
+      throw new ForbiddenException();
+    }
+
+    const isDeletedSessions = await this.authRepository.removeSession(
+      userId,
+      deviceId,
+    );
+    if (!isDeletedSessions) {
+      throw new UnauthorizedException();
+    }
+    return isDeletedSessions;
   }
 
   async validateUser(emailOrLogin: string, pass: string): Promise<any> {

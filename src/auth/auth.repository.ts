@@ -30,7 +30,7 @@ export class AuthRepository {
     ).exec();
   }
 
-  async getSessions(userId: string): Promise<AuthDocument[]> {
+  async findAllSessions(userId: string): Promise<AuthDocument[]> {
     return this.AuthModel.find(
       { userId },
       { projection: { ...DEFAULT_PROJECTION, exp: false, userId: false } },
