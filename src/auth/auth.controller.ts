@@ -77,7 +77,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('registration-confirmation')
+  @Post('registration-email-resending')
   async confirmationEmailResending(
     @Body() { email }: ConfirmationResendingDto,
     @Res() response: Response,
