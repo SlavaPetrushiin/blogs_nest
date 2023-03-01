@@ -55,10 +55,11 @@ import { MailerModule } from '@nestjs-modules/mailer';
     ]),
     MailerModule.forRoot({
       transport: {
-        service: 'gmail',
+        // service: 'gmail',
+        host: new ConfigService().get('MAIL_HOST'),
         auth: {
-          user: process.env.NODEMAILER_EMAIL,
-          pass: process.env.NODEMAILER_PASS,
+          user: new ConfigService().get('NODEMAILER_EMAIL'),
+          pass: new ConfigService().get('NODEMAILER_PASS'),
         },
         tls: { rejectUnauthorized: false },
         secure: false,
