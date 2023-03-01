@@ -2,7 +2,7 @@ import { HttpExceptionFilter } from './http-exception.filter';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 const optionsValidationPipe = {
   stopAtFirstError: true,
