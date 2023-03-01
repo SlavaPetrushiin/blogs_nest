@@ -56,10 +56,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         transport: {
-          service: 'gmail',
+          host: config.get('MAIL_HOST'),
           auth: {
             user: config.get('NODEMAILER_EMAIL'),
-            pass: new ConfigService().get('NODEMAILER_PASS'),
+            pass: config.get('NODEMAILER_PASS'),
           },
           tls: { rejectUnauthorized: false },
           secure: false,
