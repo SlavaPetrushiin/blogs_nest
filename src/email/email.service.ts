@@ -20,16 +20,11 @@ export class Email {
   constructor(private readonly mailerService: MailerService) {}
 
   async sendEmail(email: string, url: string) {
-    console.log('email: ', email);
-    this.mailerService
-      .sendMail({
-        to: email, // list of receivers
-        from: 'slava91petrushin@yandex.ru', // sender address
-        html: url, // HTML body content
-      })
-      .then((res) => {
-        console.log('Email sending: ', res);
-      });
+    await this.mailerService.sendMail({
+      to: email, // list of receivers
+      from: 'slava91petrushin@yandex.ru', // sender address
+      html: url, // HTML body content
+    });
   }
 
   getMessageForSendingEmail(
