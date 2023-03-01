@@ -53,16 +53,19 @@ import { MailerModule } from '@nestjs-modules/mailer';
       { name: Auth.name, schema: AuthSchema },
       { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
     ]),
-    MailerModule.forRoot({
-      transport: {
-        service: 'gmail',
-        auth: {
-          user: new ConfigService().get('NODEMAILER_EMAIL'),
-          pass: new ConfigService().get('NODEMAILER_PASS'),
+    MailerModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        transport: {
+          service: 'gmail',
+          auth: {
+            user: config.get('NODEMAILER_EMAIL'),
+            pass: new ConfigService().get('NODEMAILER_PASS'),
+          },
+          tls: { rejectUnauthorized: false },
+          secure: false,
         },
-        // tls: { rejectUnauthorized: false },
-        secure: false,
-      },
+      }),
+      inject: [ConfigService],
     }),
     JwtModule.register({}),
   ],
