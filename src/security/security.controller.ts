@@ -1,6 +1,6 @@
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { AuthService } from './../auth/auth.service';
-import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
+
 import {
   Controller,
   Get,
@@ -9,7 +9,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { Body, UseGuards } from '@nestjs/common/decorators';
+import { UseGuards } from '@nestjs/common/decorators';
 
 @Controller('security')
 export class SecurityController {
