@@ -39,6 +39,7 @@ export class AuthController {
     return this.authService.findUserById(req.user.id);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   async register(@Body() registrationDto: RegistrationDto) {
     return this.usersService.createUser(registrationDto);
