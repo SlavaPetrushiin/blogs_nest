@@ -1,3 +1,5 @@
+import { LikesRepository } from './likes/likes.repository';
+import { Likes, LikesSchema } from './likes/schemas/likes.schema';
 import { SecurityController } from './security/security.controller';
 import { PasswordRecoveryRepository } from './auth/password-recovery.repository';
 import {
@@ -40,6 +42,7 @@ import { AuthController } from './auth/auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { AuthRepository } from './auth/auth.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { LikesService } from './likes/likes.service';
 
 @Module({
   imports: [
@@ -52,6 +55,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       { name: Comment.name, schema: CommentSchema },
       { name: Auth.name, schema: AuthSchema },
       { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
+      { name: Likes.name, schema: LikesSchema },
     ]),
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
@@ -97,6 +101,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     LocalStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    LikesService,
+    LikesRepository,
   ],
 })
 export class AppModule {}

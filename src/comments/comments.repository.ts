@@ -1,8 +1,9 @@
 import { AllEntitiesComment } from './dto/allEntitiesComment';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { Injectable } from '@nestjs/common';
-import { Types, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { IParamsCreateComment } from './comments.service';
 
 const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
@@ -12,7 +13,7 @@ export class CommentsRepository {
     @InjectModel(Comment.name) private CommentModel: Model<CommentDocument>,
   ) {}
 
-  async findPost(commentID: string) {
+  async findComment(commentID: string) {
     return this.CommentModel.findOne(
       { id: commentID },
       DEFAULT_PROJECTION,
@@ -43,7 +44,29 @@ export class CommentsRepository {
     };
   }
 
+  async createComment(params: IParamsCreateComment): Promise<CommentDocument> {
+    return new this.CommentModel({ ...params });
+  }
+
+  async updateComment(commentId: string, newContent: string): Promise<boolean> {
+    const result = await this.CommentModel.updateOne(
+      { id: commentId },
+      { $set: { content: newContent } },
+    );
+    console.log(result);
+    return result.matchedCount > 0;
+  }
+
+  async removeComment(commentId: string): Promise<boolean> {
+    const result = await this.CommentModel.deleteOne({ id: commentId });
+    return result.deletedCount > 0;
+  }
+
   async deleteMany() {
     return this.CommentModel.deleteMany({});
+  }
+
+  async save(comment: CommentDocument) {
+    return comment.save();
   }
 }

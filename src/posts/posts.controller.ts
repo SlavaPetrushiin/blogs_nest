@@ -1,3 +1,6 @@
+import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
+import { CommentsService } from './../comments/comments.service';
+import { CreateCommentByPostIdDto } from './dto/create-comment-by-postId.dto';
 import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import {
   Controller,
@@ -12,6 +15,7 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   NotFoundException,
+  Request,
 } from '@nestjs/common';
 import { Body, UseGuards } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -21,7 +25,10 @@ import { SortDirectionType } from './../types/types';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private postsService: PostsService) {}
+  constructor(
+    private postsService: PostsService,
+    private commentsService: CommentsService,
+  ) {}
 
   @Get()
   async getPosts(
@@ -85,6 +92,21 @@ export class PostsController {
       throw new NotFoundException();
     }
     return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post(':postId/comments')
+  async createCommentsByPostId(
+    @Param('postId') postId: string,
+    @Body() contentDto: CreateCommentByPostIdDto,
+    @Request() req,
+  ) {
+    const { id } = req.user;
+    return this.commentsService.createComment({
+      userId: id,
+      postId,
+      content: contentDto.content,
+    });
   }
 
   @Get(':postId/comments')

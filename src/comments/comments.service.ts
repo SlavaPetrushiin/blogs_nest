@@ -1,58 +1,97 @@
+import { UsersService } from './../users/users.service';
+import { StatusLike } from './../likes/schemas/likes.schema';
+import { PostsService } from './../posts/posts.service';
 import { CommentDocument } from './schemas/comment.schema';
 import { AllEntitiesComment } from './dto/allEntitiesComment';
 import { CommentsRepository } from './comments.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
 
 import { Types } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
+
+export interface IParamsCreateComment {
+  userId: string;
+  userLogin: string;
+  postId: string;
+  content: string;
+}
 
 @Injectable()
 export class CommentsService {
-  constructor(private commentsRepository: CommentsRepository) {}
+  constructor(
+    private commentsRepository: CommentsRepository,
+    private postsService: PostsService,
+    private usersService: UsersService,
+  ) {}
 
   // async getPosts(query: AllEntitiesPost) {
   //   return this.postsRepository.findAllPosts(query);
   // }
 
   async getComment(id: string): Promise<CommentDocument> {
-    return this.commentsRepository.findPost(id);
+    return this.commentsRepository.findComment(id);
   }
 
-  // async createPost(post: CreatePostDto): Promise<PostDocument> {
-  //   const { blogId, content, shortDescription, title } = post;
+  async createComment(params: Omit<IParamsCreateComment, 'userLogin'>) {
+    const foundedPost = await this.postsService.getPost(params.postId);
+    if (!foundedPost) {
+      throw new NotFoundException();
+    }
 
-  //   const foundedBlog = await this.blogsRepository.findBlog(blogId);
+    const user = await this.usersService.findUserById(params.userId);
+    const newComment = await this.commentsRepository.createComment({
+      ...params,
+      userLogin: user.login,
+    });
 
-  //   if (!foundedBlog) {
-  //     return null;
-  //   }
+    await this.commentsRepository.save(newComment);
 
-  //   const cratedPost = await this.postsRepository.createPost({
-  //     title,
-  //     shortDescription,
-  //     content,
-  //     blogId,
-  //     blogName: foundedBlog.name,
-  //   });
+    return {
+      id: newComment.id,
+      content: newComment.content,
+      commentatorInfo: {
+        userId: newComment.userId,
+        userLogin: newComment.userLogin,
+      },
+      createdAt: newComment.createdAt,
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: StatusLike.None,
+      },
+    };
+  }
 
-  //   return this.postsRepository.save(cratedPost);
-  // }
+  async updateComment(commentId: string, content: string, userId: string) {
+    const foundedComment = await this.commentsRepository.findComment(commentId);
+    if (!foundedComment) {
+      throw new NotFoundException();
+    }
 
-  // async updatePost(post: UpdatePostDto, id: string) {
-  //   const { blogId } = post;
+    if (foundedComment.userId != userId) {
+      throw new ForbiddenException();
+    }
 
-  //   const foundedBlog = await this.blogsRepository.findBlog(blogId);
+    return this.commentsRepository.updateComment(commentId, content);
+  }
 
-  //   if (!foundedBlog) {
-  //     return null;
-  //   }
+  async removeComment(commentId: string, userId: string): Promise<boolean> {
+    const foundedComment = await this.commentsRepository.findComment(commentId);
 
-  //   return this.postsRepository.updatePost(post, id);
-  // }
+    if (!foundedComment) {
+      throw new NotFoundException();
+    }
 
-  // async removePost(id: string): Promise<boolean> {
-  //   return this.postsRepository.removePost(id);
-  // }
+    if (foundedComment.userId != userId) {
+      throw new ForbiddenException();
+    }
+
+    return await this.commentsRepository.removeComment(commentId);
+  }
 
   // async getCommentsByPostId(query: AllEntitiesComment, postId: string) {
   //   const foundedPost = await this.postsRepository.findPost(postId);
