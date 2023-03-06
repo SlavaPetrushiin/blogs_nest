@@ -28,9 +28,14 @@ export class CommentsController {
     private likesService: LikesService,
   ) {}
 
-  @Get(':id')
-  async getComment(@Param('id', ParseUUIDPipe) id: string) {
-    const result = await this.commentService.getComment(id);
+  @UseGuards(AccessTokenGuard)
+  @Get(':commentId')
+  async getComment(
+    @Param('commentId', ParseUUIDPipe) commentId: string,
+    @Request() req,
+  ) {
+    const userId = req.user.id;
+    const result = await this.commentService.getComment(commentId, userId);
 
     if (!result) {
       throw new NotFoundException();

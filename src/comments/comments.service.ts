@@ -32,8 +32,8 @@ export class CommentsService {
   //   return this.postsRepository.findAllPosts(query);
   // }
 
-  async getComment(id: string): Promise<CommentDocument> {
-    return this.commentsRepository.findComment(id);
+  async getComment(commentId: string, userId: string) {
+    return this.commentsRepository.findComment(commentId, userId);
   }
 
   async createComment(params: Omit<IParamsCreateComment, 'userLogin'>) {
@@ -67,12 +67,15 @@ export class CommentsService {
   }
 
   async updateComment(commentId: string, content: string, userId: string) {
-    const foundedComment = await this.commentsRepository.findComment(commentId);
+    const foundedComment = await this.commentsRepository.findComment(
+      commentId,
+      userId,
+    );
     if (!foundedComment) {
       throw new NotFoundException();
     }
 
-    if (foundedComment.userId != userId) {
+    if (foundedComment.commentatorInfo.userId != userId) {
       throw new ForbiddenException();
     }
 
@@ -80,13 +83,16 @@ export class CommentsService {
   }
 
   async removeComment(commentId: string, userId: string): Promise<boolean> {
-    const foundedComment = await this.commentsRepository.findComment(commentId);
+    const foundedComment = await this.commentsRepository.findComment(
+      commentId,
+      userId,
+    );
 
     if (!foundedComment) {
       throw new NotFoundException();
     }
 
-    if (foundedComment.userId != userId) {
+    if (foundedComment.commentatorInfo.userId != userId) {
       throw new ForbiddenException();
     }
 
