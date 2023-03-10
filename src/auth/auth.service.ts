@@ -1,5 +1,5 @@
 import { Email } from './../email/email.service';
-import { getArrayErrors } from 'src/utils/getArrayErrors';
+import { getArrayErrors } from './../utils/getArrayErrors';
 import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { PasswordService } from './../users/schemas/Password';
@@ -43,7 +43,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly emailService: Email,
     private readonly passwordRecoveryRepository: PasswordRecoveryRepository,
-  ) {}
+  ) { }
 
   async findUserById(userId) {
     const user = await this.usersService.findUserById(userId);

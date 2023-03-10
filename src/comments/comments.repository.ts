@@ -1,8 +1,5 @@
-import {
-  Likes,
-  LikesDocument,
-  StatusLike,
-} from './../likes/schemas/likes.schema';
+import { ILikesStatics, ILikes, Likes, LikesDocument, ILikeModel } from './../likes/schemas/likes.schema';
+import { LikesRepository } from './../likes/likes.repository';
 import { AllEntitiesComment } from './dto/allEntitiesComment';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -16,8 +13,9 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 export class CommentsRepository {
   constructor(
     @InjectModel(Comment.name) private CommentModel: Model<CommentDocument>,
-    @InjectModel(Likes.name) private LikesModel: Model<LikesDocument>,
-  ) {}
+    @InjectModel(Likes.name) private LikesModel: ILikeModel,
+    private readonly likesRepository: LikesRepository,
+  ) { }
 
   async findComment(commentID: string, userId: string) {
     const comment = await this.CommentModel.findOne(
@@ -29,7 +27,7 @@ export class CommentsRepository {
       throw new NotFoundException();
     }
 
-    const likesInfo = await this.getLikesInfo(commentID, userId);
+    const likesInfo = await this.LikesModel.getLikesInfo(commentID, userId, 'comment');
 
     return {
       id: comment.id,
@@ -43,7 +41,7 @@ export class CommentsRepository {
     };
   }
 
-  async getCommentsByPostId(query: AllEntitiesComment, postId: string) {
+  async getCommentsByPostId(query: AllEntitiesComment, postId: string, userId: string) {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
     const skip = (+pageNumber - 1) * +pageSize;
 
@@ -58,12 +56,29 @@ export class CommentsRepository {
     const totalCount = await this.CommentModel.countDocuments({ postId });
     const pageCount = Math.ceil(totalCount / +pageSize);
 
+    let preparedResult = [];
+
+    for (let comment of result) {
+      const likesInfo = await this.LikesModel.getLikesInfo(comment.id, userId, 'comment');
+      preparedResult.push({
+        "content": comment.content,
+        "id": comment.id,
+        "createdAt": comment.createdAt,
+        "commentatorInfo": {
+          "userId": comment.userId,
+          "userLogin": comment.userLogin,
+        },
+        likesInfo
+      })
+      comment["likesInfo"] = likesInfo
+    }
+
     return {
       pagesCount: pageCount,
       page: +pageNumber,
       pageSize: +pageSize,
       totalCount,
-      items: result,
+      items: preparedResult,
     };
   }
 
@@ -93,32 +108,5 @@ export class CommentsRepository {
     return comment.save();
   }
 
-  async getLikesInfo(commentID: string, userId: string) {
-    const likesAndDislikes: LikesDocument[] = await this.LikesModel.find({
-      parentId: commentID,
-      type: 'comment',
-    }).exec();
 
-    const likesInfo = {
-      likesCount: 0,
-      dislikesCount: 0,
-      myStatus: StatusLike.None,
-    };
-
-    likesAndDislikes.forEach((item) => {
-      if (item.status === StatusLike.Like) {
-        likesInfo.likesCount = ++likesInfo.likesCount;
-      }
-
-      if (item.status === StatusLike.Dislike) {
-        likesInfo.dislikesCount = ++likesInfo.dislikesCount;
-      }
-
-      if (item.userId === userId) {
-        likesInfo.myStatus = item.status;
-      }
-    });
-
-    return likesInfo;
-  }
 }

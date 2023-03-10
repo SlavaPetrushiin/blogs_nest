@@ -3,7 +3,7 @@ import { RecoveryPasswordDto } from './dto/recoveryPass.dto';
 import { ConfirmationResendingDto } from './dto/confirmation-resending.dto copy';
 import { ConfirmationDto } from './dto/confirmation.dto';
 import { AccessTokenGuard } from './guards/accessToken.guard';
-import { getArrayErrors } from 'src/utils/getArrayErrors';
+import { getArrayErrors } from './../utils/getArrayErrors';
 import { UsersService } from './../users/users.service';
 import { AuthService } from './auth.service';
 import { RegistrationDto } from './dto/registration.dto';
@@ -31,7 +31,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   @UseGuards(AccessTokenGuard)
   @Get('me')
@@ -49,6 +49,7 @@ export class AuthController {
   @Post('login')
   async login(@Request() req, @Res() res) {
     const title = req.headers['user-agent'] || '';
+    console.log({ title });
     const tokens = await this.authService.login(req.user, req.ip, title);
 
     if (!tokens) {

@@ -1,3 +1,4 @@
+import { CreateCommentByPostIdDto } from './../src/posts/dto/create-comment-by-postId.dto';
 import { CreateUserDto } from './../src/users/dto/create-user.dto';
 import { UpdatePostDto } from './../src/comments/dto/update-comment.dto';
 import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
@@ -10,20 +11,23 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { useContainer } from 'class-validator';
-// import cookieParser = require('cookie-parser');
-import * as request from 'supertest';
+import cookieParser = require('cookie-parser');
+import supertest from 'supertest';
 import { HttpExceptionFilter } from '../src/http-exception.filter';
 import { AppModule } from '../src/app.module';
 import { CreateBlogDto } from '../src/blogs/dto/create-blog.dto';
 import { v4 as uuidv4 } from 'uuid';
 
-const BASIC_NAME = 'admin';
-const BASIC_PASSWORD = 'qwerty';
-
-const CREATE_USER_DTO: CreateUserDto = {
+const FIRST_USER: CreateUserDto = {
   login: 'slava',
   password: '123456',
   email: 'test@yandex.ru',
+};
+
+const SECOND_USER: CreateUserDto = {
+  login: 'ivan',
+  password: '123456',
+  email: 'test2@yandex.ru',
 };
 
 const CREATE_BLOG_DTO: CreateBlogDto = {
@@ -56,6 +60,10 @@ const BASIC_AUTH = {
   payload: 'Basic YWRtaW46cXdlcnR5',
 };
 
+const CREATE_COMMENT_DTO: CreateCommentByPostIdDto = {
+  content: "Created comment"
+}
+
 jest.setTimeout(15000);
 describe('AppController', () => {
   let app: INestApplication;
@@ -87,46 +95,66 @@ describe('AppController', () => {
         },
       }),
     );
-    // app.use(cookieParser());
+    app.use(cookieParser());
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
     server = app.getHttpServer();
+
+    await supertest(server).delete('/testing/all-data').expect(204);
   });
+
 
   afterAll(async () => {
     app.close();
   });
 
-  let user;
+  let first_user, second_user;
   let first_blog;
   let first_post;
+  let accessTokenFistUser, accessTokenSecondUser;
 
-  describe('Create user. Check the existence of the created user.', () => {
+  describe('Create users. Check the existence of the created user.', () => {
     it('Get status UnauthorizedException in create user', async () => {
-      return request(server)
+      return supertest(server)
         .post('/users')
-        .send(CREATE_USER_DTO)
+        .send(FIRST_USER)
         .expect(HttpStatus.UNAUTHORIZED);
     });
 
-    it('Create valid user', async () => {
-      const response = await request(server)
+    it('Create first user', async () => {
+      const response = await supertest(server)
         .post('/users')
         .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
-        .send(CREATE_USER_DTO);
+        .send(FIRST_USER);
 
-      user = response.body;
+      first_user = response.body;
 
-      expect(user).toStrictEqual({
+      expect(first_user).toStrictEqual({
         id: expect.any(String),
-        login: CREATE_USER_DTO.login,
-        email: CREATE_USER_DTO.email,
+        login: FIRST_USER.login,
+        email: FIRST_USER.email,
+        createdAt: expect.any(String),
+      });
+    });
+
+    it('Create second user', async () => {
+      const response = await supertest(server)
+        .post('/users')
+        .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
+        .send(SECOND_USER);
+
+      second_user = response.body;
+
+      expect(second_user).toStrictEqual({
+        id: expect.any(String),
+        login: SECOND_USER.login,
+        email: SECOND_USER.email,
         createdAt: expect.any(String),
       });
     });
 
     it('Get all created users', async () => {
-      const response = await request(server)
+      const response = await supertest(server)
         .get('/users')
         .set(BASIC_AUTH.headerName, BASIC_AUTH.payload);
 
@@ -134,19 +162,28 @@ describe('AppController', () => {
         page: 1,
         pageSize: 10,
         pagesCount: 1,
-        totalCount: 1,
-        items: [user],
+        totalCount: 2,
+        items: [
+          {
+            id: expect.any(String),
+            login: SECOND_USER.login,
+            email: SECOND_USER.email,
+            createdAt: expect.any(String),
+          },
+          {
+            id: expect.any(String),
+            login: FIRST_USER.login,
+            email: FIRST_USER.email,
+            createdAt: expect.any(String),
+          }
+        ],
       });
     });
   });
 
   describe('blogger-controller', () => {
-    it('should delete all data', async () => {
-      await request(server).delete('/testing/all-data').expect(204);
-    });
-
     it('/blogs Create blog.', async () => {
-      const response = await request(server)
+      const response = await supertest(server)
         .post('/blogs')
         .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send(CREATE_BLOG_DTO);
@@ -155,12 +192,12 @@ describe('AppController', () => {
     });
 
     it('/blogs Get created blog', async () => {
-      const blog = await request(server).get(`/blogs/${first_blog.id}`);
+      const blog = await supertest(server).get(`/blogs/${first_blog.id}`);
       expect(blog.body).toStrictEqual(first_blog);
     });
 
     it('/blogs Update created blog', async () => {
-      await request(server)
+      await supertest(server)
         .put(`/blogs/${first_blog.id}`)
         .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send(UPDATE_BLOG_DTO)
@@ -168,7 +205,7 @@ describe('AppController', () => {
     });
 
     it('/blogs Get updated blog', async () => {
-      const response = await request(server).get(`/blogs/${first_blog.id}`);
+      const response = await supertest(server).get(`/blogs/${first_blog.id}`);
       const updatedBlog = response.body;
       expect(updatedBlog).toStrictEqual({
         ...first_blog,
@@ -177,13 +214,13 @@ describe('AppController', () => {
     });
 
     it('/blogs get status Not found blog ', () => {
-      return request(server)
+      return supertest(server)
         .get(`/blogs/${uuidv4()}`)
         .expect(HttpStatus.NOT_FOUND);
     });
 
     it('/blogs/:blogId/posts create post by blogId ', async () => {
-      const response = await request(server)
+      const response = await supertest(server)
         .post(`/blogs/${first_blog.id}/posts`)
         .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send(CREATE_POST_DTO);
@@ -192,7 +229,7 @@ describe('AppController', () => {
     });
 
     it('/blogs/:blogId/posts get posts by blogId ', async () => {
-      const response = await request(server).get(
+      const response = await supertest(server).get(
         `/blogs/${first_blog.id}/posts`,
       );
       const posts = response.body;
@@ -224,7 +261,7 @@ describe('AppController', () => {
 
   describe('post-controller', () => {
     it('/posts Get post by post id', async () => {
-      const response = await request(server).get('/posts/' + first_post.id);
+      const response = await supertest(server).get('/posts/' + first_post.id);
 
       expect(response.body).toStrictEqual({
         title: first_post.title,
@@ -244,7 +281,7 @@ describe('AppController', () => {
     });
 
     it('/update post', async () => {
-      return request(server)
+      return supertest(server)
         .put('/posts/' + first_post.id)
         .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .send({
@@ -255,16 +292,48 @@ describe('AppController', () => {
     });
 
     it('/delete post', async () => {
-      return request(server)
+      return supertest(server)
         .delete('/posts/' + first_post.id)
         .set(BASIC_AUTH.headerName, BASIC_AUTH.payload)
         .expect(HttpStatus.NO_CONTENT);
     });
 
     it('get deleted post', async () => {
-      return request(server)
+      return supertest(server)
         .get('/posts/' + first_post.id)
         .expect(HttpStatus.NOT_FOUND);
     });
   });
+
+  describe('login users', () => {
+    it('login first user', async function () {
+      let result = await supertest(server)
+        .post('/auth/login')
+        .set('user-agent', 'Mozilla')
+        .send({
+          loginOrEmail: FIRST_USER.login,
+          password: FIRST_USER.password
+        })
+
+      let accessToken = result.body;
+      console.log("wqeqwe");
+      console.log(accessToken);
+    })
+
+  })
+
+  describe('likes of comments', () => {
+
+    // it('create comment by postId', async function () {
+    //   await supertest(server)
+    //     .post(`/posts/${first_post}/comments`)
+
+
+
+
+    // })
+
+  })
+
+
 });

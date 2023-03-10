@@ -21,7 +21,7 @@ import {
 @UseGuards(AuthBasicGuard)
 @Controller('users')
 export class UsersController {
-  constructor(protected usersService: UsersService) {}
+  constructor(protected usersService: UsersService) { }
 
   @Get()
   async getUsers(@Query() allEntitiesUser: AllEntitiesUser) {

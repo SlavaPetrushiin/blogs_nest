@@ -19,7 +19,7 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly emailService: Email,
-  ) {}
+  ) { }
 
   async getUsers(query: AllEntitiesUser) {
     return this.usersRepository.findAllUsers(query);
@@ -63,8 +63,7 @@ export class UsersService {
       'registration',
     );
 
-    await this.emailService.sendEmail(email, url);
-
+    // this.emailService.sendEmail(email, url); TO DO DEL COMMIT
     return {
       id: createdUser.id,
       login: createdUser.login,

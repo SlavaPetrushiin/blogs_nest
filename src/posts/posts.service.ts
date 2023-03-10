@@ -13,7 +13,7 @@ export class PostsService {
     private postsRepository: PostsRepository,
     private blogsRepository: BlogsRepository,
     private commentsRepository: CommentsRepository,
-  ) {}
+  ) { }
 
   async getPosts(query: AllEntitiesPost) {
     return this.postsRepository.findAllPosts(query);
@@ -94,12 +94,12 @@ export class PostsService {
     return this.postsRepository.removePost(id);
   }
 
-  async getCommentsByPostId(query: AllEntitiesComment, postId: string) {
+  async getCommentsByPostId(query: AllEntitiesComment, postId: string, userId: string) {
     const foundedPost = await this.postsRepository.findPost(postId);
     if (!foundedPost) {
       return null;
     }
 
-    return this.commentsRepository.getCommentsByPostId(query, postId);
+    return this.commentsRepository.getCommentsByPostId(query, postId, userId);
   }
 }

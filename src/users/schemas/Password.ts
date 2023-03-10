@@ -1,10 +1,10 @@
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 
 class Password {
   async hashPassword(password: string): Promise<string | null> {
     try {
-      const salt = await bcrypt.genSalt(10);
-      return await bcrypt.hash(password, salt);
+      const salt = await bcryptjs.genSalt(10);
+      return await bcryptjs.hash(password, salt);
     } catch (error) {
       console.error(error);
       return null;
@@ -13,7 +13,7 @@ class Password {
 
   async comparePassword(password: string, hash: string): Promise<boolean> {
     try {
-      return bcrypt.compare(password, hash);
+      return bcryptjs.compare(password, hash);
     } catch (error) {
       console.error(error);
       return false;

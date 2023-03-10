@@ -28,7 +28,7 @@ export class PostsController {
   constructor(
     private postsService: PostsService,
     private commentsService: CommentsService,
-  ) {}
+  ) { }
 
   @Get()
   async getPosts(
@@ -109,6 +109,7 @@ export class PostsController {
     });
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get(':postId/comments')
   async getCommentsByPostId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
@@ -119,6 +120,7 @@ export class PostsController {
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
     @Param('postId') postId: string,
+    @Request() req,
   ) {
     const query = {
       pageNumber,
@@ -126,7 +128,8 @@ export class PostsController {
       sortBy,
       sortDirection,
     };
-    const comments = await this.postsService.getCommentsByPostId(query, postId);
+    const { id } = req.user;
+    const comments = await this.postsService.getCommentsByPostId(query, postId, id);
     if (!comments) {
       throw new NotFoundException();
     }

@@ -9,7 +9,7 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) { }
 
   async findAllUsers(query: AllEntitiesUser) {
     const {
@@ -22,12 +22,12 @@ export class UsersRepository {
     } = query;
 
     const skip = (+pageNumber - 1) * +pageSize;
-
+    console.log({ searchEmailTerm });
     const result = await this.UserModel.find(
       {
         $or: [
-          { email: { $regex: searchEmailTerm, $options: '$i' } },
-          { login: { $regex: searchLoginTerm, $options: '$i' } },
+          { email: { $regex: searchEmailTerm, $options: 'i' } },
+          { login: { $regex: searchLoginTerm, $options: 'i' } },
         ],
       },
       { projection: { ...DEFAULT_PROJECTION } },
@@ -38,8 +38,8 @@ export class UsersRepository {
 
     const totalCount = await this.UserModel.countDocuments({
       $or: [
-        { email: { $regex: searchEmailTerm, $options: '$i' } },
-        { login: { $regex: searchLoginTerm, $options: '$i' } },
+        { email: { $regex: searchEmailTerm, $options: 'i' } },
+        { login: { $regex: searchLoginTerm, $options: 'i' } },
       ],
     });
     const pageCount = Math.ceil(totalCount / +pageSize);

@@ -17,14 +17,20 @@ const URL_TEXT = {
 
 @Injectable()
 export class Email {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(private readonly mailerService: MailerService) { }
 
   async sendEmail(email: string, url: string) {
-    await this.mailerService.sendMail({
-      to: email, // list of receivers
-      from: 'slava91petrushin@yandex.ru', // sender address
-      html: url, // HTML body content
-    });
+    try {
+      await this.mailerService.sendMail({
+        to: email, // list of receivers
+        from: 'slava91petrushin@yandex.ru', // sender address
+        html: url, // HTML body content
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      return Promise.resolve()
+    }
   }
 
   getMessageForSendingEmail(
