@@ -10,7 +10,7 @@ export class UpdatePostDto {
   shortDescription: string;
 
   @IsString()
-  @MaxLength(100)
+  @MaxLength(1000)
   content: string;
 
   @IsString()

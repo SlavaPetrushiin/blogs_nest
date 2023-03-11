@@ -1,7 +1,7 @@
 import { IsString, MaxLength } from 'class-validator';
 export class CreatePostDto {
   @IsString()
-  @MaxLength(100)
+  @MaxLength(30)
   title: string;
 
   @IsString()
@@ -9,7 +9,7 @@ export class CreatePostDto {
   shortDescription: string;
 
   @IsString()
-  @MaxLength(100)
+  @MaxLength(1000)
   content: string;
 
   @IsString()
@@ -18,14 +18,14 @@ export class CreatePostDto {
 
 export class CreatePostByBlogIdDto {
   @IsString()
-  @MaxLength(100)
+  @MaxLength(30)
   title: string;
 
   @IsString()
   @MaxLength(100)
   shortDescription: string;
 
-  @MaxLength(100)
+  @MaxLength(1000)
   @IsString()
   content: string;
 }
