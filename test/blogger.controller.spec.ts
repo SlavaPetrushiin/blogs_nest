@@ -37,9 +37,10 @@ const CREATE_BLOG_DTO: CreateBlogDto = {
 };
 
 const UPDATE_BLOG_DTO: UpdateBlogDto = {
-  name: 'First blog updates',
+  name: 'Update blog',
   description: 'First blog description updated',
-  websiteUrl: 'https://vercel.com/slavapetrushiin/blogs',
+  websiteUrl:
+    'https://www.mongodb.com/docs/manual/reference/operator/query/in/',
 };
 
 const CREATE_POST_DTO: CreatePostByBlogIdDto = {

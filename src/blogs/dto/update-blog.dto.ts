@@ -1,15 +1,15 @@
-import { IsString, IsUrl, Max } from 'class-validator';
+import { IsString, IsUrl, MaxLength } from 'class-validator';
 
 export class UpdateBlogDto {
   @IsString()
-  @Max(15)
+  @MaxLength(15)
   name: string;
 
   @IsString()
-  @Max(500)
+  @MaxLength(500)
   description: string;
 
   @IsUrl()
-  @Max(100)
+  @MaxLength(100)
   websiteUrl: string;
 }

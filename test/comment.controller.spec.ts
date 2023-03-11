@@ -244,6 +244,7 @@ describe('Comments', () => {
   });
 
   it('create comment first user ', async function name() {
+    console.log({ postId1 });
     const firstComment = await supertest(server)
       .post(`/posts/${postId1}/comments`)
       .set('Authorization', `Bearer ${tokens.token_user_1}`)
