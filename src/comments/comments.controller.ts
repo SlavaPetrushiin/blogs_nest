@@ -20,6 +20,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { CommentsService } from './comments.service';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -49,7 +50,7 @@ export class CommentsController {
   @Put(':id')
   async updateComment(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() contentDto: { content: string },
+    @Body() contentDto: UpdateCommentDto,
     @Request() req,
     @Res() response: Response,
   ) {

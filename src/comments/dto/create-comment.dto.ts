@@ -1,19 +1,7 @@
-import { IsString } from 'class-validator';
-export class CreatePostDto {
+import { IsString, MaxLength, MinLength } from 'class-validator';
+export class CreateCommentDto {
   @IsString()
-  title: string;
-  @IsString()
-  shortDescription: string;
-  @IsString()
-  content: string;
-  @IsString()
-  blogId: string;
-}
-
-export class CreatePostByBlogIdDto {
-  title: string;
-  @IsString()
-  shortDescription: string;
-  @IsString()
+  @MinLength(20)
+  @MaxLength(300)
   content: string;
 }

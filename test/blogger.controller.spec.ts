@@ -1,6 +1,6 @@
+import { UpdatePostDto } from './../src/posts/dto/update-post.dto';
 import { CreateCommentByPostIdDto } from './../src/posts/dto/create-comment-by-postId.dto';
 import { CreateUserDto } from './../src/users/dto/create-user.dto';
-import { UpdatePostDto } from './../src/comments/dto/update-comment.dto';
 import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 import { UpdateBlogDto } from './../src/blogs/dto/update-blog.dto';
 import {

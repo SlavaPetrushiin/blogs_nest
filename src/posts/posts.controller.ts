@@ -1,6 +1,6 @@
+import { CreateCommentDto } from './../comments/dto/create-comment.dto';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { CommentsService } from './../comments/comments.service';
-import { CreateCommentByPostIdDto } from './dto/create-comment-by-postId.dto';
 import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import {
   Controller,
@@ -98,7 +98,7 @@ export class PostsController {
   @Post(':postId/comments')
   async createCommentsByPostId(
     @Param('postId') postId: string,
-    @Body() contentDto: CreateCommentByPostIdDto,
+    @Body() contentDto: CreateCommentDto,
     @Request() req,
   ) {
     const { id } = req.user;
