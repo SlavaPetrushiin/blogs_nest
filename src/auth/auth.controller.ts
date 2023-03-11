@@ -58,7 +58,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: MAX_AGE_COOKIE_MILLISECONDS,
       httpOnly: true,
-      // secure: true,
+      secure: true,
     });
     return res.status(200).send({ accessToken: tokens.accessToken });
   }
@@ -141,7 +141,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: MAX_AGE_COOKIE_MILLISECONDS,
       httpOnly: true,
-      // secure: true,
+      secure: true,
     });
     return res.status(200).send({ accessToken: tokens.accessToken });
   }
