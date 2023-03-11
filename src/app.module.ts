@@ -1,3 +1,4 @@
+import { CheckBlogId } from './posts/validators/checkBlogId';
 import { LikesRepository } from './likes/likes.repository';
 import { Likes, LikesSchema } from './likes/schemas/likes.schema';
 import { SecurityController } from './security/security.controller';
@@ -103,6 +104,7 @@ import { LikesService } from './likes/likes.service';
     RefreshTokenStrategy,
     LikesService,
     LikesRepository,
+    CheckBlogId,
   ],
 })
 export class AppModule {}

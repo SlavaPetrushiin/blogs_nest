@@ -1,3 +1,4 @@
+import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -25,6 +26,7 @@ const optionsValidationPipe = {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe(optionsValidationPipe));
   app.useGlobalFilters(new HttpExceptionFilter());

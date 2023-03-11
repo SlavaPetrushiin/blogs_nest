@@ -1,13 +1,22 @@
+import { CheckBlogId } from './../validators/checkBlogId';
 import { Transform } from 'class-transformer';
-import { IsString, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  MaxLength,
+  Validate,
+} from 'class-validator';
 export class CreatePostDto {
   @IsString()
   @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   @MaxLength(30)
   title: string;
 
   @IsString()
   @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   @MaxLength(100)
   shortDescription: string;
 
@@ -17,7 +26,8 @@ export class CreatePostDto {
   content: string;
 
   @IsString()
-  @Transform(({ value }) => value.trim())
+  @IsUUID()
+  @Validate(CheckBlogId)
   blogId: string;
 }
 
