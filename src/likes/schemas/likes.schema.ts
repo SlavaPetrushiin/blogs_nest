@@ -10,14 +10,14 @@ export enum StatusLike {
   Dislike = 'Dislike',
 }
 
-export type TypeParendId = 'post' | 'comment';
+export type TypeParentId = 'post' | 'comment';
 
 export type ILikes = ILikesInfo;
 export interface ILikeModel extends Model<ILikes> {
   getLikesInfo(
     parentId: string,
     userId: string,
-    type: TypeParendId,
+    type: TypeParentId,
   ): Promise<ILikesInfo>;
 }
 
@@ -59,7 +59,7 @@ export class Likes extends Document {
   userId: string;
 
   @Prop({ required: true })
-  type: TypeParendId;
+  type: TypeParentId;
 
   @Prop({ required: true })
   addedAt: string;
@@ -67,7 +67,7 @@ export class Likes extends Document {
   getLikesInfo: (
     parentId: string,
     userId: string,
-    type: TypeParendId,
+    type: TypeParentId,
   ) => Promise<ILikesInfo>;
 }
 
@@ -75,7 +75,7 @@ export interface ILikesStatics {
   getLikesInfo: (
     parentId: string,
     userId: string,
-    type: TypeParendId,
+    type: TypeParentId,
   ) => Promise<ILikesInfo>;
 }
 export type LikesDocument = Likes & Document;
@@ -84,10 +84,10 @@ export const LikesSchema = SchemaFactory.createForClass(Likes);
 LikesSchema.statics.getLikesInfo = async function (
   parentId: string,
   userId: string,
-  type: TypeParendId,
+  type: TypeParentId,
 ): Promise<ILikesInfo> {
   const likesAndDislikes = await this.find({
-    parentId,
+    parentId, //parentId: { $in: [] }
     type,
   }).exec();
 

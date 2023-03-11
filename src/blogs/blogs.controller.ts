@@ -58,10 +58,7 @@ export class BlogsController {
 
   @UseGuards(AuthBasicGuard)
   @Post()
-  async createBlog(
-    @Body() createBlogDto: CreateBlogDto,
-    // @Res({ passthrough: true }) res: Response,
-  ) {
+  async createBlog(@Body() createBlogDto: CreateBlogDto) {
     const createdBlog = await this.blogsService.createBlog(createBlogDto);
     if (!createdBlog) {
       throw new NotFoundException();
