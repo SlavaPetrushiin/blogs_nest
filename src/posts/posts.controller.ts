@@ -1,3 +1,4 @@
+import { StatusLike } from './../likes/schemas/likes.schema';
 import { CreateCommentDto } from './../comments/dto/create-comment.dto';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { CommentsService } from './../comments/comments.service';
@@ -16,6 +17,8 @@ import {
   ParseIntPipe,
   NotFoundException,
   Request,
+  ParseUUIDPipe,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { Body, UseGuards } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -138,5 +141,14 @@ export class PostsController {
       throw new NotFoundException();
     }
     return comments;
+  }
+
+  @Put(':postId/like-status')
+  async addLikeOrDislike(
+    @Param('postId', ParseUUIDPipe) postId: string,
+    @Body('likeStatus', new ParseEnumPipe(StatusLike)) likeStatus: StatusLike,
+    @Request() req,
+  ) {
+    return '';
   }
 }
