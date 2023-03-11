@@ -17,7 +17,7 @@ const URL_TEXT = {
 
 @Injectable()
 export class Email {
-  constructor(private readonly mailerService: MailerService) { }
+  constructor(private readonly mailerService: MailerService) {}
 
   async sendEmail(email: string, url: string) {
     try {
@@ -29,7 +29,7 @@ export class Email {
     } catch (error) {
       console.log(error);
     } finally {
-      return Promise.resolve()
+      return Promise.resolve();
     }
   }
 

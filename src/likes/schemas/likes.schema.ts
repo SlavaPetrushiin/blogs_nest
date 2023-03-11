@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model, Document } from 'mongoose';
+import { Model, Document } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 // export type LikesDocument = Likes & Document;
@@ -12,11 +12,13 @@ export enum StatusLike {
 
 export type TypeParendId = 'post' | 'comment';
 
-export interface ILikes extends ILikesInfo {
-
-}
+export type ILikes = ILikesInfo;
 export interface ILikeModel extends Model<ILikes> {
-  getLikesInfo(parentId: string, userId: string, type: TypeParendId): Promise<ILikesInfo>
+  getLikesInfo(
+    parentId: string,
+    userId: string,
+    type: TypeParendId,
+  ): Promise<ILikesInfo>;
 }
 
 export interface ILikesInfo {
@@ -24,7 +26,6 @@ export interface ILikesInfo {
   dislikesCount: number;
   myStatus: StatusLike;
 }
-
 
 @Schema({
   timestamps: true,
@@ -63,19 +64,28 @@ export class Likes extends Document {
   @Prop({ required: true })
   addedAt: string;
 
-  getLikesInfo: (parentId: string, userId: string, type: TypeParendId) => Promise<ILikesInfo>
+  getLikesInfo: (
+    parentId: string,
+    userId: string,
+    type: TypeParendId,
+  ) => Promise<ILikesInfo>;
 }
-
 
 export interface ILikesStatics {
-  getLikesInfo: (parentId: string, userId: string, type: TypeParendId) => Promise<ILikesInfo>
+  getLikesInfo: (
+    parentId: string,
+    userId: string,
+    type: TypeParendId,
+  ) => Promise<ILikesInfo>;
 }
 export type LikesDocument = Likes & Document;
-export type LikesModel = Model<LikesDocument, {}, ILikesStatics>;
 export const LikesSchema = SchemaFactory.createForClass(Likes);
 
-
-LikesSchema.statics.getLikesInfo = async function (parentId: string, userId: string, type: TypeParendId): Promise<ILikesInfo> {
+LikesSchema.statics.getLikesInfo = async function (
+  parentId: string,
+  userId: string,
+  type: TypeParendId,
+): Promise<ILikesInfo> {
   const likesAndDislikes = await this.find({
     parentId,
     type,
@@ -102,6 +112,4 @@ LikesSchema.statics.getLikesInfo = async function (parentId: string, userId: str
   });
 
   return likesInfo;
-}
-
-
+};

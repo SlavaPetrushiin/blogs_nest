@@ -1,4 +1,10 @@
-import { ILikesStatics, ILikes, Likes, LikesDocument, ILikeModel } from './../likes/schemas/likes.schema';
+import {
+  ILikesStatics,
+  ILikes,
+  Likes,
+  LikesDocument,
+  ILikeModel,
+} from './../likes/schemas/likes.schema';
 import { LikesRepository } from './../likes/likes.repository';
 import { AllEntitiesComment } from './dto/allEntitiesComment';
 import { Comment, CommentDocument } from './schemas/comment.schema';
@@ -15,7 +21,7 @@ export class CommentsRepository {
     @InjectModel(Comment.name) private CommentModel: Model<CommentDocument>,
     @InjectModel(Likes.name) private LikesModel: ILikeModel,
     private readonly likesRepository: LikesRepository,
-  ) { }
+  ) {}
 
   async findComment(commentID: string, userId: string) {
     const comment = await this.CommentModel.findOne(
@@ -27,7 +33,11 @@ export class CommentsRepository {
       throw new NotFoundException();
     }
 
-    const likesInfo = await this.LikesModel.getLikesInfo(commentID, userId, 'comment');
+    const likesInfo = await this.LikesModel.getLikesInfo(
+      commentID,
+      userId,
+      'comment',
+    );
 
     return {
       id: comment.id,
@@ -41,7 +51,11 @@ export class CommentsRepository {
     };
   }
 
-  async getCommentsByPostId(query: AllEntitiesComment, postId: string, userId: string) {
+  async getCommentsByPostId(
+    query: AllEntitiesComment,
+    postId: string,
+    userId: string,
+  ) {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
     const skip = (+pageNumber - 1) * +pageSize;
 
@@ -56,21 +70,25 @@ export class CommentsRepository {
     const totalCount = await this.CommentModel.countDocuments({ postId });
     const pageCount = Math.ceil(totalCount / +pageSize);
 
-    let preparedResult = [];
+    const preparedResult = [];
 
-    for (let comment of result) {
-      const likesInfo = await this.LikesModel.getLikesInfo(comment.id, userId, 'comment');
+    for (const comment of result) {
+      const likesInfo = await this.LikesModel.getLikesInfo(
+        comment.id,
+        userId,
+        'comment',
+      );
       preparedResult.push({
-        "content": comment.content,
-        "id": comment.id,
-        "createdAt": comment.createdAt,
-        "commentatorInfo": {
-          "userId": comment.userId,
-          "userLogin": comment.userLogin,
+        content: comment.content,
+        id: comment.id,
+        createdAt: comment.createdAt,
+        commentatorInfo: {
+          userId: comment.userId,
+          userLogin: comment.userLogin,
         },
-        likesInfo
-      })
-      comment["likesInfo"] = likesInfo
+        likesInfo,
+      });
+      comment['likesInfo'] = likesInfo;
     }
 
     return {
@@ -91,7 +109,6 @@ export class CommentsRepository {
       { id: commentId },
       { $set: { content: newContent } },
     );
-    console.log(result);
     return result.matchedCount > 0;
   }
 
@@ -107,6 +124,4 @@ export class CommentsRepository {
   async save(comment: CommentDocument) {
     return comment.save();
   }
-
-
 }

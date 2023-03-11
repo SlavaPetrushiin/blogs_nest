@@ -44,11 +44,10 @@ import { AuthRepository } from './auth/auth.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { LikesService } from './likes/likes.service';
 
-
 @Module({
   imports: [
     configModule,
-    MongooseModule.forRoot(new ConfigService().get('MONGO_LOCAL')),
+    MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
@@ -106,4 +105,4 @@ import { LikesService } from './likes/likes.service';
     LikesRepository,
   ],
 })
-export class AppModule { }
+export class AppModule {}

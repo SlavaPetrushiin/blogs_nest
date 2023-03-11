@@ -31,7 +31,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @Get('me')
@@ -49,7 +49,6 @@ export class AuthController {
   @Post('login')
   async login(@Request() req, @Res() res) {
     const title = req.headers['user-agent'] || '';
-    console.log({ title });
     const tokens = await this.authService.login(req.user, req.ip, title);
 
     if (!tokens) {

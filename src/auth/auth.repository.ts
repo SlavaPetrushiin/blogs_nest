@@ -74,4 +74,8 @@ export class AuthRepository {
   async save(dataSession: AuthDocument) {
     return dataSession.save();
   }
+
+  async deleteMany() {
+    return this.AuthModel.deleteMany({});
+  }
 }

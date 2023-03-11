@@ -43,7 +43,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly emailService: Email,
     private readonly passwordRecoveryRepository: PasswordRecoveryRepository,
-  ) { }
+  ) {}
 
   async findUserById(userId) {
     const user = await this.usersService.findUserById(userId);

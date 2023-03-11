@@ -71,6 +71,7 @@ export class CommentsService {
       commentId,
       userId,
     );
+    console.log('AAAAAAAAAAAAA');
     if (!foundedComment) {
       throw new NotFoundException();
     }

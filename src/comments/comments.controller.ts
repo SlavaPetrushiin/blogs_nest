@@ -91,6 +91,7 @@ export class CommentsController {
     @Request() req,
   ) {
     const userId = req.user.id;
+
     return this.likesService.updateLikes({
       parentId: id,
       likeStatus,

@@ -1,3 +1,4 @@
+import { AuthRepository } from './../auth/auth.repository';
 import { UsersRepository } from './../users/users.repository';
 import { BlogsRepository } from './../blogs/blogs.repository';
 import { CommentsRepository } from './../comments/comments.repository';
@@ -11,6 +12,7 @@ export class TestingController {
     private postsRepository: PostsRepository,
     private commentsRepository: CommentsRepository,
     private usersRepository: UsersRepository,
+    private authRepository: AuthRepository,
   ) {}
 
   @Delete('all-data')
@@ -20,10 +22,11 @@ export class TestingController {
     const p = await this.postsRepository.deleteMany();
     const u = await this.usersRepository.deleteMany();
     const c = await this.commentsRepository.deleteMany();
+    const a = await this.authRepository.deleteMany();
     // const s = authDevicesSessions.deleteMany({});
     // const bp = badPractice.deleteMany({});
     // const l = LikesModel.deleteMany({});
 
-    await Promise.all([b, p, u, c]);
+    await Promise.all([b, p, u, c, a]);
   }
 }

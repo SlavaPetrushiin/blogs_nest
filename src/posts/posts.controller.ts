@@ -28,7 +28,7 @@ export class PostsController {
   constructor(
     private postsService: PostsService,
     private commentsService: CommentsService,
-  ) { }
+  ) {}
 
   @Get()
   async getPosts(
@@ -129,7 +129,11 @@ export class PostsController {
       sortDirection,
     };
     const { id } = req.user;
-    const comments = await this.postsService.getCommentsByPostId(query, postId, id);
+    const comments = await this.postsService.getCommentsByPostId(
+      query,
+      postId,
+      id,
+    );
     if (!comments) {
       throw new NotFoundException();
     }

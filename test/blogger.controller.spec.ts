@@ -61,8 +61,8 @@ const BASIC_AUTH = {
 };
 
 const CREATE_COMMENT_DTO: CreateCommentByPostIdDto = {
-  content: "Created comment"
-}
+  content: 'Created comment',
+};
 
 jest.setTimeout(15000);
 describe('AppController', () => {
@@ -103,15 +103,14 @@ describe('AppController', () => {
     await supertest(server).delete('/testing/all-data').expect(204);
   });
 
-
   afterAll(async () => {
     app.close();
   });
 
   let first_user, second_user;
+  let first_user_token, second_user_token;
   let first_blog;
   let first_post;
-  let accessTokenFistUser, accessTokenSecondUser;
 
   describe('Create users. Check the existence of the created user.', () => {
     it('Get status UnauthorizedException in create user', async () => {
@@ -175,7 +174,7 @@ describe('AppController', () => {
             login: FIRST_USER.login,
             email: FIRST_USER.email,
             createdAt: expect.any(String),
-          }
+          },
         ],
       });
     });
@@ -304,36 +303,4 @@ describe('AppController', () => {
         .expect(HttpStatus.NOT_FOUND);
     });
   });
-
-  describe('login users', () => {
-    it('login first user', async function () {
-      let result = await supertest(server)
-        .post('/auth/login')
-        .set('user-agent', 'Mozilla')
-        .send({
-          loginOrEmail: FIRST_USER.login,
-          password: FIRST_USER.password
-        })
-
-      let accessToken = result.body;
-      console.log("wqeqwe");
-      console.log(accessToken);
-    })
-
-  })
-
-  describe('likes of comments', () => {
-
-    // it('create comment by postId', async function () {
-    //   await supertest(server)
-    //     .post(`/posts/${first_post}/comments`)
-
-
-
-
-    // })
-
-  })
-
-
 });

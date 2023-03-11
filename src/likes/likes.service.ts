@@ -15,10 +15,6 @@ export class CreateOrUpdateLikeDto {
 export class LikesService {
   constructor(private likesRepository: LikesRepository) {}
 
-  async getLikes() {
-    console.log('ff');
-  }
-
   async updateLikes(params: CreateOrUpdateLikeDto) {
     const likeOrDislike = await this.likesRepository.updateLike(params);
     return likeOrDislike;
