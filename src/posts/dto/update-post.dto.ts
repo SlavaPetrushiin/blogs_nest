@@ -1,4 +1,4 @@
-import { IsString, MaxLength } from 'class-validator';
+import { IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class UpdatePostDto {
   @IsString()
@@ -14,5 +14,6 @@ export class UpdatePostDto {
   content: string;
 
   @IsString()
+  @IsUUID()
   blogId: string;
 }
