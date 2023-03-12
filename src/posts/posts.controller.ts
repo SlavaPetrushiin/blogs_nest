@@ -45,7 +45,7 @@ export class PostsController {
     @Request() req,
   ) {
     const { id } = req.user;
-    const result = await this.postsService.getPosts(
+    return this.postsService.getPosts(
       {
         pageNumber,
         pageSize,
@@ -54,7 +54,6 @@ export class PostsController {
       },
       id,
     );
-    return result;
   }
 
   @UseGuards(AccessTokenGuard)

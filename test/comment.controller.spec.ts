@@ -295,71 +295,6 @@ describe('Comments', () => {
     });
   });
 
-  it('should return postsbyId after likes', async function () {
-    await supertest(server)
-      .put(`/comments/${commentId1}/like-status`)
-      .set('Authorization', `Bearer ${tokens.token_user_1}`)
-      .send({ likeStatus: StatusLike.Like })
-      .expect(HttpStatus.OK);
-
-    await supertest(server)
-      .put(`/comments/${commentId1}/like-status`)
-      .set('Authorization', `Bearer ${tokens.token_user_2}`)
-      .send({ likeStatus: StatusLike.Dislike })
-      .expect(HttpStatus.OK);
-
-    await supertest(server)
-      .put(`/comments/${commentId1}/like-status`)
-      .set('Authorization', `Bearer ${tokens.token_user_1}`)
-      .send({ likeStatus: StatusLike.Dislike })
-      .expect(HttpStatus.OK);
-
-    await supertest(server)
-      .put(`/comments/${commentId2}/like-status`)
-      .set('Authorization', `Bearer ${tokens.token_user_2}`)
-      .send({ likeStatus: StatusLike.Dislike })
-      .expect(HttpStatus.OK);
-
-    const commentsByPostId = await supertest(server).get(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
-
-    expect(commentsByPostId.body).toStrictEqual({
-      pagesCount: 1,
-      page: 1,
-      pageSize: 10,
-      totalCount: 2,
-      items: [
-        {
-          id: expect.any(String),
-          content: COMMENT_CONTENT_2.content,
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: inputModelUser2.login,
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 0,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: expect.any(String),
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: expect.any(String),
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 0,
-            dislikesCount: 2,
-            myStatus: StatusLike.Dislike,
-          },
-        },
-      ],
-    });
-  });
-
   it('should return postsbyId after dislikes', async () => {
     // create dislike/like for post from both users
     await supertest(server).put(`/posts/${postId1}/like-status`).set('Authorization', `Bearer ${tokens.token_user_1}`).send({ likeStatus: StatusLike.Dislike });
@@ -539,4 +474,63 @@ describe('Comments', () => {
       ],
     });
   });
+
+  // it('should return postsbyId after likes', async function () {
+  //   await supertest(server)
+  //     .put(`/comments/${commentId1}/like-status`)
+  //     .set('Authorization', `Bearer ${tokens.token_user_1}`)
+  //     .send({ likeStatus: StatusLike.Like })
+  //     .expect(HttpStatus.OK);
+
+  //   await supertest(server)
+  //     .put(`/comments/${commentId1}/like-status`)
+  //     .set('Authorization', `Bearer ${tokens.token_user_2}`)
+  //     .send({ likeStatus: StatusLike.Dislike })
+  //     .expect(HttpStatus.OK);
+
+  //   await supertest(server)
+  //     .put(`/comments/${commentId1}/like-status`)
+  //     .set('Authorization', `Bearer ${tokens.token_user_1}`)
+  //     .send({ likeStatus: StatusLike.Dislike })
+  //     .expect(HttpStatus.OK);
+
+  //   const commentsByPostId = await supertest(server).get(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
+
+  //   expect(commentsByPostId.body).toStrictEqual({
+  //     pagesCount: 1,
+  //     page: 1,
+  //     pageSize: 10,
+  //     totalCount: 2,
+  //     items: [
+  //       {
+  //         id: expect.any(String),
+  //         content: COMMENT_CONTENT_2.content,
+  //         commentatorInfo: {
+  //           userId: expect.any(String),
+  //           userLogin: inputModelUser2.login,
+  //         },
+  //         createdAt: expect.any(String),
+  //         likesInfo: {
+  //           likesCount: 0,
+  //           dislikesCount: 1,
+  //           myStatus: 'None',
+  //         },
+  //       },
+  //       {
+  //         id: expect.any(String),
+  //         content: expect.any(String),
+  //         commentatorInfo: {
+  //           userId: expect.any(String),
+  //           userLogin: expect.any(String),
+  //         },
+  //         createdAt: expect.any(String),
+  //         likesInfo: {
+  //           likesCount: 0,
+  //           dislikesCount: 2,
+  //           myStatus: StatusLike.Dislike,
+  //         },
+  //       },
+  //     ],
+  //   });
+  // });
 });

@@ -37,14 +37,13 @@ export class PostsRepository {
     const totalCount = await this.PostModel.countDocuments(postFilter, {});
     const pageCount = Math.ceil(totalCount / +pageSize);
     const idPosts: string[] = result.map((com) => com.id);
-
     const likesAndDislikes = await this.likesRepository.findLikesDislikesByParentsId(idPosts, 'post');
     const preparedResult = [];
 
     for (const post of result) {
       const likesInfo = this.getLikesInfo(likesAndDislikes, userId, post.id);
       const onlyLikes = likesAndDislikes.filter((item) => item.status === StatusLike.Like);
-      const lastThreeLikes = JSON.parse(JSON.stringify(onlyLikes));
+      const lastThreeLikes = JSON.parse(JSON.stringify(onlyLikes)).filter((l) => l.parentId === post.id);
       lastThreeLikes.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
       if (lastThreeLikes.length > 3) {
@@ -71,7 +70,9 @@ export class PostsRepository {
         },
       });
     }
-    console.log({ preparedResult });
+
+    preparedResult.map((l) => console.log(l));
+
     return {
       pagesCount: pageCount,
       page: +pageNumber,
