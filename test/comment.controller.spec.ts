@@ -1,10 +1,5 @@
 import { StatusLike } from './../src/likes/schemas/likes.schema';
-import {
-  INestApplication,
-  ValidationPipe,
-  BadRequestException,
-  HttpStatus,
-} from '@nestjs/common';
+import { INestApplication, ValidationPipe, BadRequestException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { useContainer } from 'class-validator';
 import cookieParser = require('cookie-parser');
@@ -177,45 +172,24 @@ describe('Comments', () => {
     await supertest(server).post('/auth/registration').send(inputModelUser4);
 
     //Auth
-    const auth_user_1 = await supertest(server)
-      .post('/auth/login')
-      .set('user-agent', 'Mozilla')
-      .send(correctInputModelAuth1);
-    const auth_user_2 = await supertest(server)
-      .post('/auth/login')
-      .set('user-agent', 'AppleWebKit')
-      .send(correctInputModelAuth2);
-    const auth_user_3 = await supertest(server)
-      .post('/auth/login')
-      .set('user-agent', 'Chrome')
-      .send(correctInputModelAuth3);
-    const auth_user_4 = await supertest(server)
-      .post('/auth/login')
-      .set('user-agent', 'Safari')
-      .send(correctInputModelAuth4);
+    const auth_user_1 = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1);
+    const auth_user_2 = await supertest(server).post('/auth/login').set('user-agent', 'AppleWebKit').send(correctInputModelAuth2);
+    const auth_user_3 = await supertest(server).post('/auth/login').set('user-agent', 'Chrome').send(correctInputModelAuth3);
+    const auth_user_4 = await supertest(server).post('/auth/login').set('user-agent', 'Safari').send(correctInputModelAuth4);
 
     tokens.token_user_1 = auth_user_1.body.accessToken;
     tokens.token_user_2 = auth_user_2.body.accessToken;
     tokens.token_user_3 = auth_user_3.body.accessToken;
     tokens.token_user_4 = auth_user_4.body.accessToken;
 
-    const blog = await supertest(server)
-      .post('/blogs')
-      .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
-      .send(BLOG_MODEL);
+    const blog = await supertest(server).post('/blogs').set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(BLOG_MODEL);
 
     const blogID = blog.body.id;
 
-    post_1 = await supertest(server)
-      .post(`/blogs/${blogID}/posts`)
-      .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
-      .send(POST_MODEL_1);
+    post_1 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(POST_MODEL_1);
     postId1 = post_1.body.id;
 
-    post_2 = await supertest(server)
-      .post(`/blogs/${blogID}/posts`)
-      .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
-      .send(POST_MODEL_2);
+    post_2 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(POST_MODEL_2);
     postId2 = post_2.body.id;
 
     // post_3 = await supertest(server)
@@ -311,9 +285,13 @@ describe('Comments', () => {
       .send({ likeStatus: StatusLike.Dislike })
       .expect(HttpStatus.OK);
 
-    const commentsByPostId = await supertest(server)
-      .get(`/posts/${postId1}/comments`)
-      .set('Authorization', `Bearer ${tokens.token_user_1}`);
+    await supertest(server)
+      .put(`/comments/${comment_2.id}/like-status`)
+      .set('Authorization', `Bearer ${tokens.token_user_2}`)
+      .send({ likeStatus: StatusLike.Dislike })
+      .expect(HttpStatus.OK);
+
+    const commentsByPostId = await supertest(server).get(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
 
     expect(commentsByPostId.body).toStrictEqual({
       pagesCount: 1,
@@ -331,7 +309,7 @@ describe('Comments', () => {
           createdAt: expect.any(String),
           likesInfo: {
             likesCount: 0,
-            dislikesCount: 0,
+            dislikesCount: 1,
             myStatus: 'None',
           },
         },

@@ -1,10 +1,5 @@
-import {
-  ILikesStatics,
-  ILikes,
-  Likes,
-  LikesDocument,
-  ILikeModel,
-} from './../likes/schemas/likes.schema';
+import { ILikesInfo } from './../../dist/likes/schemas/likes.schema.d';
+import { Likes, LikesDocument, ILikeModel, StatusLike } from './../likes/schemas/likes.schema';
 import { LikesRepository } from './../likes/likes.repository';
 import { AllEntitiesComment } from './dto/allEntitiesComment';
 import { Comment, CommentDocument } from './schemas/comment.schema';
@@ -24,20 +19,14 @@ export class CommentsRepository {
   ) {}
 
   async findComment(commentID: string, userId: string) {
-    const comment = await this.CommentModel.findOne(
-      { id: commentID },
-      DEFAULT_PROJECTION,
-    ).exec();
+    const comment = await this.CommentModel.findOne({ id: commentID }, DEFAULT_PROJECTION).exec();
 
     if (!comment) {
       throw new NotFoundException();
     }
 
-    const likesInfo = await this.LikesModel.getLikesInfo(
-      commentID,
-      userId,
-      'comment',
-    );
+    const likesAndDislikes = await this.likesRepository.findLikesDislikesByParentsId([comment.id], 'comment');
+    const likesInfo = this.getLikesInfo(likesAndDislikes, userId, comment.id);
 
     return {
       id: comment.id,
@@ -51,33 +40,25 @@ export class CommentsRepository {
     };
   }
 
-  async getCommentsByPostId(
-    query: AllEntitiesComment,
-    postId: string,
-    userId: string,
-  ) {
+  async getCommentsByPostId(query: AllEntitiesComment, postId: string, userId: string) {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
     const skip = (+pageNumber - 1) * +pageSize;
 
-    const result = await this.CommentModel.find(
-      { postId },
-      { projection: { ...DEFAULT_PROJECTION, postId: false } },
-    )
+    const comments: CommentDocument[] = await this.CommentModel.find({ postId }, { projection: { ...DEFAULT_PROJECTION, postId: false } })
       .skip(skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
 
     const totalCount = await this.CommentModel.countDocuments({ postId });
     const pageCount = Math.ceil(totalCount / +pageSize);
+    const idComments: string[] = comments.map((com) => com.id);
 
+    const likesAndDislikes = await this.likesRepository.findLikesDislikesByParentsId(idComments, 'comment');
     const preparedResult = [];
 
-    for (const comment of result) {
-      const likesInfo = await this.LikesModel.getLikesInfo(
-        comment.id,
-        userId,
-        'comment',
-      );
+    for (const comment of comments) {
+      const likesInfo = this.getLikesInfo(likesAndDislikes, userId, comment.id);
+
       preparedResult.push({
         content: comment.content,
         id: comment.id,
@@ -88,7 +69,6 @@ export class CommentsRepository {
         },
         likesInfo,
       });
-      comment['likesInfo'] = likesInfo;
     }
 
     return {
@@ -100,15 +80,40 @@ export class CommentsRepository {
     };
   }
 
+  private getLikesInfo(dataArray: LikesDocument[], userId: string, parentId: string): ILikesInfo {
+    const likesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: StatusLike.None,
+    };
+
+    for (const likeOrDislike of dataArray) {
+      if (parentId !== likeOrDislike.parentId) {
+        continue;
+      }
+
+      if (likeOrDislike.status === StatusLike.Like) {
+        likesInfo.likesCount = ++likesInfo.likesCount;
+      }
+
+      if (likeOrDislike.status === StatusLike.Dislike) {
+        likesInfo.dislikesCount = ++likesInfo.dislikesCount;
+      }
+
+      if (likeOrDislike.userId === userId) {
+        likesInfo.myStatus = likeOrDislike.status;
+      }
+    }
+
+    return likesInfo;
+  }
+
   async createComment(params: IParamsCreateComment): Promise<CommentDocument> {
     return new this.CommentModel({ ...params });
   }
 
   async updateComment(commentId: string, newContent: string): Promise<boolean> {
-    const result = await this.CommentModel.updateOne(
-      { id: commentId },
-      { $set: { content: newContent } },
-    );
+    const result = await this.CommentModel.updateOne({ id: commentId }, { $set: { content: newContent } });
     return result.matchedCount > 0;
   }
 

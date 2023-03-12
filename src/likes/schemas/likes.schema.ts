@@ -14,11 +14,9 @@ export type TypeParentId = 'post' | 'comment';
 
 export type ILikes = ILikesInfo;
 export interface ILikeModel extends Model<ILikes> {
-  getLikesInfo(
-    parentId: string,
-    userId: string,
-    type: TypeParentId,
-  ): Promise<ILikesInfo>;
+  getLikesInfo(parentId: string, userId: string, type: TypeParentId): Promise<ILikesInfo>;
+
+  getLikesInfoByParentId(parentId: string[], userId: string, type: TypeParentId): Promise<any>;
 }
 
 export interface ILikesInfo {
@@ -64,28 +62,16 @@ export class Likes extends Document {
   @Prop({ required: true })
   addedAt: string;
 
-  getLikesInfo: (
-    parentId: string,
-    userId: string,
-    type: TypeParentId,
-  ) => Promise<ILikesInfo>;
+  getLikesInfo: (parentId: string, userId: string, type: TypeParentId) => Promise<ILikesInfo>;
 }
 
 export interface ILikesStatics {
-  getLikesInfo: (
-    parentId: string,
-    userId: string,
-    type: TypeParentId,
-  ) => Promise<ILikesInfo>;
+  getLikesInfo: (parentId: string, userId: string, type: TypeParentId) => Promise<ILikesInfo>;
 }
 export type LikesDocument = Likes & Document;
 export const LikesSchema = SchemaFactory.createForClass(Likes);
 
-LikesSchema.statics.getLikesInfo = async function (
-  parentId: string,
-  userId: string,
-  type: TypeParentId,
-): Promise<ILikesInfo> {
+LikesSchema.statics.getLikesInfo = async function (parentId: string, userId: string, type: TypeParentId): Promise<ILikesInfo> {
   const likesAndDislikes = await this.find({
     parentId, //parentId: { $in: [] }
     type,
@@ -112,4 +98,11 @@ LikesSchema.statics.getLikesInfo = async function (
   });
 
   return likesInfo;
+};
+
+LikesSchema.statics.getLikesInfoByParentId = async function (parentId: string[], type: TypeParentId): Promise<ILikesInfo> {
+  return this.find({
+    parentId: { $in: [...parentId] },
+    type,
+  }).exec();
 };
