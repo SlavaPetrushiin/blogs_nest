@@ -1,18 +1,16 @@
 import { CreateOrUpdateLikeDto } from './likes.service';
-import { LikesDocument, Likes, StatusLike, ILikesInfo, TypeParentId } from './schemas/likes.schema';
+import { LikesDocument, Likes, TypeParentId } from './schemas/likes.schema';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-
-const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class LikesRepository {
   constructor(@InjectModel(Likes.name) private LikesModel: Model<LikesDocument>) {}
 
   async updateLike(params: CreateOrUpdateLikeDto) {
-    const { likeStatus, parentId, type, userId } = params;
-    const query = { parentId, userId, type };
+    const { likeStatus, parentId, type, userId, login } = params;
+    const query = { parentId, userId, type, login };
     const update = { $set: { status: likeStatus } };
     const options = { upsert: true };
     const result = await this.LikesModel.updateOne(query, update, options);
@@ -24,5 +22,9 @@ export class LikesRepository {
       parentId: { $in: [...parentId] },
       type,
     }).exec();
+  }
+
+  async deleteMany() {
+    return this.LikesModel.deleteMany({});
   }
 }

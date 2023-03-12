@@ -1,7 +1,9 @@
+import { LikesRepository } from './../likes/likes.repository';
+import { LikesDocument, StatusLike, ILikesInfo } from './../likes/schemas/likes.schema';
 import { AllEntitiesComment } from './../comments/dto/allEntitiesComment';
 import { CommentsRepository } from './../comments/comments.repository';
 import { BlogsRepository } from './../blogs/blogs.repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AllEntitiesPost } from './dto/allEntitiesPost';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -13,17 +15,28 @@ export class PostsService {
     private postsRepository: PostsRepository,
     private blogsRepository: BlogsRepository,
     private commentsRepository: CommentsRepository,
+    private likesRepository: LikesRepository,
   ) {}
 
-  async getPosts(query: AllEntitiesPost) {
-    return this.postsRepository.findAllPosts(query);
+  async getPosts(params: AllEntitiesPost, userId: string) {
+    return this.postsRepository.findAllPosts(params, userId);
   }
 
-  async getPost(id: string) {
-    const foundedPost = await this.postsRepository.findPost(id);
+  async getPost(postId: string, userId: string) {
+    const foundedPost = await this.postsRepository.findPost(postId);
 
     if (!foundedPost) {
-      return null;
+      throw new NotFoundException();
+    }
+
+    const likesAndDislikes = await this.likesRepository.findLikesDislikesByParentsId([postId], 'post');
+    const likesInfo = this.postsRepository.getLikesInfo(likesAndDislikes, userId, foundedPost.id);
+    const onlyLikes = likesAndDislikes.filter((item) => item.status === StatusLike.Like);
+    const lastThreeLikes = JSON.parse(JSON.stringify(onlyLikes));
+    lastThreeLikes.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    if (lastThreeLikes.length > 3) {
+      lastThreeLikes.length = 3;
     }
 
     return {
@@ -35,10 +48,14 @@ export class PostsService {
       blogName: foundedPost.blogName,
       createdAt: foundedPost.createdAt,
       extendedLikesInfo: {
-        dislikesCount: 0,
-        likesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
+        dislikesCount: likesInfo.dislikesCount,
+        likesCount: likesInfo.likesCount,
+        myStatus: likesInfo.myStatus,
+        newestLikes: lastThreeLikes.map((like) => ({
+          addedAt: like.createdAt,
+          userId: like.userId,
+          login: like.login,
+        })),
       },
     };
   }
@@ -94,16 +111,22 @@ export class PostsService {
     return this.postsRepository.removePost(id);
   }
 
-  async getCommentsByPostId(
-    query: AllEntitiesComment,
-    postId: string,
-    userId: string,
-  ) {
+  async getCommentsByPostId(query: AllEntitiesComment, postId: string, userId: string) {
     const foundedPost = await this.postsRepository.findPost(postId);
     if (!foundedPost) {
       return null;
     }
 
     return this.commentsRepository.getCommentsByPostId(query, postId, userId);
+  }
+
+  async addLikeOrDislike(postId: string, likeStatus: StatusLike, userId: string, login: string) {
+    const post = await this.getPost(postId, userId);
+
+    if (!post) {
+      throw new NotFoundException();
+    }
+
+    return this.likesRepository.updateLike({ likeStatus, parentId: post.id, type: 'post', userId, login });
   }
 }

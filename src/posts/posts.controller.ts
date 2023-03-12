@@ -19,20 +19,20 @@ import {
   Request,
   ParseUUIDPipe,
   ParseEnumPipe,
+  BadRequestException,
 } from '@nestjs/common';
-import { Body, UseGuards } from '@nestjs/common/decorators';
+import { Body, Res, UseGuards } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
 import { SortDirectionType } from './../types/types';
+import { Response } from 'express';
 
 @Controller('posts')
 export class PostsController {
-  constructor(
-    private postsService: PostsService,
-    private commentsService: CommentsService,
-  ) {}
+  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) {}
 
+  @UseGuards(AccessTokenGuard)
   @Get()
   async getPosts(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
@@ -42,19 +42,26 @@ export class PostsController {
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
+    @Request() req,
   ) {
-    const result = await this.postsService.getPosts({
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-    });
+    const { id } = req.user;
+    const result = await this.postsService.getPosts(
+      {
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+      },
+      id,
+    );
     return result;
   }
 
-  @Get(':id')
-  async getPost(@Param('id') id: string) {
-    const result = await this.postsService.getPost(id);
+  @UseGuards(AccessTokenGuard)
+  @Get(':postId')
+  async getPost(@Param('postId') postId: string, @Request() req) {
+    const { id } = req.user;
+    const result = await this.postsService.getPost(postId, id);
     if (!result) {
       throw new NotFoundException();
     }
@@ -75,10 +82,7 @@ export class PostsController {
   @UseGuards(AuthBasicGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(
-    @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto,
-  ) {
+  async updatePost(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     const result = await this.postsService.updatePost(updatePostDto, id);
     if (!result) {
       throw new NotFoundException();
@@ -99,11 +103,7 @@ export class PostsController {
 
   @UseGuards(AccessTokenGuard)
   @Post(':postId/comments')
-  async createCommentsByPostId(
-    @Param('postId') postId: string,
-    @Body() contentDto: CreateCommentDto,
-    @Request() req,
-  ) {
+  async createCommentsByPostId(@Param('postId') postId: string, @Body() contentDto: CreateCommentDto, @Request() req) {
     const { id } = req.user;
     return this.commentsService.createComment({
       userId: id,
@@ -132,23 +132,28 @@ export class PostsController {
       sortDirection,
     };
     const { id } = req.user;
-    const comments = await this.postsService.getCommentsByPostId(
-      query,
-      postId,
-      id,
-    );
+    const comments = await this.postsService.getCommentsByPostId(query, postId, id);
     if (!comments) {
       throw new NotFoundException();
     }
     return comments;
   }
 
+  @UseGuards(AccessTokenGuard)
   @Put(':postId/like-status')
   async addLikeOrDislike(
     @Param('postId', ParseUUIDPipe) postId: string,
     @Body('likeStatus', new ParseEnumPipe(StatusLike)) likeStatus: StatusLike,
     @Request() req,
+    @Res() response: Response,
   ) {
-    return '';
+    const { id, login } = req.user;
+    const isCreated = await this.postsService.addLikeOrDislike(postId, likeStatus, id, login);
+
+    if (!isCreated) {
+      throw new NotFoundException();
+    }
+
+    return response.status(HttpStatus.NO_CONTENT).send();
   }
 }

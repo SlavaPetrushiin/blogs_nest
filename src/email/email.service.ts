@@ -33,11 +33,7 @@ export class Email {
     }
   }
 
-  getMessageForSendingEmail(
-    url: string,
-    code: string,
-    typeMessage: TypeUrlMessage,
-  ): string {
+  getMessageForSendingEmail(url: string, code: string, typeMessage: TypeUrlMessage): string {
     return `
         <h1>${URL_TEXT[typeMessage].title}</h1>
         <p>${URL_TEXT[typeMessage].text}

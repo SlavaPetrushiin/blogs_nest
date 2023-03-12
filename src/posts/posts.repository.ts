@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { LikesRepository } from './../likes/likes.repository';
+import { StatusLike, LikesDocument, ILikesInfo } from './../likes/schemas/likes.schema';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, PostDocument } from './schemas/post.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,10 +17,10 @@ interface INewPostDto extends CreatePostDto {
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectModel(Post.name) private PostModel: Model<PostDocument>) {}
+  constructor(@InjectModel(Post.name) private PostModel: Model<PostDocument>, private likesRepository: LikesRepository) {}
 
-  async findAllPosts(query: AllEntitiesPost, blogId: string = null) {
-    const { pageNumber, pageSize, sortBy, sortDirection } = query;
+  async findAllPosts(params: AllEntitiesPost, userId: string, blogId: string = null) {
+    const { pageNumber, pageSize, sortBy, sortDirection } = params;
     const skip = (+pageNumber - 1) * +pageSize;
     const postFilter: any = {};
 
@@ -34,21 +36,48 @@ export class PostsRepository {
 
     const totalCount = await this.PostModel.countDocuments(postFilter, {});
     const pageCount = Math.ceil(totalCount / +pageSize);
+    const idPosts: string[] = result.map((com) => com.id);
 
+    const likesAndDislikes = await this.likesRepository.findLikesDislikesByParentsId(idPosts, 'post');
+    const preparedResult = [];
+
+    for (const post of result) {
+      const likesInfo = this.getLikesInfo(likesAndDislikes, userId, post.id);
+      const onlyLikes = likesAndDislikes.filter((item) => item.status === StatusLike.Like);
+      const lastThreeLikes = JSON.parse(JSON.stringify(onlyLikes));
+      lastThreeLikes.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+      if (lastThreeLikes.length > 3) {
+        lastThreeLikes.length = 3;
+      }
+
+      preparedResult.push({
+        id: post.id,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt,
+        extendedLikesInfo: {
+          dislikesCount: likesInfo.dislikesCount,
+          likesCount: likesInfo.likesCount,
+          myStatus: likesInfo.myStatus,
+          newestLikes: lastThreeLikes.map((like) => ({
+            addedAt: like.createdAt,
+            userId: like.userId,
+            login: like.login,
+          })),
+        },
+      });
+    }
+    console.log({ preparedResult });
     return {
       pagesCount: pageCount,
       page: +pageNumber,
       pageSize: +pageSize,
       totalCount: totalCount,
-      items: result.map((post) => ({
-        ...post,
-        extendedLikesInfo: {
-          dislikesCount: 0,
-          likesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
-        },
-      })),
+      items: preparedResult,
     };
   }
 
@@ -89,5 +118,33 @@ export class PostsRepository {
 
   async deleteMany() {
     return this.PostModel.deleteMany({});
+  }
+
+  public getLikesInfo(dataArray: LikesDocument[], userId: string, parentId: string): ILikesInfo {
+    const likesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: StatusLike.None,
+    };
+
+    for (const likeOrDislike of dataArray) {
+      if (parentId !== likeOrDislike.parentId) {
+        continue;
+      }
+
+      if (likeOrDislike.status === StatusLike.Like) {
+        likesInfo.likesCount = ++likesInfo.likesCount;
+      }
+
+      if (likeOrDislike.status === StatusLike.Dislike) {
+        likesInfo.dislikesCount = ++likesInfo.dislikesCount;
+      }
+
+      if (likeOrDislike.userId === userId) {
+        likesInfo.myStatus = likeOrDislike.status;
+      }
+    }
+
+    return likesInfo;
   }
 }

@@ -1,5 +1,4 @@
-import { ILikesInfo } from './../../dist/likes/schemas/likes.schema.d';
-import { Likes, LikesDocument, ILikeModel, StatusLike } from './../likes/schemas/likes.schema';
+import { LikesDocument, StatusLike, ILikesInfo } from './../likes/schemas/likes.schema';
 import { LikesRepository } from './../likes/likes.repository';
 import { AllEntitiesComment } from './dto/allEntitiesComment';
 import { Comment, CommentDocument } from './schemas/comment.schema';
@@ -12,11 +11,7 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class CommentsRepository {
-  constructor(
-    @InjectModel(Comment.name) private CommentModel: Model<CommentDocument>,
-    @InjectModel(Likes.name) private LikesModel: ILikeModel,
-    private readonly likesRepository: LikesRepository,
-  ) {}
+  constructor(@InjectModel(Comment.name) private CommentModel: Model<CommentDocument>, private readonly likesRepository: LikesRepository) {}
 
   async findComment(commentID: string, userId: string) {
     const comment = await this.CommentModel.findOne({ id: commentID }, DEFAULT_PROJECTION).exec();

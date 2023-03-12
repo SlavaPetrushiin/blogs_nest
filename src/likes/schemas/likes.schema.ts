@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Model, Document } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 // export type LikesDocument = Likes & Document;
@@ -12,19 +12,13 @@ export enum StatusLike {
 
 export type TypeParentId = 'post' | 'comment';
 
-export type ILikes = ILikesInfo;
-export interface ILikeModel extends Model<ILikes> {
-  getLikesInfo(parentId: string, userId: string, type: TypeParentId): Promise<ILikesInfo>;
-
-  getLikesInfoByParentId(parentId: string[], userId: string, type: TypeParentId): Promise<any>;
-}
-
 export interface ILikesInfo {
   likesCount: number;
   dislikesCount: number;
   myStatus: StatusLike;
 }
 
+export type LikesDocument = HydratedDocument<Likes>;
 @Schema({
   timestamps: true,
   toJSON: {
@@ -36,7 +30,7 @@ export interface ILikesInfo {
     },
   },
 })
-export class Likes extends Document {
+export class Likes {
   createdAt: string;
 
   @Prop({
@@ -60,49 +54,7 @@ export class Likes extends Document {
   type: TypeParentId;
 
   @Prop({ required: true })
-  addedAt: string;
-
-  getLikesInfo: (parentId: string, userId: string, type: TypeParentId) => Promise<ILikesInfo>;
+  login: string;
 }
 
-export interface ILikesStatics {
-  getLikesInfo: (parentId: string, userId: string, type: TypeParentId) => Promise<ILikesInfo>;
-}
-export type LikesDocument = Likes & Document;
 export const LikesSchema = SchemaFactory.createForClass(Likes);
-
-LikesSchema.statics.getLikesInfo = async function (parentId: string, userId: string, type: TypeParentId): Promise<ILikesInfo> {
-  const likesAndDislikes = await this.find({
-    parentId, //parentId: { $in: [] }
-    type,
-  }).exec();
-
-  const likesInfo = {
-    likesCount: 0,
-    dislikesCount: 0,
-    myStatus: StatusLike.None,
-  };
-
-  likesAndDislikes.forEach((item) => {
-    if (item.status === StatusLike.Like) {
-      likesInfo.likesCount = ++likesInfo.likesCount;
-    }
-
-    if (item.status === StatusLike.Dislike) {
-      likesInfo.dislikesCount = ++likesInfo.dislikesCount;
-    }
-
-    if (item.userId === userId) {
-      likesInfo.myStatus = item.status;
-    }
-  });
-
-  return likesInfo;
-};
-
-LikesSchema.statics.getLikesInfoByParentId = async function (parentId: string[], type: TypeParentId): Promise<ILikesInfo> {
-  return this.find({
-    parentId: { $in: [...parentId] },
-    type,
-  }).exec();
-};

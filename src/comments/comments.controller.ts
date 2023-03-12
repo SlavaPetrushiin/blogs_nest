@@ -24,17 +24,11 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(
-    private commentService: CommentsService,
-    private likesService: LikesService,
-  ) {}
+  constructor(private commentService: CommentsService, private likesService: LikesService) {}
 
   @UseGuards(AccessTokenGuard)
   @Get(':commentId')
-  async getComment(
-    @Param('commentId', ParseUUIDPipe) commentId: string,
-    @Request() req,
-  ) {
+  async getComment(@Param('commentId', ParseUUIDPipe) commentId: string, @Request() req) {
     const userId = req.user.id;
     const result = await this.commentService.getComment(commentId, userId);
 
@@ -48,17 +42,8 @@ export class CommentsController {
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Put(':id')
-  async updateComment(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() contentDto: UpdateCommentDto,
-    @Request() req,
-    @Res() response: Response,
-  ) {
-    const result = await this.commentService.updateComment(
-      id,
-      contentDto.content,
-      req.user.id,
-    );
+  async updateComment(@Param('id', new ParseUUIDPipe()) id: string, @Body() contentDto: UpdateCommentDto, @Request() req, @Res() response: Response) {
+    const result = await this.commentService.updateComment(id, contentDto.content, req.user.id);
 
     if (result) {
       response.status(HttpStatus.NO_CONTENT).send();
@@ -70,11 +55,7 @@ export class CommentsController {
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async deleteComment(
-    @Param('id') id: string,
-    @Request() req,
-    @Res() response: Response,
-  ) {
+  async deleteComment(@Param('id') id: string, @Request() req, @Res() response: Response) {
     const result = await this.commentService.removeComment(id, req.user.id);
 
     if (result) {
@@ -86,18 +67,16 @@ export class CommentsController {
 
   @UseGuards(AccessTokenGuard)
   @Put(':id/like-status')
-  async updateLikeStatus(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body('likeStatus', new ParseEnumPipe(StatusLike)) likeStatus: StatusLike,
-    @Request() req,
-  ) {
+  async updateLikeStatus(@Param('id', ParseUUIDPipe) id: string, @Body('likeStatus', new ParseEnumPipe(StatusLike)) likeStatus: StatusLike, @Request() req) {
     const userId = req.user.id;
+    const login = req.user.login;
 
     return this.likesService.updateLikes({
       parentId: id,
       likeStatus,
       type: 'comment',
       userId,
+      login,
     });
   }
 }

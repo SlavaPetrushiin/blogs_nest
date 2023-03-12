@@ -9,6 +9,7 @@ export class CreateOrUpdateLikeDto {
   likeStatus: StatusLike;
   type: LikeType;
   userId: string;
+  login: string;
 }
 
 @Injectable()
@@ -16,7 +17,6 @@ export class LikesService {
   constructor(private likesRepository: LikesRepository) {}
 
   async updateLikes(params: CreateOrUpdateLikeDto) {
-    const likeOrDislike = await this.likesRepository.updateLike(params);
-    return likeOrDislike;
+    return this.likesRepository.updateLike(params);
   }
 }

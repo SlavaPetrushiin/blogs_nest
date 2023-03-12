@@ -3,10 +3,7 @@ import { LikesRepository } from './likes/likes.repository';
 import { Likes, LikesSchema } from './likes/schemas/likes.schema';
 import { SecurityController } from './security/security.controller';
 import { PasswordRecoveryRepository } from './auth/password-recovery.repository';
-import {
-  PasswordRecovery,
-  PasswordRecoverySchema,
-} from './auth/schemas/password-recovery.schema';
+import { PasswordRecovery, PasswordRecoverySchema } from './auth/schemas/password-recovery.schema';
 import { Email } from './email/email.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 const configModule = ConfigModule.forRoot({
@@ -74,16 +71,7 @@ import { LikesService } from './likes/likes.service';
     }),
     JwtModule.register({}),
   ],
-  controllers: [
-    AuthController,
-    AppController,
-    UsersController,
-    BlogsController,
-    PostsController,
-    CommentsController,
-    TestingController,
-    SecurityController,
-  ],
+  controllers: [AuthController, AppController, UsersController, BlogsController, PostsController, CommentsController, TestingController, SecurityController],
   providers: [
     AuthService,
     AppService,

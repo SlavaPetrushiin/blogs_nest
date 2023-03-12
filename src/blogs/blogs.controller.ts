@@ -1,5 +1,7 @@
+import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import {
+  Request,
   Controller,
   Get,
   Post,
@@ -69,10 +71,7 @@ export class BlogsController {
   @UseGuards(AuthBasicGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateBlog(
-    @Param('id') id: string,
-    @Body() updateBlogDTO: UpdateBlogDto,
-  ) {
+  async updateBlog(@Param('id') id: string, @Body() updateBlogDTO: UpdateBlogDto) {
     const updatedBlog = await this.blogsService.updateBlog(updateBlogDTO, id);
     if (!updatedBlog) {
       throw new NotFoundException();
@@ -93,6 +92,7 @@ export class BlogsController {
   }
 
   /* Get posts by blogId */
+  @UseGuards(AccessTokenGuard)
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
@@ -103,14 +103,16 @@ export class BlogsController {
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
     @Param('blogId') blogId: string,
+    @Request() req,
   ) {
+    const { id } = req.user;
     const query = {
       pageNumber,
       pageSize,
       sortBy,
       sortDirection,
     };
-    const result = await this.blogsService.getPostsByBlogId(query, blogId);
+    const result = await this.blogsService.getPostsByBlogId(query, id, blogId);
     if (!result) {
       throw new NotFoundException();
     }
@@ -119,14 +121,8 @@ export class BlogsController {
 
   @UseGuards(AuthBasicGuard)
   @Post(':blogId/posts')
-  async createPostByBlogId(
-    @Param('blogId') blogId: string,
-    @Body() createPostDto: CreatePostByBlogIdDto,
-  ) {
-    const result = await this.blogsService.createPostByBlogId(
-      createPostDto,
-      blogId,
-    );
+  async createPostByBlogId(@Param('blogId') blogId: string, @Body() createPostDto: CreatePostByBlogIdDto) {
+    const result = await this.blogsService.createPostByBlogId(createPostDto, blogId);
     if (!result) {
       throw new NotFoundException();
     }

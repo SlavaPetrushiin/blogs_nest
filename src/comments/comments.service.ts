@@ -1,17 +1,8 @@
 import { UsersService } from './../users/users.service';
 import { StatusLike } from './../likes/schemas/likes.schema';
 import { PostsService } from './../posts/posts.service';
-import { CommentDocument } from './schemas/comment.schema';
-import { AllEntitiesComment } from './dto/allEntitiesComment';
 import { CommentsRepository } from './comments.repository';
-import { BlogsRepository } from '../blogs/blogs.repository';
-
-import { Types } from 'mongoose';
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 export interface IParamsCreateComment {
   userId: string;
@@ -22,22 +13,14 @@ export interface IParamsCreateComment {
 
 @Injectable()
 export class CommentsService {
-  constructor(
-    private commentsRepository: CommentsRepository,
-    private postsService: PostsService,
-    private usersService: UsersService,
-  ) {}
-
-  // async getPosts(query: AllEntitiesPost) {
-  //   return this.postsRepository.findAllPosts(query);
-  // }
+  constructor(private commentsRepository: CommentsRepository, private postsService: PostsService, private usersService: UsersService) {}
 
   async getComment(commentId: string, userId: string) {
     return this.commentsRepository.findComment(commentId, userId);
   }
 
   async createComment(params: Omit<IParamsCreateComment, 'userLogin'>) {
-    const foundedPost = await this.postsService.getPost(params.postId);
+    const foundedPost = await this.postsService.getPost(params.postId, params.userId);
     if (!foundedPost) {
       throw new NotFoundException();
     }
@@ -67,11 +50,7 @@ export class CommentsService {
   }
 
   async updateComment(commentId: string, content: string, userId: string) {
-    const foundedComment = await this.commentsRepository.findComment(
-      commentId,
-      userId,
-    );
-    console.log('AAAAAAAAAAAAA');
+    const foundedComment = await this.commentsRepository.findComment(commentId, userId);
     if (!foundedComment) {
       throw new NotFoundException();
     }
@@ -84,10 +63,7 @@ export class CommentsService {
   }
 
   async removeComment(commentId: string, userId: string): Promise<boolean> {
-    const foundedComment = await this.commentsRepository.findComment(
-      commentId,
-      userId,
-    );
+    const foundedComment = await this.commentsRepository.findComment(commentId, userId);
 
     if (!foundedComment) {
       throw new NotFoundException();
@@ -99,13 +75,4 @@ export class CommentsService {
 
     return await this.commentsRepository.removeComment(commentId);
   }
-
-  // async getCommentsByPostId(query: AllEntitiesComment, postId: string) {
-  //   const foundedPost = await this.postsRepository.findPost(postId);
-  //   if (!foundedPost) {
-  //     return null;
-  //   }
-
-  //   return this.commentsRepository.getCommentsByPostId(query, postId);
-  // }
 }

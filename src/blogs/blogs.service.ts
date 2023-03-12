@@ -10,10 +10,7 @@ import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 
 @Injectable()
 export class BlogsService {
-  constructor(
-    private blogsRepository: BlogsRepository,
-    private postsRepository: PostsRepository,
-  ) {}
+  constructor(private blogsRepository: BlogsRepository, private postsRepository: PostsRepository) {}
 
   async getBlogs(query: AllEntitiesBlog) {
     return this.blogsRepository.findAllBlogs(query);
@@ -40,19 +37,16 @@ export class BlogsService {
     return isDeleted;
   }
 
-  async getPostsByBlogId(query: AllEntitiesPost, blogId: string) {
+  async getPostsByBlogId(query: AllEntitiesPost, userId: string, blogId: string) {
     const foundedBlog = await this.blogsRepository.findBlog(blogId);
     if (!foundedBlog) {
       return null;
     }
 
-    return this.postsRepository.findAllPosts(query, blogId);
+    return this.postsRepository.findAllPosts(query, userId, blogId);
   }
 
-  async createPostByBlogId(
-    createPostByBlogIdDto: CreatePostByBlogIdDto,
-    blogId: string,
-  ) {
+  async createPostByBlogId(createPostByBlogIdDto: CreatePostByBlogIdDto, blogId: string) {
     const foundedBlog = await this.blogsRepository.findBlog(blogId);
     if (!foundedBlog) {
       return null;

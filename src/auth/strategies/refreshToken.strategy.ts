@@ -4,10 +4,7 @@ import { Request } from 'express';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-refresh',
-) {
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor() {
     super({
       secretOrKey: process.env.JWT_REFRESH_SECRET,
