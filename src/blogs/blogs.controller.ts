@@ -1,4 +1,4 @@
-import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
+import { ExtactUserFromToken } from './../posts/guards/ExtactUserFromToken';
 import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import {
   Request,
@@ -24,7 +24,7 @@ import { CreatePostByBlogIdDto } from './../posts/dto/create-post.dto';
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(private blogsService: BlogsService) {}
+  constructor(private blogsService: BlogsService) { }
 
   @Get()
   async getBlogs(
@@ -46,7 +46,7 @@ export class BlogsController {
         sortDirection,
       });
       return result;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   @Get(':id')
@@ -92,7 +92,7 @@ export class BlogsController {
   }
 
   /* Get posts by blogId */
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(ExtactUserFromToken)
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)

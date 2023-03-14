@@ -1,3 +1,4 @@
+import { ExtactUserFromToken } from './guards/ExtactUserFromToken';
 import { StatusLike } from './../likes/schemas/likes.schema';
 import { CreateCommentDto } from './../comments/dto/create-comment.dto';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
@@ -30,9 +31,9 @@ import { Response } from 'express';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) {}
+  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) { }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(ExtactUserFromToken)
   @Get()
   async getPosts(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)

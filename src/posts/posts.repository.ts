@@ -17,7 +17,7 @@ interface INewPostDto extends CreatePostDto {
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectModel(Post.name) private PostModel: Model<PostDocument>, private likesRepository: LikesRepository) {}
+  constructor(@InjectModel(Post.name) private PostModel: Model<PostDocument>, private likesRepository: LikesRepository) { }
 
   async findAllPosts(params: AllEntitiesPost, userId: string, blogId: string = null) {
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
@@ -70,9 +70,6 @@ export class PostsRepository {
         },
       });
     }
-
-    preparedResult.map((l) => console.log(l));
-
     return {
       pagesCount: pageCount,
       page: +pageNumber,
