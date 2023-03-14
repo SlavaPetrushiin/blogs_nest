@@ -1,3 +1,4 @@
+import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { StatusLike } from './../likes/schemas/likes.schema';
 import { CreateCommentDto } from './../comments/dto/create-comment.dto';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
@@ -19,7 +20,6 @@ import {
   Request,
   ParseUUIDPipe,
   ParseEnumPipe,
-  BadRequestException,
 } from '@nestjs/common';
 import { Body, Res, UseGuards } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -32,7 +32,7 @@ import { Response } from 'express';
 export class PostsController {
   constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) {}
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get()
   async getPosts(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
@@ -56,7 +56,7 @@ export class PostsController {
     );
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':postId')
   async getPost(@Param('postId') postId: string, @Request() req) {
     const { id } = req.user;
@@ -111,7 +111,7 @@ export class PostsController {
     });
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':postId/comments')
   async getCommentsByPostId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)

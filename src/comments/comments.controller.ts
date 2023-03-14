@@ -1,3 +1,4 @@
+import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { LikesService } from './../likes/likes.service';
 import { StatusLike } from './../likes/schemas/likes.schema';
 import { Body } from '@nestjs/common/decorators';
@@ -26,7 +27,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentsController {
   constructor(private commentService: CommentsService, private likesService: LikesService) {}
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':commentId')
   async getComment(@Param('commentId', ParseUUIDPipe) commentId: string, @Request() req) {
     const userId = req.user.id;

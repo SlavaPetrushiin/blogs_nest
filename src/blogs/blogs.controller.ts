@@ -1,3 +1,4 @@
+import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import {
@@ -92,7 +93,7 @@ export class BlogsController {
   }
 
   /* Get posts by blogId */
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
