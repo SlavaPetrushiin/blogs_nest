@@ -1,12 +1,6 @@
 import { CheckBlogId } from './../validators/checkBlogId';
 import { Transform } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  MaxLength,
-  Validate,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, MaxLength, Validate } from 'class-validator';
 export class CreatePostDto {
   @IsString()
   @Transform(({ value }) => value.trim())
@@ -29,7 +23,7 @@ export class CreatePostDto {
   @IsString()
   @IsUUID()
   @Validate(CheckBlogId)
-  blogId: string;
+  readonly blogId: string;
 }
 
 export class CreatePostByBlogIdDto {

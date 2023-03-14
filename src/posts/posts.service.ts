@@ -1,5 +1,6 @@
+import { LikeStatusDto } from './../likes/dto/like.dto';
 import { LikesRepository } from './../likes/likes.repository';
-import { LikesDocument, StatusLike, ILikesInfo } from './../likes/schemas/likes.schema';
+import { StatusLike } from './../likes/schemas/likes.schema';
 import { AllEntitiesComment } from './../comments/dto/allEntitiesComment';
 import { CommentsRepository } from './../comments/comments.repository';
 import { BlogsRepository } from './../blogs/blogs.repository';
@@ -120,7 +121,7 @@ export class PostsService {
     return this.commentsRepository.getCommentsByPostId(query, postId, userId);
   }
 
-  async addLikeOrDislike(postId: string, likeStatus: StatusLike, userId: string, login: string) {
+  async addLikeOrDislike(postId: string, likeStatus: LikeStatusDto, userId: string, login: string) {
     const post = await this.getPost(postId, userId);
 
     if (!post) {

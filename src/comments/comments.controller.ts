@@ -1,3 +1,4 @@
+import { LikeStatusDto } from './../likes/dto/like.dto';
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { LikesService } from './../likes/likes.service';
 import { StatusLike } from './../likes/schemas/likes.schema';
@@ -68,7 +69,7 @@ export class CommentsController {
 
   @UseGuards(AccessTokenGuard)
   @Put(':id/like-status')
-  async updateLikeStatus(@Param('id', ParseUUIDPipe) id: string, @Body('likeStatus', new ParseEnumPipe(StatusLike)) likeStatus: StatusLike, @Request() req) {
+  async updateLikeStatus(@Param('id', ParseUUIDPipe) id: string, @Body('likeStatus') likeStatus: LikeStatusDto, @Request() req) {
     const userId = req.user.id;
     const login = req.user.login;
 

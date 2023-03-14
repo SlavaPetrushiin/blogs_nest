@@ -1,21 +1,22 @@
+import { BlogsService } from './../../blogs/blogs.service';
 import { Injectable } from '@nestjs/common';
-import { BlogsRepository } from './../../blogs/blogs.repository';
-import {
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
-} from 'class-validator';
+import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
 
-@ValidatorConstraint({ name: 'blogId', async: true })
+@ValidatorConstraint({ name: 'BlogIsExist', async: false })
 @Injectable()
 export class CheckBlogId implements ValidatorConstraintInterface {
-  constructor(private readonly blogsRepository: BlogsRepository) {}
+  constructor(private readonly blogsService: BlogsService) {}
 
   async validate(blogId: string): Promise<boolean> {
-    const blog = await this.blogsRepository.findBlog(blogId);
+    try {
+      const blog = await this.blogsService.getBlog(blogId);
 
-    if (blog) {
-      return true;
-    } else {
+      if (blog) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
       return false;
     }
   }

@@ -1,3 +1,4 @@
+import { LikeStatusDto } from './../likes/dto/like.dto';
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { StatusLike } from './../likes/schemas/likes.schema';
 import { CreateCommentDto } from './../comments/dto/create-comment.dto';
@@ -19,7 +20,6 @@ import {
   NotFoundException,
   Request,
   ParseUUIDPipe,
-  ParseEnumPipe,
 } from '@nestjs/common';
 import { Body, Res, UseGuards } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -142,12 +142,12 @@ export class PostsController {
   @Put(':postId/like-status')
   async addLikeOrDislike(
     @Param('postId', ParseUUIDPipe) postId: string,
-    @Body('likeStatus', new ParseEnumPipe(StatusLike)) likeStatus: StatusLike,
+    @Body('likeStatus') likeStatusDto: LikeStatusDto,
     @Request() req,
     @Res() response: Response,
   ) {
     const { id, login } = req.user;
-    const isCreated = await this.postsService.addLikeOrDislike(postId, likeStatus, id, login);
+    const isCreated = await this.postsService.addLikeOrDislike(postId, likeStatusDto, id, login);
 
     if (!isCreated) {
       throw new NotFoundException();

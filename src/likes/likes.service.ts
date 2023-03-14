@@ -1,12 +1,12 @@
+import { LikeStatusDto } from './dto/like.dto';
 import { LikesRepository } from './likes.repository';
-import { StatusLike } from './schemas/likes.schema';
 import { Injectable } from '@nestjs/common';
 
 type LikeType = 'post' | 'comment';
 
 export class CreateOrUpdateLikeDto {
   parentId: string;
-  likeStatus: StatusLike;
+  likeStatus: LikeStatusDto;
   type: LikeType;
   userId: string;
   login: string;
