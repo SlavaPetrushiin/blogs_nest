@@ -1,4 +1,5 @@
-import { IsString, IsUUID, MaxLength } from 'class-validator';
+import { CheckBlogId } from './../validators/checkBlogId';
+import { IsString, IsUUID, MaxLength, Validate } from 'class-validator';
 
 export class UpdatePostDto {
   @IsString()
@@ -15,5 +16,6 @@ export class UpdatePostDto {
 
   @IsString()
   @IsUUID()
-  blogId: string;
+  @Validate(CheckBlogId, { message: 'Not exist blog' })
+  readonly blogId: string;
 }

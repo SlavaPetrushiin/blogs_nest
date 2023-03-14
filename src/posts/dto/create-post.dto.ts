@@ -22,7 +22,7 @@ export class CreatePostDto {
 
   @IsString()
   @IsUUID()
-  @Validate(CheckBlogId)
+  @Validate(CheckBlogId, { message: 'Not exist blog' })
   readonly blogId: string;
 }
 
