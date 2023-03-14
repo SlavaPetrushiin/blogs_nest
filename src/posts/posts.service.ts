@@ -121,7 +121,7 @@ export class PostsService {
     return this.commentsRepository.getCommentsByPostId(query, postId, userId);
   }
 
-  async addLikeOrDislike(postId: string, likeStatus: LikeStatusDto, userId: string, login: string) {
+  async addLikeOrDislike(postId: string, likeStatus: StatusLike, userId: string, login: string) {
     const post = await this.getPost(postId, userId);
 
     if (!post) {

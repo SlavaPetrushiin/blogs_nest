@@ -1,6 +1,5 @@
 import { LikeStatusDto } from './../likes/dto/like.dto';
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
-import { StatusLike } from './../likes/schemas/likes.schema';
 import { CreateCommentDto } from './../comments/dto/create-comment.dto';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { CommentsService } from './../comments/comments.service';
@@ -140,14 +139,9 @@ export class PostsController {
 
   @UseGuards(AccessTokenGuard)
   @Put(':postId/like-status')
-  async addLikeOrDislike(
-    @Param('postId', ParseUUIDPipe) postId: string,
-    @Body('likeStatus') likeStatusDto: LikeStatusDto,
-    @Request() req,
-    @Res() response: Response,
-  ) {
+  async addLikeOrDislike(@Param('postId', ParseUUIDPipe) postId: string, @Body() { likeStatus }: LikeStatusDto, @Request() req, @Res() response: Response) {
     const { id, login } = req.user;
-    const isCreated = await this.postsService.addLikeOrDislike(postId, likeStatusDto, id, login);
+    const isCreated = await this.postsService.addLikeOrDislike(postId, likeStatus, id, login);
 
     if (!isCreated) {
       throw new NotFoundException();
