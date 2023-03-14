@@ -67,6 +67,7 @@ export class CommentsController {
     }
   }
 
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AccessTokenGuard)
   @Put(':id/like-status')
   async updateLikeStatus(@Param('id', ParseUUIDPipe) id: string, @Body() { likeStatus }: LikeStatusDto, @Request() req) {
