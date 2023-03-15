@@ -67,14 +67,14 @@ export class CommentsController {
     }
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessTokenGuard)
   @Put(':id/like-status')
   async updateLikeStatus(@Param('id', ParseUUIDPipe) id: string, @Body() { likeStatus }: LikeStatusDto, @Request() req) {
     const userId = req.user.id;
     const login = req.user.login;
 
-    return this.likesService.updateLikes({
+    return this.commentService.updateLikes({
       parentId: id,
       likeStatus,
       type: 'comment',

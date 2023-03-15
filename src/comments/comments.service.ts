@@ -1,3 +1,5 @@
+import { LikesRepository } from './../likes/likes.repository';
+import { CreateOrUpdateLikeDto } from './../likes/likes.service';
 import { UsersService } from './../users/users.service';
 import { StatusLike } from './../likes/schemas/likes.schema';
 import { PostsService } from './../posts/posts.service';
@@ -13,7 +15,12 @@ export interface IParamsCreateComment {
 
 @Injectable()
 export class CommentsService {
-  constructor(private commentsRepository: CommentsRepository, private postsService: PostsService, private usersService: UsersService) {}
+  constructor(
+    private commentsRepository: CommentsRepository,
+    private postsService: PostsService,
+    private usersService: UsersService,
+    private likesRepository: LikesRepository,
+  ) {}
 
   async getComment(commentId: string, userId: string) {
     return this.commentsRepository.findComment(commentId, userId);
@@ -74,5 +81,12 @@ export class CommentsService {
     }
 
     return await this.commentsRepository.removeComment(commentId);
+  }
+
+  async updateLikes(params: CreateOrUpdateLikeDto) {
+    const comment = await this.commentsRepository.findComment(params.parentId, params.userId);
+    if (!comment) throw new NotFoundException();
+
+    return this.likesRepository.updateLike(params);
   }
 }
