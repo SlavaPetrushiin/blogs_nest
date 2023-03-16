@@ -16,8 +16,8 @@ function isEmailValid(value) {
   return EMAIL_REGEXP.test(value);
 }
 
-const EXPIRES_ACCESS_TIME = '10h'; //'10s';
-const EXPIRES_REFRESH_TIME = '20h'; //'20s';
+const EXPIRES_ACCESS_TIME = '10s'; //'10s';
+const EXPIRES_REFRESH_TIME = '20s'; //'20s';
 
 export const convertJwtPayloadSecondsToIsoDate = (value: number): string => {
   return new Date(value * 1000).toISOString();
@@ -242,7 +242,7 @@ export class AuthService {
   }
 
   async login(user: any, ipAddress: string, title: string) {
-    const { id, login, email, createdAt } = user;
+    const { id, login } = user;
 
     const deviceId = uuidv4();
     const accessToken = this.jwtService.sign({ id, login }, { secret: process.env.JWT_ACCESS_SECRET, expiresIn: EXPIRES_ACCESS_TIME });
