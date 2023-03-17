@@ -10,14 +10,17 @@ import { RegistrationDto } from './dto/registration.dto';
 import { Controller, Get, Post, Body, HttpCode, BadRequestException, HttpStatus, UseGuards, Request, UnauthorizedException, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { SkipThrottle } from '@nestjs/throttler';
 
 const MILLISECONDS_IN_HOUR = 3_600_000;
 const MAX_AGE_COOKIE_MILLISECONDS = 20; // * MILLISECONDS_IN_HOUR; //MILLISECONDS_IN_HOUR * 20 //20_000;
 
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService, private readonly usersService: UsersService) {}
 
+  @SkipThrottle(false)
   @UseGuards(AccessTokenGuard)
   @Get('me')
   async getMe(@Request() req) {
@@ -48,6 +51,7 @@ export class AuthController {
     return res.status(200).send({ accessToken: tokens.accessToken });
   }
 
+  @SkipThrottle(false)
   @UseGuards(RefreshTokenGuard)
   @HttpCode(204)
   @Post('logout')
@@ -103,6 +107,7 @@ export class AuthController {
     response.status(HttpStatus.NO_CONTENT).send();
   }
 
+  @SkipThrottle(false)
   @HttpCode(HttpStatus.UNAUTHORIZED)
   @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
