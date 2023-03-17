@@ -12,7 +12,7 @@ import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 
 const MILLISECONDS_IN_HOUR = 3_600_000;
-const MAX_AGE_COOKIE_MILLISECONDS = 20; //* MILLISECONDS_IN_HOUR; //MILLISECONDS_IN_HOUR * 20 //20_000;
+const MAX_AGE_COOKIE_MILLISECONDS = 20; // * MILLISECONDS_IN_HOUR; //MILLISECONDS_IN_HOUR * 20 //20_000;
 
 @Controller('auth')
 export class AuthController {
