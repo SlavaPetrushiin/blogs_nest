@@ -154,7 +154,7 @@ export class AuthService {
     const foundedSession = await this.authRepository.getSession(convertJwtPayloadSecondsToIsoDate(user.iat), id, deviceId);
 
     if (!foundedSession) {
-      throw new BadRequestException(getArrayErrors('email', 'Пользователя не найден'));
+      throw new UnauthorizedException();
     }
 
     const accessToken = this.jwtService.sign({ id }, { secret: process.env.JWT_ACCESS_SECRET, expiresIn: EXPIRES_ACCESS_TIME });
@@ -175,7 +175,7 @@ export class AuthService {
     });
 
     if (!result) {
-      throw new BadRequestException(getArrayErrors('email', 'Пользователя не найден'));
+      throw new UnauthorizedException();
     }
 
     return { accessToken, refreshToken };
