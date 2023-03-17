@@ -19,36 +19,20 @@ export class AuthRepository {
     return new this.AuthModel(dataSession);
   }
 
-  async getSession(
-    iat: string,
-    userId: string,
-    deviceId: string,
-  ): Promise<AuthDocument> {
-    return this.AuthModel.findOne(
-      { lastActiveDate: iat, userId, deviceId },
-      { projection: { ...DEFAULT_PROJECTION } },
-    ).exec();
+  async getSession(iat: string, userId: string, deviceId: string): Promise<AuthDocument> {
+    return this.AuthModel.findOne({ lastActiveDate: iat, userId, deviceId }, { projection: { ...DEFAULT_PROJECTION } }).exec();
   }
 
   async findAllSessions(userId: string): Promise<AuthDocument[]> {
-    return this.AuthModel.find(
-      { userId },
-      { projection: { ...DEFAULT_PROJECTION, exp: false, userId: false } },
-    );
+    return this.AuthModel.find({ userId }, { projection: { ...DEFAULT_PROJECTION, exp: false, userId: false } });
   }
 
-  public async removeSession(
-    userId: string,
-    deviceId: string,
-  ): Promise<boolean> {
+  public async removeSession(userId: string, deviceId: string): Promise<boolean> {
     const res = await this.AuthModel.deleteOne({ userId, deviceId });
     return res.deletedCount > 0 ? true : false;
   }
 
-  async removeAllSessionsUserNotCurrent(
-    userId: string,
-    deviceId: string,
-  ): Promise<boolean> {
+  async removeAllSessionsUserNotCurrent(userId: string, deviceId: string): Promise<boolean> {
     const res = await this.AuthModel.deleteMany({
       userId,
       deviceId: { $ne: deviceId },
@@ -77,5 +61,9 @@ export class AuthRepository {
 
   async deleteMany() {
     return this.AuthModel.deleteMany({});
+  }
+
+  async logout(userId: string, deviceId: string) {
+    return this.AuthModel.deleteOne({ id: userId, deviceId });
   }
 }

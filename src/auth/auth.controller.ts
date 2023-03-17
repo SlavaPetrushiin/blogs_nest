@@ -12,7 +12,7 @@ import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 
 const MILLISECONDS_IN_HOUR = 3_600_000;
-const MAX_AGE_COOKIE_MILLISECONDS = 20; //* MILLISECONDS_IN_HOUR; //MILLISECONDS_IN_HOUR * 20 //20_000;
+const MAX_AGE_COOKIE_MILLISECONDS = 20 * MILLISECONDS_IN_HOUR; //MILLISECONDS_IN_HOUR * 20 //20_000;
 
 @Controller('auth')
 export class AuthController {
@@ -46,6 +46,18 @@ export class AuthController {
       secure: true,
     });
     return res.status(200).send({ accessToken: tokens.accessToken });
+  }
+
+  @UseGuards(RefreshTokenGuard)
+  @HttpCode(204)
+  @Post('logout')
+  async logout(@Request() req) {
+    const userId = req.user.id;
+    const deviceId = req.user.deviceId;
+    const isDeleted = await this.authService.logout(userId, deviceId);
+
+    if (!isDeleted) throw new UnauthorizedException();
+    return;
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

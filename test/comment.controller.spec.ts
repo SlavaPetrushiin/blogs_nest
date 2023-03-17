@@ -160,6 +160,7 @@ describe('Comments', () => {
   // postId6 = '';
   let comment_1, comment_2;
   let commentId1, commentId2;
+  let cookie1, cookie2;
 
   it('should delete all data', async () => {
     await supertest(server).delete('/testing/all-data').expect(204);
@@ -182,6 +183,9 @@ describe('Comments', () => {
     tokens.token_user_2 = auth_user_2.body.accessToken;
     tokens.token_user_3 = auth_user_3.body.accessToken;
     tokens.token_user_4 = auth_user_4.body.accessToken;
+
+    cookie1 = auth_user_1.header['set-cookie'];
+    cookie2 = auth_user_2.header['set-cookie'];
 
     const blog = await supertest(server).post('/blogs').set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(BLOG_MODEL);
     const blogID = blog.body.id;
@@ -473,6 +477,11 @@ describe('Comments', () => {
         },
       ],
     });
+  });
+
+  it('should delete current device, if user logout', async () => {
+    console.log({ cookie1 });
+    await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(204);
   });
 
   // it('should return postsbyId after likes', async function () {

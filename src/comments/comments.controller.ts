@@ -1,7 +1,6 @@
 import { LikeStatusDto } from './../likes/dto/like.dto';
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { LikesService } from './../likes/likes.service';
-import { StatusLike } from './../likes/schemas/likes.schema';
 import { Body } from '@nestjs/common/decorators';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import {

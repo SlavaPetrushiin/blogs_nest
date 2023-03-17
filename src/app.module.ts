@@ -41,10 +41,15 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthRepository } from './auth/auth.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { LikesService } from './likes/likes.service';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
     configModule,
+    ThrottlerModule.forRoot({
+      ttl: 10,
+      limit: 5,
+    }),
     MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
