@@ -16,8 +16,8 @@ function isEmailValid(value) {
   return EMAIL_REGEXP.test(value);
 }
 
-const EXPIRES_ACCESS_TIME = '10h'; //'10s';
-const EXPIRES_REFRESH_TIME = '20h'; //'20s';
+const EXPIRES_ACCESS_TIME = '10s'; //'10s';
+const EXPIRES_REFRESH_TIME = '20s'; //'20s';
 
 export const convertJwtPayloadSecondsToIsoDate = (value: number): string => {
   return new Date(value * 1000).toISOString();
