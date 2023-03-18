@@ -9,6 +9,7 @@ import { Injectable, BadRequestException, NotFoundException, ForbiddenException,
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import { PasswordRecoveryRepository } from './password-recovery.repository';
+import jwt from 'jsonwebtoken';
 
 const EMAIL_REGEXP = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu;
 
@@ -150,28 +151,21 @@ export class AuthService {
   }
 
   async updateRefreshToken(user: { id: string; deviceId: string; iat: number; exp: number }) {
-    const { id, iat, deviceId, exp } = user;
-    const foundedSession = await this.authRepository.getSession(convertJwtPayloadSecondsToIsoDate(user.iat), id, deviceId);
+    const { id, iat, deviceId } = user;
+    const foundedSession = await this.authRepository.getSession(convertJwtPayloadSecondsToIsoDate(iat), id, deviceId);
 
     if (!foundedSession) {
       throw new UnauthorizedException();
     }
 
-    const accessToken = this.jwtService.sign({ id }, { secret: process.env.JWT_ACCESS_SECRET, expiresIn: EXPIRES_ACCESS_TIME });
-    const refreshToken = this.jwtService.sign(
-      { id, deviceId },
-      {
-        secret: process.env.JWT_REFRESH_SECRET,
-        expiresIn: EXPIRES_REFRESH_TIME,
-      },
-    );
-
+    const accessToken = jwt.sign({ id, deviceId }, process.env.JWT_ACCESS_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
+    const refreshToken = jwt.sign({ id, deviceId }, process.env.JWT_REFRESH_SECRET, { expiresIn: EXPIRES_REFRESH_TIME });
     const decodedRefreshToken: any = this.jwtService.decode(refreshToken);
 
     const result = await this.authRepository.updateSession({
       oldLastActiveDate: foundedSession.lastActiveDate,
-      lastActiveDate: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.iat!),
-      exp: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.exp!),
+      lastActiveDate: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.iat),
+      exp: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.exp),
     });
 
     if (!result) {
@@ -245,15 +239,8 @@ export class AuthService {
     const { id, login } = user;
 
     const deviceId = uuidv4();
-    const accessToken = this.jwtService.sign({ id, login }, { secret: process.env.JWT_ACCESS_SECRET, expiresIn: EXPIRES_ACCESS_TIME });
-    const refreshToken = this.jwtService.sign(
-      { id, deviceId },
-      {
-        secret: process.env.JWT_REFRESH_SECRET,
-        expiresIn: EXPIRES_REFRESH_TIME,
-      },
-    );
-
+    const accessToken = jwt.sign({ id, login }, process.env.JWT_ACCESS_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
+    const refreshToken = jwt.sign({ id, deviceId }, process.env.JWT_REFRESH_SECRET, { expiresIn: EXPIRES_REFRESH_TIME });
     const decodedRefreshToken: any = this.jwtService.decode(refreshToken);
 
     const authDeviceSession = await this.authRepository.createSession({
@@ -270,7 +257,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async logout(userId: string, deviceId: string) {
+  async logout(userId: string, deviceId: string): Promise<boolean> {
     return this.authRepository.logout(userId, deviceId);
   }
 }

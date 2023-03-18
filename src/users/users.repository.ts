@@ -12,22 +12,12 @@ export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
 
   async findAllUsers(query: AllEntitiesUser) {
-    const {
-      pageNumber,
-      pageSize,
-      searchEmailTerm,
-      searchLoginTerm,
-      sortBy,
-      sortDirection,
-    } = query;
+    const { pageNumber, pageSize, searchEmailTerm, searchLoginTerm, sortBy, sortDirection } = query;
 
     const skip = (+pageNumber - 1) * +pageSize;
     const result = await this.UserModel.find(
       {
-        $or: [
-          { email: { $regex: searchEmailTerm, $options: 'i' } },
-          { login: { $regex: searchLoginTerm, $options: 'i' } },
-        ],
+        $or: [{ email: { $regex: searchEmailTerm, $options: 'i' } }, { login: { $regex: searchLoginTerm, $options: 'i' } }],
       },
       { projection: { ...DEFAULT_PROJECTION } },
     )
@@ -36,10 +26,7 @@ export class UsersRepository {
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
 
     const totalCount = await this.UserModel.countDocuments({
-      $or: [
-        { email: { $regex: searchEmailTerm, $options: 'i' } },
-        { login: { $regex: searchLoginTerm, $options: 'i' } },
-      ],
+      $or: [{ email: { $regex: searchEmailTerm, $options: 'i' } }, { login: { $regex: searchLoginTerm, $options: 'i' } }],
     });
     const pageCount = Math.ceil(totalCount / +pageSize);
 
@@ -68,10 +55,7 @@ export class UsersRepository {
   }
 
   async findUserByCode(code): Promise<UserDocument> {
-    return this.UserModel.findOne(
-      { 'emailConfirmation.code': code },
-      { projection: { ...DEFAULT_PROJECTION } },
-    ).exec();
+    return this.UserModel.findOne({ 'emailConfirmation.code': code }, { projection: { ...DEFAULT_PROJECTION } }).exec();
   }
 
   async findUserById(userId: string) {
@@ -79,10 +63,7 @@ export class UsersRepository {
   }
 
   async updateConfirmationStatus(userId: string) {
-    return this.UserModel.findOneAndUpdate(
-      { id: userId },
-      { $set: { 'emailConfirmation.isConfirmed': true } },
-    );
+    return this.UserModel.findOneAndUpdate({ id: userId }, { $set: { 'emailConfirmation.isConfirmed': true } });
   }
 
   async updateConfirmationCode(id: string, code: string, expirationData: Date) {
@@ -98,10 +79,7 @@ export class UsersRepository {
   }
 
   async updatePassword(id: string, newPassword: string): Promise<boolean> {
-    const result = await this.UserModel.updateOne(
-      { id },
-      { $set: { password: newPassword } },
-    );
+    const result = await this.UserModel.updateOne({ id }, { $set: { password: newPassword } });
 
     return result.matchedCount > 0;
   }

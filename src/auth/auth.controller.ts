@@ -1,3 +1,4 @@
+import { RefreshTokenCustomGuard } from './../guards/refresh-token.guard';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { RecoveryPasswordDto } from './dto/recoveryPass.dto';
 import { ConfirmationResendingDto } from './dto/confirmation-resending.dto copy';
@@ -52,7 +53,7 @@ export class AuthController {
   }
 
   @SkipThrottle(false)
-  @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenCustomGuard)
   @HttpCode(204)
   @Post('logout')
   async logout(@Request() req) {
@@ -109,7 +110,8 @@ export class AuthController {
 
   @SkipThrottle(false)
   @HttpCode(HttpStatus.UNAUTHORIZED)
-  @UseGuards(RefreshTokenGuard)
+  //@UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenCustomGuard)
   @Post('refresh-token')
   async refreshToken(@Request() req, @Res() res) {
     const user = req.user;

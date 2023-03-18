@@ -63,7 +63,8 @@ export class AuthRepository {
     return this.AuthModel.deleteMany({});
   }
 
-  async logout(userId: string, deviceId: string) {
-    return this.AuthModel.deleteOne({ id: userId, deviceId });
+  async logout(userId: string, deviceId: string): Promise<boolean> {
+    const isDeleted = await this.AuthModel.deleteOne({ userId, deviceId });
+    return isDeleted.deletedCount > 0;
   }
 }

@@ -484,62 +484,38 @@ describe('Comments', () => {
     await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(204);
   });
 
-  // it('should return postsbyId after likes', async function () {
-  //   await supertest(server)
-  //     .put(`/comments/${commentId1}/like-status`)
-  //     .set('Authorization', `Bearer ${tokens.token_user_1}`)
-  //     .send({ likeStatus: StatusLike.Like })
-  //     .expect(HttpStatus.OK);
+  // describe('Tokens', () => {
+  //   let auth_user_1, cookieWithTokens, cookieWithUpdatedTokens;
 
-  //   await supertest(server)
-  //     .put(`/comments/${commentId1}/like-status`)
-  //     .set('Authorization', `Bearer ${tokens.token_user_2}`)
-  //     .send({ likeStatus: StatusLike.Dislike })
-  //     .expect(HttpStatus.OK);
+  //   it('should register user', async () => {
+  //     auth_user_1 = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1).expect(200);
+  //     cookieWithTokens = auth_user_1.header['set-cookie'];
 
-  //   await supertest(server)
-  //     .put(`/comments/${commentId1}/like-status`)
-  //     .set('Authorization', `Bearer ${tokens.token_user_1}`)
-  //     .send({ likeStatus: StatusLike.Dislike })
-  //     .expect(HttpStatus.OK);
+  //     // console.log({ 'accessToken: ': auth_user_1.body.accessToken });
 
-  //   const commentsByPostId = await supertest(server).get(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
+  //     LogoutTimeout(9);
+  //   });
 
-  //   expect(commentsByPostId.body).toStrictEqual({
-  //     pagesCount: 1,
-  //     page: 1,
-  //     pageSize: 10,
-  //     totalCount: 2,
-  //     items: [
-  //       {
-  //         id: expect.any(String),
-  //         content: COMMENT_CONTENT_2.content,
-  //         commentatorInfo: {
-  //           userId: expect.any(String),
-  //           userLogin: inputModelUser2.login,
-  //         },
-  //         createdAt: expect.any(String),
-  //         likesInfo: {
-  //           likesCount: 0,
-  //           dislikesCount: 1,
-  //           myStatus: 'None',
-  //         },
-  //       },
-  //       {
-  //         id: expect.any(String),
-  //         content: expect.any(String),
-  //         commentatorInfo: {
-  //           userId: expect.any(String),
-  //           userLogin: expect.any(String),
-  //         },
-  //         createdAt: expect.any(String),
-  //         likesInfo: {
-  //           likesCount: 0,
-  //           dislikesCount: 2,
-  //           myStatus: StatusLike.Dislike,
-  //         },
-  //       },
-  //     ],
+  //   it('should refresh-token', async () => {
+  //     const result = await supertest(server).post('/auth/refresh-token').set('Cookie', cookieWithTokens);
+  //     cookieWithUpdatedTokens = result.header['set-cookie'];
+
+  //     expect(result.body).toStrictEqual({
+  //       accessToken: expect.any(String),
+  //     });
+  //   });
+
+  //   it('LogoutTimeout', async () => {
+  //     // await LogoutTimeout();
+  //     await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(401);
   //   });
   // });
 });
+
+function LogoutTimeout(delay: number) {
+  return new Promise<void>((res) => {
+    setTimeout(() => {
+      res();
+    }, delay * 1000);
+  });
+}
