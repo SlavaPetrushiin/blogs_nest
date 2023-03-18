@@ -1,5 +1,4 @@
 import { RefreshTokenCustomGuard } from './../guards/refresh-token.guard';
-import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { RecoveryPasswordDto } from './dto/recoveryPass.dto';
 import { ConfirmationResendingDto } from './dto/confirmation-resending.dto copy';
 import { ConfirmationDto } from './dto/confirmation.dto';
@@ -14,7 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { SkipThrottle } from '@nestjs/throttler';
 
 const MILLISECONDS_IN_HOUR = 3_600_000;
-const MAX_AGE_COOKIE_MILLISECONDS = 20; // * MILLISECONDS_IN_HOUR; //MILLISECONDS_IN_HOUR * 20 //20_000;
+const MAX_AGE_COOKIE_MILLISECONDS = 20 * MILLISECONDS_IN_HOUR; //MILLISECONDS_IN_HOUR * 20 //20_000;
 
 @SkipThrottle()
 @Controller('auth')
@@ -46,8 +45,8 @@ export class AuthController {
 
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: MAX_AGE_COOKIE_MILLISECONDS,
-      httpOnly: true,
-      secure: true,
+      // httpOnly: true,
+      // secure: true,
     });
     return res.status(200).send({ accessToken: tokens.accessToken });
   }
@@ -57,9 +56,7 @@ export class AuthController {
   @HttpCode(204)
   @Post('logout')
   async logout(@Request() req) {
-    const userId = req.user.id;
-    const deviceId = req.user.deviceId;
-    const isDeleted = await this.authService.logout(userId, deviceId);
+    const isDeleted = await this.authService.logout(req.user);
 
     if (!isDeleted) throw new UnauthorizedException();
     return;
@@ -123,8 +120,8 @@ export class AuthController {
 
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: MAX_AGE_COOKIE_MILLISECONDS,
-      httpOnly: true,
-      secure: true,
+      // httpOnly: true,
+      // secure: true,
     });
     return res.status(200).send({ accessToken: tokens.accessToken });
   }

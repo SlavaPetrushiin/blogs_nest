@@ -484,32 +484,32 @@ describe('Comments', () => {
     await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(204);
   });
 
-  // describe('Tokens', () => {
-  //   let auth_user_1, cookieWithTokens, cookieWithUpdatedTokens;
+  describe('Tokens', () => {
+    let auth_user_1, cookieWithTokens, cookieWithUpdatedTokens;
 
-  //   it('should register user', async () => {
-  //     auth_user_1 = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1).expect(200);
-  //     cookieWithTokens = auth_user_1.header['set-cookie'];
+    it('should register user', async () => {
+      auth_user_1 = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1).expect(200);
+      cookieWithTokens = auth_user_1.header['set-cookie'];
 
-  //     // console.log({ 'accessToken: ': auth_user_1.body.accessToken });
+      // console.log({ 'accessToken: ': auth_user_1.body.accessToken });
 
-  //     LogoutTimeout(9);
-  //   });
+      LogoutTimeout(9);
+    });
 
-  //   it('should refresh-token', async () => {
-  //     const result = await supertest(server).post('/auth/refresh-token').set('Cookie', cookieWithTokens);
-  //     cookieWithUpdatedTokens = result.header['set-cookie'];
+    it('should refresh-token', async () => {
+      const result = await supertest(server).post('/auth/refresh-token').set('Cookie', cookieWithTokens);
+      cookieWithUpdatedTokens = result.header['set-cookie'];
 
-  //     expect(result.body).toStrictEqual({
-  //       accessToken: expect.any(String),
-  //     });
-  //   });
+      expect(result.body).toStrictEqual({
+        accessToken: expect.any(String),
+      });
+    });
 
-  //   it('LogoutTimeout', async () => {
-  //     // await LogoutTimeout();
-  //     await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(401);
-  //   });
-  // });
+    it('LogoutTimeout', async () => {
+      // await LogoutTimeout();
+      await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(401);
+    });
+  });
 });
 
 function LogoutTimeout(delay: number) {

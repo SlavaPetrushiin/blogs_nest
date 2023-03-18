@@ -40,12 +40,14 @@ export class AuthRepository {
     return res.deletedCount > 0 ? true : false;
   }
 
-  async updateSession(params: IPramsForUpdateRefreshToken) {
+  async updateSession(params: IPramsForUpdateRefreshToken): Promise<boolean> {
     const res = await this.AuthModel.updateOne(
       { lastActiveDate: params.oldLastActiveDate },
       { $set: { lastActiveDate: params.lastActiveDate, exp: params.exp } },
     );
-    if (res.matchedCount == 0) {
+
+    console.log({ res });
+    if (res.modifiedCount == 0) {
       return false;
     }
     return true;
@@ -63,8 +65,9 @@ export class AuthRepository {
     return this.AuthModel.deleteMany({});
   }
 
-  async logout(userId: string, deviceId: string): Promise<boolean> {
-    const isDeleted = await this.AuthModel.deleteOne({ userId, deviceId });
+  async logout(userId: string, deviceId: string, lastActiveDate: string): Promise<boolean> {
+    const isDeleted = await this.AuthModel.deleteOne({ lastActiveDate, userId, deviceId });
+    console.log({ isDeleted });
     return isDeleted.deletedCount > 0;
   }
 }

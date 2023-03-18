@@ -1,14 +1,7 @@
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { AuthService } from './../auth/auth.service';
 
-import {
-  Controller,
-  Get,
-  Request,
-  Delete,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Request, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common/decorators';
 
 @Controller('security')
@@ -18,16 +11,14 @@ export class SecurityController {
   @UseGuards(AccessTokenGuard)
   @Get('devices')
   async getDevices(@Request() req) {
-    return this.authService.findAllSessions(req.user.id);
+    const userId = req.user.id;
+    return this.authService.findAllSessions(userId);
   }
 
   @UseGuards(AccessTokenGuard)
   @Delete('devices')
   async deleteDevices(@Request() req) {
-    this.authService.removeAllSessionsUserNotCurrent(
-      req.user.id,
-      req.user.deviceId,
-    );
+    this.authService.removeAllSessionsUserNotCurrent(req.user.id, req.user.deviceId);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
