@@ -1,3 +1,4 @@
+import { RefreshTokenCustomGuard } from './../guards/refresh-token.guard';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { AuthService } from './../auth/auth.service';
 
@@ -8,21 +9,21 @@ import { UseGuards } from '@nestjs/common/decorators';
 export class SecurityController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(RefreshTokenCustomGuard)
   @Get('devices')
   async getDevices(@Request() req) {
     const userId = req.user.id;
     return this.authService.findAllSessions(userId);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(RefreshTokenCustomGuard)
   @Delete('devices')
   async deleteDevices(@Request() req) {
     this.authService.removeAllSessionsUserNotCurrent(req.user.id, req.user.deviceId);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(RefreshTokenCustomGuard)
   @Delete('devices/:deviceId')
   async deleteCurrentDevice(@Request() req) {
     this.authService.removeCurrentDevice(req.user.id, req.user.deviceId);
