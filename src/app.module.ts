@@ -41,7 +41,8 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthRepository } from './auth/auth.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { LikesService } from './likes/likes.service';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -98,6 +99,10 @@ import { ThrottlerModule } from '@nestjs/throttler';
     LikesService,
     LikesRepository,
     CheckBlogId,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
-export class AppModule {}
+export class AppModule { }
