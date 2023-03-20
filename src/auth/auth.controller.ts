@@ -18,7 +18,7 @@ const MAX_AGE_COOKIE_MILLISECONDS = 20; //* MILLISECONDS_IN_HOUR; //MILLISECONDS
 @SkipThrottle()
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly usersService: UsersService) {}
+  constructor(private readonly authService: AuthService, private readonly usersService: UsersService) { }
 
   @SkipThrottle(false)
   @UseGuards(AccessTokenGuard)
@@ -27,12 +27,14 @@ export class AuthController {
     return this.authService.findUserById(req.user.id);
   }
 
+  @SkipThrottle(false)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   async register(@Body() registrationDto: RegistrationDto) {
     return this.usersService.createUser(registrationDto);
   }
 
+  @SkipThrottle(false)
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Request() req, @Res() res) {
@@ -62,6 +64,7 @@ export class AuthController {
     return;
   }
 
+  @SkipThrottle(false)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async confirmationEmail(@Body() confirmationDto: ConfirmationDto, @Res() response: Response) {
@@ -72,6 +75,7 @@ export class AuthController {
     response.status(HttpStatus.NO_CONTENT).send();
   }
 
+  @SkipThrottle(false)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   async confirmationEmailResending(@Body() { email }: ConfirmationResendingDto, @Res() response: Response) {
@@ -82,6 +86,7 @@ export class AuthController {
     response.status(HttpStatus.NO_CONTENT).send();
   }
 
+  @SkipThrottle(false)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
   async passwordRecovery(@Body() { email }: ConfirmationResendingDto, @Res() response: Response) {
@@ -93,6 +98,7 @@ export class AuthController {
     response.status(HttpStatus.NO_CONTENT).send();
   }
 
+  @SkipThrottle(false)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
   async updatePassword(@Body() recoveryPasswordDto: RecoveryPasswordDto, @Res() response: Response) {
