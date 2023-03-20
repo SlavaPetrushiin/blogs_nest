@@ -1,10 +1,10 @@
+import { SkipThrottle } from '@nestjs/throttler';
 import { RefreshTokenCustomGuard } from './../guards/refresh-token.guard';
-import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { AuthService } from './../auth/auth.service';
 
-import { Controller, Get, Request, Delete, HttpCode, HttpStatus, NotFoundException, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Request, Delete, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
 import { Param, UseGuards } from '@nestjs/common/decorators';
-
+@SkipThrottle()
 @Controller('security')
 export class SecurityController {
   constructor(private authService: AuthService) { }
