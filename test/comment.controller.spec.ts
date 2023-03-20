@@ -18,6 +18,18 @@ const BLOG_MODEL = {
   websiteUrl: 'https://someurl1.com',
 };
 
+const BLOG_MODEL_TWO = {
+  name: 'LOG_MODEL_TWO',
+  description: 'blogDescription',
+  websiteUrl: 'https://someurl1.com',
+};
+
+const BLOG_MODEL_THREE = {
+  name: 'LOG_MODEL_TWO',
+  description: 'blogDescription',
+  websiteUrl: 'https://someurl1.com',
+};
+
 const POST_MODEL_1 = {
   title: 'post 1',
   shortDescription: 'postDescription2',
@@ -187,12 +199,12 @@ describe('Comments', () => {
     cookie1 = auth_user_1.header['set-cookie'];
     cookie2 = auth_user_2.header['set-cookie'];
 
-    const blog = await supertest(server).post('/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL);
+    const blog = await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL);
     const blogID = blog.body.id;
 
     //CREATE POSTS
-    post_1 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(POST_MODEL_1);
-    post_2 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_2}`).send(POST_MODEL_2);
+    post_1 = await supertest(server).post(`/blogger/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(POST_MODEL_1);
+    post_2 = await supertest(server).post(`/blogger/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_2}`).send(POST_MODEL_2);
     postId1 = post_1.body.id;
     postId2 = post_2.body.id;
 
@@ -226,6 +238,14 @@ describe('Comments', () => {
     //   .send(POST_MODEL_6);
     // postId6 = post_6.body.id;
   });
+
+  it('shoud get my blogs', async () => {
+    await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL_TWO).expect(201);
+    await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_2}`).send(BLOG_MODEL_THREE).expect(201);
+
+    const blogsFirstUser = await supertest(server).get('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`);
+    expect(blogsFirstUser.body.items.length).toBe(2);
+  })
 
   it('should posts length == 2', async () => {
     const response = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);

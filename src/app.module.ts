@@ -48,10 +48,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
   imports: [
     configModule,
     ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
+      ttl: 60,
+      limit: 10,
     }),
-    MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
+    MongooseModule.forRoot(new ConfigService().get('MONGO_LOCAL')),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },

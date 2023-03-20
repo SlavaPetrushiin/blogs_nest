@@ -1,6 +1,5 @@
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
-import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import {
   Request,
   Controller,
@@ -15,6 +14,7 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   NotFoundException,
+  Res
 } from '@nestjs/common';
 import { Body, UseGuards } from '@nestjs/common/decorators';
 import { CreateBlogDto } from './dto/create-blog.dto';
@@ -23,11 +23,12 @@ import { BlogsService } from './blogs.service';
 import { SortDirectionType } from './../types/types';
 import { CreatePostByBlogIdDto } from './../posts/dto/create-post.dto';
 
-@Controller('blogs')
+@Controller('blogger')
 export class BlogsController {
   constructor(private blogsService: BlogsService) { }
 
-  @Get()
+  @UseGuards(AccessTokenGuard)
+  @Get('blogs')
   async getBlogs(
     @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm: string,
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
@@ -37,20 +38,21 @@ export class BlogsController {
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
+    @Request() req
   ) {
-    try {
-      const result = await this.blogsService.getBlogs({
-        searchNameTerm,
-        pageNumber,
-        pageSize,
-        sortBy,
-        sortDirection,
-      });
-      return result;
-    } catch (error) { }
+    const userId = req.user.id;
+    const result = await this.blogsService.getBlogs({
+      searchNameTerm,
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    }, userId);
+
+    return result;
   }
 
-  @Get(':id')
+  @Get('blogs/:id')
   async getBlog(@Param('id') id: string) {
     const result = await this.blogsService.getBlog(id);
     if (!result) {
@@ -59,20 +61,19 @@ export class BlogsController {
     return result;
   }
 
-  // @UseGuards(AuthBasicGuard)
   @UseGuards(AccessTokenGuard)
-  @Post()
-  async createBlog(@Body() createBlogDto: CreateBlogDto) {
-    const createdBlog = await this.blogsService.createBlog(createBlogDto);
+  @Post('blogs')
+  async createBlog(@Body() createBlogDto: CreateBlogDto, @Request() req) {
+    const userId = req.user.id;
+    const createdBlog = await this.blogsService.createBlog(createBlogDto, userId);
     if (!createdBlog) {
       throw new NotFoundException();
     }
     return createdBlog;
   }
 
-  //@UseGuards(AuthBasicGuard)
   @UseGuards(AccessTokenGuard)
-  @Put(':id')
+  @Put('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(@Param('id') id: string, @Body() updateBlogDTO: UpdateBlogDto) {
     const updatedBlog = await this.blogsService.updateBlog(updateBlogDTO, id);
@@ -83,9 +84,8 @@ export class BlogsController {
     return updatedBlog;
   }
 
-  //@UseGuards(AuthBasicGuard)
   @UseGuards(AccessTokenGuard)
-  @Delete(':id')
+  @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeBlog(@Param('id') id: string) {
     const result = await this.blogsService.removeBlog(id);
@@ -97,7 +97,7 @@ export class BlogsController {
 
   /* Get posts by blogId */
   @UseGuards(GetUserIdFromBearerToken)
-  @Get(':blogId/posts')
+  @Get('blogs/:blogId/posts')
   async getPostsByBlogId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
     pageNumber: number,
@@ -123,9 +123,8 @@ export class BlogsController {
     return result;
   }
 
-  //@UseGuards(AuthBasicGuard)
   @UseGuards(AccessTokenGuard)
-  @Post(':blogId/posts')
+  @Post('blogs/:blogId/posts')
   async createPostByBlogId(@Param('blogId') blogId: string, @Body() createPostDto: CreatePostByBlogIdDto) {
     const result = await this.blogsService.createPostByBlogId(createPostDto, blogId);
     if (!result) {

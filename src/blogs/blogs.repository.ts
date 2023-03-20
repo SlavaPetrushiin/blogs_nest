@@ -10,25 +10,33 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) {}
+  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) { }
 
-  async findAllBlogs(query: AllEntitiesBlog) {
+  async findAllBlogs(query: AllEntitiesBlog, ownerId?: string) {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
       query;
+    const filter = {
+      ownerId,
+      name: {
+        $regex: searchNameTerm,
+        $options: 'i'
+      }
+    };
+
     const skip = (+pageNumber - 1) * +pageSize;
 
     const result = await this.BlogModel.find(
-      { name: { $regex: searchNameTerm, $options: '$i' } },
+      filter,
       DEFAULT_PROJECTION,
     )
       .skip(+skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
 
-    const totalCount = await this.BlogModel.countDocuments({
-      name: { $regex: searchNameTerm, $options: '$i' },
-    });
+    const totalCount = await this.BlogModel.countDocuments(filter);
     const pageCount = Math.ceil(totalCount / +pageSize);
+
+    console.log({ result });
 
     return {
       pagesCount: pageCount,
@@ -43,8 +51,8 @@ export class BlogsRepository {
     return this.BlogModel.findOne({ id }, DEFAULT_PROJECTION).exec();
   }
 
-  async createBlog(blog: CreateBlogDto): Promise<BlogDocument> {
-    return new this.BlogModel({ ...blog });
+  async createBlog(blog: CreateBlogDto, ownerId: string): Promise<BlogDocument> {
+    return new this.BlogModel({ ...blog, ownerId });
   }
 
   async updateBlog(blog: UpdateBlogDto, id: string): Promise<boolean> {
@@ -61,7 +69,7 @@ export class BlogsRepository {
 
   async removeBlog(id: string): Promise<boolean> {
     const res = await this.BlogModel.deleteOne({ id });
-    return res.deletedCount > 0 ? true : false;
+    return res.deletedCount > 0;
   }
 
   async save(blog: BlogDocument) {

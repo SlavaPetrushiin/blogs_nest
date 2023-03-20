@@ -40,6 +40,9 @@ export class Blog {
     default: false,
   })
   isMembership: boolean;
+
+  @Prop({ required: true })
+  ownerId: string;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
