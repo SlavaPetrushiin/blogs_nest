@@ -25,7 +25,7 @@ import { CreatePostByBlogIdDto } from './../posts/dto/create-post.dto';
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(private blogsService: BlogsService) {}
+  constructor(private blogsService: BlogsService) { }
 
   @Get()
   async getBlogs(
@@ -47,7 +47,7 @@ export class BlogsController {
         sortDirection,
       });
       return result;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   @Get(':id')
@@ -59,7 +59,8 @@ export class BlogsController {
     return result;
   }
 
-  @UseGuards(AuthBasicGuard)
+  // @UseGuards(AuthBasicGuard)
+  @UseGuards(AccessTokenGuard)
   @Post()
   async createBlog(@Body() createBlogDto: CreateBlogDto) {
     const createdBlog = await this.blogsService.createBlog(createBlogDto);
@@ -69,7 +70,8 @@ export class BlogsController {
     return createdBlog;
   }
 
-  @UseGuards(AuthBasicGuard)
+  //@UseGuards(AuthBasicGuard)
+  @UseGuards(AccessTokenGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(@Param('id') id: string, @Body() updateBlogDTO: UpdateBlogDto) {
@@ -81,7 +83,8 @@ export class BlogsController {
     return updatedBlog;
   }
 
-  @UseGuards(AuthBasicGuard)
+  //@UseGuards(AuthBasicGuard)
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeBlog(@Param('id') id: string) {
@@ -120,7 +123,8 @@ export class BlogsController {
     return result;
   }
 
-  @UseGuards(AuthBasicGuard)
+  //@UseGuards(AuthBasicGuard)
+  @UseGuards(AccessTokenGuard)
   @Post(':blogId/posts')
   async createPostByBlogId(@Param('blogId') blogId: string, @Body() createPostDto: CreatePostByBlogIdDto) {
     const result = await this.blogsService.createPostByBlogId(createPostDto, blogId);

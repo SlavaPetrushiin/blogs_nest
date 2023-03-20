@@ -26,10 +26,12 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
 import { SortDirectionType } from './../types/types';
 import { Response } from 'express';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) {}
+  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) { }
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get()
@@ -66,7 +68,7 @@ export class PostsController {
     return result;
   }
 
-  @UseGuards(AuthBasicGuard)
+  @UseGuards(AccessTokenGuard)
   @Post()
   async createPost(@Body() createPostDto: CreatePostDto) {
     const createdPost = await this.postsService.createPost(createPostDto);
@@ -77,7 +79,7 @@ export class PostsController {
     return createdPost;
   }
 
-  @UseGuards(AuthBasicGuard)
+  @UseGuards(AccessTokenGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
@@ -88,7 +90,7 @@ export class PostsController {
     return result;
   }
 
-  @UseGuards(AuthBasicGuard)
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removePost(@Param('id') id: string) {

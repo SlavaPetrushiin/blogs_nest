@@ -187,12 +187,12 @@ describe('Comments', () => {
     cookie1 = auth_user_1.header['set-cookie'];
     cookie2 = auth_user_2.header['set-cookie'];
 
-    const blog = await supertest(server).post('/blogs').set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(BLOG_MODEL);
+    const blog = await supertest(server).post('/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL);
     const blogID = blog.body.id;
 
     //CREATE POSTS
-    post_1 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(POST_MODEL_1);
-    post_2 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(POST_MODEL_2);
+    post_1 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(POST_MODEL_1);
+    post_2 = await supertest(server).post(`/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_2}`).send(POST_MODEL_2);
     postId1 = post_1.body.id;
     postId2 = post_2.body.id;
 
@@ -373,8 +373,8 @@ describe('Comments', () => {
 
   it('should return all posts after cancel likes', async () => {
     // create dislike for post and comment from first user
-    await supertest(server).put(`/posts/${postId1}/like-status`).set('Authorization', `Bearer ${tokens.token_user_1}`).send({ likeStatus: StatusLike.None });
-    await supertest(server).put(`/posts/${postId1}/like-status`).set('Authorization', `Bearer ${tokens.token_user_2}`).send({ likeStatus: StatusLike.None });
+    await supertest(server).put(`/posts/${postId1}/like-status`).set('Authorization', `Bearer ${tokens.token_user_1}`).send({ likeStatus: StatusLike.None }).expect(204);
+    await supertest(server).put(`/posts/${postId1}/like-status`).set('Authorization', `Bearer ${tokens.token_user_2}`).send({ likeStatus: StatusLike.None }).expect(204);
 
     const PostByIdForFirstUser = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);
     expect(PostByIdForFirstUser.body).toStrictEqual({
