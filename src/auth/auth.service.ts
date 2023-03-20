@@ -38,7 +38,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly emailService: Email,
     private readonly passwordRecoveryRepository: PasswordRecoveryRepository,
-  ) {}
+  ) { }
 
   async findUserById(userId) {
     const user = await this.usersService.findUserById(userId);
@@ -186,7 +186,6 @@ export class AuthService {
 
   async removeCurrentDevice(userId: string, deviceId: string): Promise<boolean> {
     const foundedDevice = await this.authRepository.getDevice(deviceId);
-
     if (!foundedDevice) {
       throw new NotFoundException();
     }

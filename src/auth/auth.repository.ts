@@ -11,9 +11,16 @@ export interface IPramsForUpdateRefreshToken {
   exp: string;
 }
 
+export interface IUserDataSession {
+  ip: string;
+  title: string;
+  lastActiveDate: string;
+  deviceId: string;
+}
+
 @Injectable()
 export class AuthRepository {
-  constructor(@InjectModel(Auth.name) private AuthModel: Model<AuthDocument>) {}
+  constructor(@InjectModel(Auth.name) private AuthModel: Model<AuthDocument>) { }
 
   async createSession(dataSession) {
     return new this.AuthModel(dataSession);
@@ -23,13 +30,14 @@ export class AuthRepository {
     return this.AuthModel.findOne({ lastActiveDate: iat, userId, deviceId }, { projection: { ...DEFAULT_PROJECTION } }).exec();
   }
 
-  async findAllSessions(userId: string): Promise<AuthDocument[]> {
-    return this.AuthModel.find({ userId }, { projection: { ...DEFAULT_PROJECTION, exp: false, userId: false } });
+  async findAllSessions(userId: string): Promise<IUserDataSession[]> {
+    const result = await this.AuthModel.find({ userId }, { projection: { ...DEFAULT_PROJECTION, exp: false, userId: false } }).exec();
+    return result.map(item => ({ ip: item.ip, title: item.title, lastActiveDate: item.lastActiveDate, deviceId: item.deviceId }))
   }
 
   public async removeSession(userId: string, deviceId: string): Promise<boolean> {
     const res = await this.AuthModel.deleteOne({ userId, deviceId });
-    return res.deletedCount > 0 ? true : false;
+    return res.deletedCount > 0;
   }
 
   async removeAllSessionsUserNotCurrent(userId: string, deviceId: string): Promise<boolean> {
@@ -37,7 +45,7 @@ export class AuthRepository {
       userId,
       deviceId: { $ne: deviceId },
     });
-    return res.deletedCount > 0 ? true : false;
+    return res.deletedCount > 0;
   }
 
   async updateSession(params: IPramsForUpdateRefreshToken): Promise<boolean> {
@@ -46,7 +54,6 @@ export class AuthRepository {
       { $set: { lastActiveDate: params.lastActiveDate, exp: params.exp } },
     );
 
-    console.log({ res });
     if (res.modifiedCount == 0) {
       return false;
     }
@@ -67,7 +74,6 @@ export class AuthRepository {
 
   async logout(userId: string, deviceId: string, lastActiveDate: string): Promise<boolean> {
     const isDeleted = await this.AuthModel.deleteOne({ lastActiveDate, userId, deviceId });
-    console.log({ isDeleted });
     return isDeleted.deletedCount > 0;
   }
 }

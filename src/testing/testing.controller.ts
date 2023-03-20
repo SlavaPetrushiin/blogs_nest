@@ -15,7 +15,7 @@ export class TestingController {
     private usersRepository: UsersRepository,
     private authRepository: AuthRepository,
     private likesRepository: LikesRepository,
-  ) {}
+  ) { }
 
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -25,7 +25,6 @@ export class TestingController {
     const u = await this.usersRepository.deleteMany();
     const c = await this.commentsRepository.deleteMany();
     const a = await this.authRepository.deleteMany();
-    // const s = authDevicesSessions.deleteMany({});
     // const bp = badPractice.deleteMany({});
     const l = this.likesRepository.deleteMany();
 
