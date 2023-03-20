@@ -16,6 +16,7 @@ export class SecurityController {
     return this.authService.findAllSessions(userId);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(RefreshTokenCustomGuard)
   @Delete('devices')
   async deleteDevices(@Request() req) {
