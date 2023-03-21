@@ -16,6 +16,7 @@ export class BlogsRepository {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
       query;
     const filter = {
+      isBan: false,
       "blogOwnerInfo.ownerId": ownerId,
       name: {
         $regex: searchNameTerm,
@@ -49,6 +50,7 @@ export class BlogsRepository {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
       query;
     const filter = {
+      isBan: false,
       name: {
         $regex: searchNameTerm,
         $options: 'i'
@@ -78,7 +80,7 @@ export class BlogsRepository {
   }
 
   findBlog(id: string): Promise<BlogDocument> {
-    return this.BlogModel.findOne({ id }, DEFAULT_PROJECTION).exec();
+    return this.BlogModel.findOne({ id, isBan: false }, DEFAULT_PROJECTION).exec();
   }
 
   async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string): Promise<BlogDocument> {

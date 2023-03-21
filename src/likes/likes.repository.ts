@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class LikesRepository {
-  constructor(@InjectModel(Likes.name) private LikesModel: Model<LikesDocument>) {}
+  constructor(@InjectModel(Likes.name) private LikesModel: Model<LikesDocument>) { }
 
   async updateLike(params: CreateOrUpdateLikeDto) {
     const { likeStatus, parentId, type, userId, login } = params;

@@ -70,6 +70,9 @@ export class Blog {
 
   @Prop({ type: BlogOwnerInfo, required: true })
   blogOwnerInfo: IBlogOwnerInfo
+
+  @Prop({ default: false })
+  isBan: boolean;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

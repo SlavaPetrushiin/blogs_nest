@@ -11,10 +11,10 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class CommentsRepository {
-  constructor(@InjectModel(Comment.name) private CommentModel: Model<CommentDocument>, private readonly likesRepository: LikesRepository) {}
+  constructor(@InjectModel(Comment.name) private CommentModel: Model<CommentDocument>, private readonly likesRepository: LikesRepository) { }
 
   async findComment(commentID: string, userId: string) {
-    const comment = await this.CommentModel.findOne({ id: commentID }, DEFAULT_PROJECTION).exec();
+    const comment = await this.CommentModel.findOne({ id: commentID, isBan: false }, DEFAULT_PROJECTION).exec();
 
     if (!comment) {
       throw new NotFoundException();
@@ -39,7 +39,7 @@ export class CommentsRepository {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
     const skip = (+pageNumber - 1) * +pageSize;
 
-    const comments: CommentDocument[] = await this.CommentModel.find({ postId }, { projection: { ...DEFAULT_PROJECTION, postId: false } })
+    const comments: CommentDocument[] = await this.CommentModel.find({ postId, isBan: false }, { projection: { ...DEFAULT_PROJECTION, postId: false } })
       .skip(skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });

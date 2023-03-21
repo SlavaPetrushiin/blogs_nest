@@ -23,7 +23,7 @@ export class PostsRepository {
   async findAllPosts(params: AllEntitiesPost, userId: string, blogId: string = null) {
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
     const skip = (+pageNumber - 1) * +pageSize;
-    const postFilter: any = {};
+    const postFilter: any = { isBan: false };
 
     if (blogId) {
       postFilter.blogId = blogId;
@@ -81,7 +81,7 @@ export class PostsRepository {
   }
 
   findPost(id: string): Promise<PostDocument> {
-    return this.PostModel.findOne({ id: id }, DEFAULT_PROJECTION).exec();
+    return this.PostModel.findOne({ id: id, isBan: false }, DEFAULT_PROJECTION).exec();
   }
 
   async createPost(post: INewPostDto): Promise<PostDocument> {
