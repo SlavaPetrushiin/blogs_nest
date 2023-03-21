@@ -61,8 +61,8 @@ export class UsersService {
       },
       banInfo: {
         isBanned: false,
-        banDate: "",
-        banReason: ""
+        banDate: null,
+        banReason: null
       }
     });
 

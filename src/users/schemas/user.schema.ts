@@ -29,10 +29,10 @@ export class BanInfo implements IBanInfo {
   @Prop({ required: true, type: Boolean, default: false })
   isBanned: boolean;
 
-  @Prop({ type: String, default: '' })
+  @Prop({ type: String, default: null })
   banDate: string;
 
-  @Prop({ type: String, default: '' })
+  @Prop({ type: String, default: null })
   banReason: string;
 }
 
