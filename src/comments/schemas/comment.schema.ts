@@ -39,7 +39,7 @@ export class Comment {
   postId: string;
 
   @Prop({ default: false })
-  isBan: boolean;
+  isBanned: boolean;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

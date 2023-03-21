@@ -57,7 +57,7 @@ export class Likes {
   login: string;
 
   @Prop({ default: false })
-  isBan: boolean;
+  isBanned: boolean;
 }
 
 export const LikesSchema = SchemaFactory.createForClass(Likes);

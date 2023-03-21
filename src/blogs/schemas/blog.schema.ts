@@ -72,7 +72,7 @@ export class Blog {
   blogOwnerInfo: IBlogOwnerInfo
 
   @Prop({ default: false })
-  isBan: boolean;
+  isBanned: boolean;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

@@ -25,14 +25,14 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private commentService: CommentsService, private likesService: LikesService) {}
+  constructor(private commentService: CommentsService, private likesService: LikesService) { }
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get(':commentId')
   async getComment(@Param('commentId', ParseUUIDPipe) commentId: string, @Request() req) {
     const userId = req.user.id;
     const result = await this.commentService.getComment(commentId, userId);
-
+    console.log({ result });
     if (!result) {
       throw new NotFoundException();
     }

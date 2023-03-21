@@ -16,7 +16,7 @@ export class BlogsRepository {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
       query;
     const filter = {
-      isBan: false,
+      isBanned: false,
       "blogOwnerInfo.ownerId": ownerId,
       name: {
         $regex: searchNameTerm,
@@ -50,7 +50,7 @@ export class BlogsRepository {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
       query;
     const filter = {
-      isBan: false,
+      isBanned: false,
       name: {
         $regex: searchNameTerm,
         $options: 'i'
@@ -80,7 +80,7 @@ export class BlogsRepository {
   }
 
   findBlog(id: string): Promise<BlogDocument> {
-    return this.BlogModel.findOne({ id, isBan: false }, DEFAULT_PROJECTION).exec();
+    return this.BlogModel.findOne({ id, isBanned: false }, DEFAULT_PROJECTION).exec();
   }
 
   async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string): Promise<BlogDocument> {
@@ -116,6 +116,15 @@ export class BlogsRepository {
   async removeBlog(id: string): Promise<boolean> {
     const res = await this.BlogModel.deleteOne({ id });
     return res.deletedCount > 0;
+  }
+
+  async updateUserBanStatus(userId: string, isBanned: boolean) {
+    return this.BlogModel.updateOne(
+      { userId },
+      {
+        $set: { isBanned },
+      },
+    )
   }
 
   async save(blog: BlogDocument) {

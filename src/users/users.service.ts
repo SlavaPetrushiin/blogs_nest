@@ -1,3 +1,5 @@
+import { CommentsRepository } from './../comments/comments.repository';
+import { PostsRepository } from './../posts/posts.repository';
 import { AuthRepository } from './../auth/auth.repository';
 import { BanUserDto } from './dto/ban-user.dto';
 import { BlogDocument } from './../blogs/schemas/blog.schema';
@@ -24,7 +26,9 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private readonly emailService: Email,
     private readonly blogsRepository: BlogsRepository,
-    private readonly authRepository: AuthRepository
+    private readonly authRepository: AuthRepository,
+    private readonly postsRepository: PostsRepository,
+    private readonly commentsRepository: CommentsRepository,
   ) { }
 
   async getUsers(query: AllEntitiesUser) {
@@ -142,7 +146,13 @@ export class UsersService {
       : { isBanned: banUserDto.isBanned, banDate: null, banReason: null };
 
     await this.usersRepository.banOrUnbanUser(updateBanInfo, userId);
-    await this.authRepository.removeSessionBanedUser(userId);
+    await this.blogsRepository.updateUserBanStatus(userId, updateBanInfo.isBanned);
+    await this.postsRepository.updateUserBanStatus(userId, updateBanInfo.isBanned);
+    await this.commentsRepository.updateUserBanStatus(userId, updateBanInfo.isBanned);
+
+    if (banUserDto.isBanned) {
+      await this.authRepository.removeSessionBanedUser(userId);
+    }
 
     return true;
   }
