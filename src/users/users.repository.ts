@@ -40,6 +40,7 @@ export class UsersRepository {
         login: user.login,
         email: user.email,
         createdAt: user.createdAt,
+        banInfo: user.banInfo
       })),
     };
   }
