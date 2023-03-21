@@ -217,6 +217,10 @@ export class AuthService {
 
     const foundedUser = await this.usersService.findUserByEmailOrLogin(payload);
 
+    if (foundedUser.banInfo.banDate) {
+      throw new UnauthorizedException();
+    }
+
     if (!foundedUser) {
       return null;
     }
