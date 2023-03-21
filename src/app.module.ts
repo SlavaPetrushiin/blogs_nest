@@ -51,7 +51,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       ttl: 60,
       limit: 10,
     }),
-    MongooseModule.forRoot(new ConfigService().get('MONGO_LOCAL')),
+    MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
