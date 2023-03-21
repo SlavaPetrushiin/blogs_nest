@@ -1,11 +1,13 @@
+import { AuthRepository } from './../auth/auth.repository';
+import { BanUserDto } from './dto/ban-user.dto';
 import { BlogDocument } from './../blogs/schemas/blog.schema';
 import { BlogsRepository } from './../blogs/blogs.repository';
 import { Email } from './../email/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AllEntitiesUser } from './dto/allEntitiesUser.dto';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import { UserDocument } from './schemas/user.schema';
+import { UserDocument, IBanInfo } from './schemas/user.schema';
 import { PasswordService } from './schemas/Password';
 import { v4 as uuidv4 } from 'uuid';
 import { getArrayErrors } from './../utils/getArrayErrors';
@@ -21,7 +23,8 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly emailService: Email,
-    private readonly blogsRepository: BlogsRepository
+    private readonly blogsRepository: BlogsRepository,
+    private readonly authRepository: AuthRepository
   ) { }
 
   async getUsers(query: AllEntitiesUser) {
@@ -56,6 +59,11 @@ export class UsersService {
         expirationData: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed: false,
       },
+      banInfo: {
+        isBanned: false,
+        banDate: "",
+        banReason: ""
+      }
     });
 
     await this.usersRepository.save(createdUser);
@@ -115,6 +123,27 @@ export class UsersService {
 
   async removeUser(id: string): Promise<boolean> {
     return this.usersRepository.removeUser(id);
+  }
+
+  async banOrUnbanUse(banUserDto: BanUserDto, userId: string): Promise<boolean> {
+    let foundedUser = await this.usersRepository.findUserById(userId);
+
+    if (!foundedUser) {
+      throw new NotFoundException();
+    }
+
+    const updateBanInfo: IBanInfo = banUserDto.isBanned
+      ? {
+        isBanned: banUserDto.isBanned,
+        banDate: new Date().toISOString(),
+        banReason: banUserDto.banReason,
+      }
+      : { isBanned: banUserDto.isBanned, banDate: '', banReason: '' };
+
+    await this.usersRepository.banOrUnbanUser(updateBanInfo, userId);
+    await this.authRepository.removeSessionBanedUser(userId);
+
+    return true;
   }
 
   async bindBlogWithUser(blogsId: string, userId: string): Promise<boolean> {

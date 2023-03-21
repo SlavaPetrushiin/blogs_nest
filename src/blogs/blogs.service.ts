@@ -62,6 +62,7 @@ export class BlogsService {
       content,
       blogId: foundedBlog.id,
       blogName: foundedBlog.name,
+      userId: foundedBlog.blogOwnerInfo.ownerId
     });
     await this.postsRepository.save(cratedPost);
 

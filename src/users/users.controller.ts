@@ -1,3 +1,4 @@
+import { BanUserDto } from './dto/ban-user.dto';
 import { BlogsService } from './../blogs/blogs.service';
 import { SortDirectionType } from './../types/types';
 import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
@@ -74,13 +75,14 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
-  @Put('/users/:id/ban')
-  async addUserToBan() {
-    return 'ban'
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put('/users/:userId/ban')
+  async addUserToBan(@Body() banUserDto: BanUserDto, @Param('userId') userId: string) {
+    return this.usersService.banOrUnbanUse(banUserDto, userId);
   }
 
-  @Delete('users/:uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete('users/:uuid')
   async deleteUser(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     const isRemoved = await this.usersService.removeUser(uuid);
     if (!isRemoved) {

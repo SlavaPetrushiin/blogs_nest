@@ -13,6 +13,7 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0, updatedAt: 0 };
 interface INewPostDto extends CreatePostDto {
   blogName: string;
   blogId: string;
+  userId: string
 }
 
 @Injectable()

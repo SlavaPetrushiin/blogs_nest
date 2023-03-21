@@ -2,14 +2,14 @@ import { FindUserByEmailOrLogin } from './users.service';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { AllEntitiesUser } from './dto/allEntitiesUser.dto';
-import { User, UserDocument } from './schemas/user.schema';
+import { User, UserDocument, IBanInfo } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 
 const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) { }
 
   async findAllUsers(query: AllEntitiesUser) {
     const { pageNumber, pageSize, searchEmailTerm, searchLoginTerm, sortBy, sortDirection } = query;
@@ -95,5 +95,12 @@ export class UsersRepository {
 
   async deleteMany() {
     return this.UserModel.deleteMany({});
+  }
+
+  async banOrUnbanUser(updateBanInfo: IBanInfo, userId: string) {
+    return this.UserModel.updateOne(
+      { id: userId },
+      { $set: { banInfo: updateBanInfo } },
+    ).exec();
   }
 }

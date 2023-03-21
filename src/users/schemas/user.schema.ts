@@ -18,6 +18,26 @@ class EmailConfirmation {
 
 const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
 
+
+export interface IBanInfo {
+  isBanned: boolean;
+  banDate: string;
+  banReason: string;
+}
+@Schema({ _id: false, id: false, versionKey: false })
+export class BanInfo implements IBanInfo {
+  @Prop({ required: true, type: Boolean, default: false })
+  isBanned: boolean;
+
+  @Prop({ type: String, default: '' })
+  banDate: string;
+
+  @Prop({ type: String, default: '' })
+  banReason: string;
+}
+
+export const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
+
 @Schema({
   timestamps: true,
   toJSON: {
@@ -62,6 +82,9 @@ export class User {
     expirationData: Date;
     isConfirmed: boolean;
   };
+
+  @Prop({ required: true, type: BanInfoSchema })
+  banInfo: BanInfo;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

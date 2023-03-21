@@ -40,6 +40,11 @@ export class AuthRepository {
     return res.deletedCount > 0;
   }
 
+  public async removeSessionBanedUser(userId: string): Promise<boolean> {
+    const res = await this.AuthModel.deleteOne({ userId });
+    return res.deletedCount > 0;
+  }
+
   async removeAllSessionsUserNotCurrent(userId: string, deviceId: string): Promise<boolean> {
     const res = await this.AuthModel.deleteMany({
       userId,

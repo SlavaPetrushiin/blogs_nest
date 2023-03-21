@@ -40,6 +40,9 @@ export class Post {
 
   @Prop({ required: true })
   blogName: string;
+
+  @Prop({ required: true })
+  userId: string;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
