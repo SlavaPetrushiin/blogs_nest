@@ -139,7 +139,7 @@ export class UsersService {
         banDate: new Date().toISOString(),
         banReason: banUserDto.banReason,
       }
-      : { isBanned: banUserDto.isBanned, banDate: '', banReason: '' };
+      : { isBanned: banUserDto.isBanned, banDate: null, banReason: null };
 
     await this.usersRepository.banOrUnbanUser(updateBanInfo, userId);
     await this.authRepository.removeSessionBanedUser(userId);
