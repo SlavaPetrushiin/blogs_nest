@@ -1,3 +1,4 @@
+import { SkipThrottle } from '@nestjs/throttler';
 import { BanUserDto } from './dto/ban-user.dto';
 import { BlogsService } from './../blogs/blogs.service';
 import { SortDirectionType } from './../types/types';
@@ -24,6 +25,7 @@ import {
   ParseIntPipe
 } from '@nestjs/common';
 
+@SkipThrottle()
 @UseGuards(AuthBasicGuard)
 @Controller('sa')
 export class UsersController {
@@ -49,7 +51,6 @@ export class UsersController {
     })
   }
 
-  @UseGuards(AuthBasicGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Put('blogs/:id/bind-with-user/:userId')
   async function(
@@ -70,6 +71,7 @@ export class UsersController {
     return users;
   }
 
+  @HttpCode(HttpStatus.CREATED)
   @Post('users')
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);

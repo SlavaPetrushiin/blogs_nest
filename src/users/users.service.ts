@@ -80,6 +80,7 @@ export class UsersService {
       login: createdUser.login,
       email: createdUser.email,
       createdAt: createdUser.createdAt,
+      banInfo: createdUser.banInfo
     };
   }
 
