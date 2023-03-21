@@ -29,7 +29,7 @@ import { BlogsController } from './blogs/blogs.controller';
 import { BlogsService } from './blogs/blogs.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from './blogs/schemas/blog.schema';
+import { Blog, BlogSchema, BlogOwnerInfo, BlogOwnerInfoSchema } from './blogs/schemas/blog.schema';
 import { BlogsRepository } from './blogs/blogs.repository';
 import { User, UserSchema } from './users/schemas/user.schema';
 import { PostsController } from './posts/posts.controller';
@@ -60,6 +60,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       { name: Auth.name, schema: AuthSchema },
       { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
       { name: Likes.name, schema: LikesSchema },
+      { name: BlogOwnerInfo.name, schema: BlogOwnerInfoSchema },
     ]),
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({

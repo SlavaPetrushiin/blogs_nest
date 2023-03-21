@@ -65,7 +65,8 @@ export class BlogsController {
   @Post('blogs')
   async createBlog(@Body() createBlogDto: CreateBlogDto, @Request() req) {
     const userId = req.user.id;
-    const createdBlog = await this.blogsService.createBlog(createBlogDto, userId);
+    const login = req.user.login;
+    const createdBlog = await this.blogsService.createBlog(createBlogDto, userId, login);
     if (!createdBlog) {
       throw new NotFoundException();
     }

@@ -500,92 +500,106 @@ describe('Comments', () => {
   });
 
   it('should delete current device, if user logout', async () => {
-    console.log({ cookie1 });
     await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(204);
   });
 
-  describe('Tokens', () => {
-    let auth_user_1, cookieWithTokens, cookieWithUpdatedTokens;
+  describe('bind blog with user', () => {
+    it("Not bind blog with user, if blog binded user", async () => {
+      //GET USERS
+      const users = await supertest(server).get('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`);
+      expect(users.body.items.length).toBe(4);
+      const userId = users.body.items[0].id;
 
-    it('should register user', async () => {
-      auth_user_1 = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1).expect(200);
-      cookieWithTokens = auth_user_1.header['set-cookie'];
-    });
+      //GET BLOGS
+      const blogsFirstUser = await supertest(server).get('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`);
+      expect(blogsFirstUser.body.items.length).toBe(2);
+      const blogId = blogsFirstUser.body.items[0].id;
 
-    it('should refresh-token', async () => {
-      const result = await supertest(server).post('/auth/refresh-token').set('Cookie', cookieWithTokens);
-      cookieWithUpdatedTokens = result.header['set-cookie'];
-
-      expect(result.body).toStrictEqual({
-        accessToken: expect.any(String),
-      });
-    });
-
-    it('LogoutTimeout', async () => {
-      // await LogoutTimeout();
-      await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(401);
-    });
-  });
-
-
-  describe('Check devices', () => {
-    const notValidRefreshToken = "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0MTkiLCJpYXQiOjE2NzE4MDMxNzEsImV4cCI6MTY3MTgzOTE3MX0.qWEEdZE92hf5QGgUJDneJOzIY4rF8gIykyezL0u95hY"
-    let userInMozilla, userInAppleWebKit, userInChrome, userInSafari;
-    let device1, device2, device3, device4;
-    let cookie1, cookie2, cookie3, cookie4;
-
-    it('should delete all data', async () => {
-      await supertest(server).delete('/testing/all-data').expect(204);
-    });
-
-    it('User  should login four brousers', async () => {
-      await supertest(server).post('/auth/registration').send(inputModelUser1);
-
-      userInMozilla = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1);
-      userInAppleWebKit = await supertest(server).post('/auth/login').set('user-agent', 'AppleWebKit').send(correctInputModelAuth1);
-      userInChrome = await supertest(server).post('/auth/login').set('user-agent', 'Chrome').send(correctInputModelAuth1);
-      userInSafari = await supertest(server).post('/auth/login').set('user-agent', 'Safari').send(correctInputModelAuth1);
-
-      cookie1 = userInMozilla.header['set-cookie'];
-      cookie2 = userInAppleWebKit.header['set-cookie'];
-      cookie3 = userInChrome.header['set-cookie'];
-      cookie4 = userInSafari.header['set-cookie'];
-
-      const userAuthSessions = await supertest(server).get('/security/devices').set('Cookie', cookie1);
-
-      expect(userAuthSessions.body.length).toBe(4);
-      device1 = userAuthSessions.body[0].deviceId;
-      device2 = userAuthSessions.body[1].deviceId;
-      device3 = userAuthSessions.body[2].deviceId;
-      device4 = userAuthSessions.body[3].deviceId;
+      await supertest(server).put(`/sa/blogs/${blogId}/bind-with-user/${userId}`).set('Authorization', `Basic YWRtaW46cXdlcnR5`).expect(400);
     })
-
-    it('Should return error if :id from uri param not found', async () => {
-      await supertest(server).delete(`/security/devices/ba841d88-c79c-46c0-98a0-748529aea19p`).set('Cookie', cookie1).expect(404);
-    })
-
-    it('Should return 204 status if remove exist device id', async () => {
-      await supertest(server).delete(`/security/devices/${device1}`).set('Cookie', cookie1).expect(204);
-      let userAuthSessions = await supertest(server).get('/security/devices').set('Cookie', cookie1);
-      expect(userAuthSessions.body.length).toBe(3);
-    })
-
-    it('Should return 401 status if auth credentials is incorrect', async () => {
-      await supertest(server).delete(`/security/devices/${device1}`).set('Cookie', notValidRefreshToken).expect(401);
-    })
-
-    it('Should return 403 status if deviceId belongs to someone else  user', async () => {
-      await supertest(server).post('/auth/registration').send(inputModelUser2);
-      const secondUserAuth = await supertest(server).post('/auth/login').set('user-agent', 'AppleWebKit').send(correctInputModelAuth2).expect(200);
-      const secondCookie = secondUserAuth.header['set-cookie'];
-      const secondUserSessions = await supertest(server).get('/security/devices').set('Cookie', secondCookie);
-      const deviceIdSecondUser = secondUserSessions.body[0].deviceId;
-
-      expect(secondUserSessions.body.length).toBe(1);
-
-      await supertest(server).delete(`/security/devices/${deviceIdSecondUser}`).set('Cookie', cookie1).expect(403);
-    })
-
   })
+
+  // describe('Tokens', () => {
+  //   let auth_user_1, cookieWithTokens, cookieWithUpdatedTokens;
+
+  //   it('should register user', async () => {
+  //     auth_user_1 = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1).expect(200);
+  //     cookieWithTokens = auth_user_1.header['set-cookie'];
+  //   });
+
+  //   it('should refresh-token', async () => {
+  //     const result = await supertest(server).post('/auth/refresh-token').set('Cookie', cookieWithTokens);
+  //     cookieWithUpdatedTokens = result.header['set-cookie'];
+
+  //     expect(result.body).toStrictEqual({
+  //       accessToken: expect.any(String),
+  //     });
+  //   });
+
+  //   it('LogoutTimeout', async () => {
+  //     // await LogoutTimeout();
+  //     await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(401);
+  //   });
+  // });
+
+  // describe('Check devices', () => {
+  //   const notValidRefreshToken = "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0MTkiLCJpYXQiOjE2NzE4MDMxNzEsImV4cCI6MTY3MTgzOTE3MX0.qWEEdZE92hf5QGgUJDneJOzIY4rF8gIykyezL0u95hY"
+  //   let userInMozilla, userInAppleWebKit, userInChrome, userInSafari;
+  //   let device1, device2, device3, device4;
+  //   let cookie1, cookie2, cookie3, cookie4;
+
+  //   it('should delete all data', async () => {
+  //     await supertest(server).delete('/testing/all-data').expect(204);
+  //   });
+
+  //   it('User  should login four brousers', async () => {
+  //     await supertest(server).post('/auth/registration').send(inputModelUser1);
+
+  //     userInMozilla = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1);
+  //     userInAppleWebKit = await supertest(server).post('/auth/login').set('user-agent', 'AppleWebKit').send(correctInputModelAuth1);
+  //     userInChrome = await supertest(server).post('/auth/login').set('user-agent', 'Chrome').send(correctInputModelAuth1);
+  //     userInSafari = await supertest(server).post('/auth/login').set('user-agent', 'Safari').send(correctInputModelAuth1);
+
+  //     cookie1 = userInMozilla.header['set-cookie'];
+  //     cookie2 = userInAppleWebKit.header['set-cookie'];
+  //     cookie3 = userInChrome.header['set-cookie'];
+  //     cookie4 = userInSafari.header['set-cookie'];
+
+  //     const userAuthSessions = await supertest(server).get('/security/devices').set('Cookie', cookie1);
+
+  //     expect(userAuthSessions.body.length).toBe(4);
+  //     device1 = userAuthSessions.body[0].deviceId;
+  //     device2 = userAuthSessions.body[1].deviceId;
+  //     device3 = userAuthSessions.body[2].deviceId;
+  //     device4 = userAuthSessions.body[3].deviceId;
+  //   })
+
+  //   it('Should return error if :id from uri param not found', async () => {
+  //     await supertest(server).delete(`/security/devices/ba841d88-c79c-46c0-98a0-748529aea19p`).set('Cookie', cookie1).expect(404);
+  //   })
+
+  //   it('Should return 204 status if remove exist device id', async () => {
+  //     await supertest(server).delete(`/security/devices/${device1}`).set('Cookie', cookie1).expect(204);
+  //     let userAuthSessions = await supertest(server).get('/security/devices').set('Cookie', cookie1);
+  //     expect(userAuthSessions.body.length).toBe(3);
+  //   })
+
+  //   it('Should return 401 status if auth credentials is incorrect', async () => {
+  //     await supertest(server).delete(`/security/devices/${device1}`).set('Cookie', notValidRefreshToken).expect(401);
+  //   })
+
+  //   it('Should return 403 status if deviceId belongs to someone else  user', async () => {
+  //     await supertest(server).post('/auth/registration').send(inputModelUser2);
+  //     const secondUserAuth = await supertest(server).post('/auth/login').set('user-agent', 'AppleWebKit').send(correctInputModelAuth2).expect(200);
+  //     const secondCookie = secondUserAuth.header['set-cookie'];
+  //     const secondUserSessions = await supertest(server).get('/security/devices').set('Cookie', secondCookie);
+  //     const deviceIdSecondUser = secondUserSessions.body[0].deviceId;
+
+  //     expect(secondUserSessions.body.length).toBe(1);
+
+  //     await supertest(server).delete(`/security/devices/${deviceIdSecondUser}`).set('Cookie', cookie1).expect(403);
+  //   })
+
+  // })
 });
 

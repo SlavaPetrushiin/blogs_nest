@@ -4,6 +4,33 @@ import { v4 as uuidv4 } from 'uuid';
 
 export type BlogDocument = HydratedDocument<Blog>;
 
+export interface IBlogOwnerInfo {
+  ownerId: string;
+  userLogin: string;
+}
+
+@Schema({
+  timestamps: true,
+  toJSON: {
+    transform: function (doc: any, ret: any) {
+      delete ret.__v;
+      delete ret._id;
+      delete ret.updatedAt;
+      delete ret.createdAt;
+      return ret;
+    },
+  },
+})
+export class BlogOwnerInfo {
+  @Prop({ required: true })
+  ownerId: string;
+
+  @Prop()
+  userLogin: string;
+}
+export const BlogOwnerInfoSchema = SchemaFactory.createForClass(BlogOwnerInfo);
+
+
 @Schema({
   timestamps: true,
   toJSON: {
@@ -41,8 +68,8 @@ export class Blog {
   })
   isMembership: boolean;
 
-  @Prop({ required: true })
-  ownerId: string;
+  @Prop({ type: BlogOwnerInfo, required: true })
+  blogOwnerInfo: IBlogOwnerInfo
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

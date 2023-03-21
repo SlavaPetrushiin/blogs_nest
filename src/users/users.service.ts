@@ -1,3 +1,5 @@
+import { BlogDocument } from './../blogs/schemas/blog.schema';
+import { BlogsRepository } from './../blogs/blogs.repository';
 import { Email } from './../email/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AllEntitiesUser } from './dto/allEntitiesUser.dto';
@@ -19,6 +21,7 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly emailService: Email,
+    private readonly blogsRepository: BlogsRepository
   ) { }
 
   async getUsers(query: AllEntitiesUser) {
@@ -112,5 +115,27 @@ export class UsersService {
 
   async removeUser(id: string): Promise<boolean> {
     return this.usersRepository.removeUser(id);
+  }
+
+  async bindBlogWithUser(blogsId: string, userId: string): Promise<boolean> {
+    const foundedBlog = await this.blogsRepository.findBlog(blogsId);
+    const foundedUser = await this.usersRepository.findUserById(userId);
+    const errors = this.validateDataForBindBlog(foundedBlog, foundedUser);
+
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    return this.blogsRepository.bindBlogWithUser(blogsId, userId, foundedUser.login)
+  }
+
+  validateDataForBindBlog(foundedBlog: BlogDocument, foundedUser: UserDocument): { field: string, message: string }[] {
+    const errors = [];
+
+    if (!foundedBlog) errors.push({ field: "blog", message: "Blog not exsist" });
+    if (foundedBlog.blogOwnerInfo.ownerId) errors.push({ field: "blog", message: "Blog with bind user" });
+    if (!foundedUser) errors.push({ field: "blog", message: "User not exist" });
+
+    return errors;
   }
 }

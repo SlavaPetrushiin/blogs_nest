@@ -16,12 +16,16 @@ export class BlogsService {
     return this.blogsRepository.findAllBlogs(query, userId);
   }
 
+  async findAllBlogsBySA(query: AllEntitiesBlog) {
+    return this.blogsRepository.findAllBlogsBySA(query);
+  }
+
   async getBlog(id: string): Promise<BlogDocument> {
     return this.blogsRepository.findBlog(id);
   }
 
-  async createBlog(blog: CreateBlogDto, ownerId: string): Promise<BlogDocument> {
-    const cratedBlog = await this.blogsRepository.createBlog(blog, ownerId);
+  async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string): Promise<BlogDocument> {
+    const cratedBlog = await this.blogsRepository.createBlog(blog, ownerId, userLogin);
     return this.blogsRepository.save(cratedBlog);
   }
 

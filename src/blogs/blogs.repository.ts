@@ -16,7 +16,39 @@ export class BlogsRepository {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
       query;
     const filter = {
-      ownerId,
+      "blogOwnerInfo.ownerId": ownerId,
+      name: {
+        $regex: searchNameTerm,
+        $options: 'i'
+      }
+    };
+    const skip = (+pageNumber - 1) * +pageSize;
+
+    const result = await this.BlogModel.find(
+      filter,
+      { ...DEFAULT_PROJECTION, blogOwnerInfo: 0 },
+    )
+      .skip(+skip)
+      .limit(+pageSize)
+      .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
+
+    const totalCount = await this.BlogModel.countDocuments(filter);
+    const pageCount = Math.ceil(totalCount / +pageSize);
+
+    return {
+      pagesCount: pageCount,
+      page: +pageNumber,
+      pageSize: +pageSize,
+      totalCount: totalCount,
+      items: result,
+    };
+  }
+
+
+  async findAllBlogsBySA(query: AllEntitiesBlog) {
+    const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
+      query;
+    const filter = {
       name: {
         $regex: searchNameTerm,
         $options: 'i'
@@ -36,8 +68,6 @@ export class BlogsRepository {
     const totalCount = await this.BlogModel.countDocuments(filter);
     const pageCount = Math.ceil(totalCount / +pageSize);
 
-    console.log({ result });
-
     return {
       pagesCount: pageCount,
       page: +pageNumber,
@@ -51,8 +81,11 @@ export class BlogsRepository {
     return this.BlogModel.findOne({ id }, DEFAULT_PROJECTION).exec();
   }
 
-  async createBlog(blog: CreateBlogDto, ownerId: string): Promise<BlogDocument> {
-    return new this.BlogModel({ ...blog, ownerId });
+  async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string): Promise<BlogDocument> {
+    return new this.BlogModel({
+      ...blog,
+      blogOwnerInfo: { ownerId, userLogin }
+    });
   }
 
   async updateBlog(blog: UpdateBlogDto, id: string): Promise<boolean> {
@@ -65,6 +98,17 @@ export class BlogsRepository {
     );
 
     return !!result.matchedCount;
+  }
+
+  async bindBlogWithUser(blogId: string, userId: string, login: string): Promise<boolean> {
+    const result = await this.BlogModel.updateOne(
+      { id: blogId },
+      {
+        $set: { ownerId: userId, userLogin: login },
+      },
+    );
+
+    return result.matchedCount > 0;
   }
 
   async removeBlog(id: string): Promise<boolean> {
