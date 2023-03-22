@@ -18,7 +18,7 @@ const MAX_AGE_COOKIE_MILLISECONDS = 20 * MILLISECONDS_IN_HOUR; //MILLISECONDS_IN
 @SkipThrottle()
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly usersService: UsersService) { }
+  constructor(private readonly authService: AuthService, private readonly usersService: UsersService) {}
 
   @SkipThrottle(false)
   @UseGuards(AccessTokenGuard)
