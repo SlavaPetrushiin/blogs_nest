@@ -33,6 +33,7 @@ export class UsersRepository {
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
 
     const totalCount = await this.UserModel.countDocuments({
+      ...filter,
       $or: [{ email: { $regex: searchEmailTerm, $options: 'i' } }, { login: { $regex: searchLoginTerm, $options: 'i' } }],
     });
     const pageCount = Math.ceil(totalCount / +pageSize);
