@@ -30,8 +30,8 @@ export class UsersService {
     private readonly authRepository: AuthRepository,
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
-    private readonly likesRepository: LikesRepository
-  ) { }
+    private readonly likesRepository: LikesRepository,
+  ) {}
 
   async getUsers(query: AllEntitiesUser) {
     return this.usersRepository.findAllUsers(query);
@@ -44,15 +44,11 @@ export class UsersService {
     const oldUserByEmail = await this.findUserByEmail(email);
     const oldUserByLogin = await this.findUserByLogin(login);
     if (oldUserByEmail) {
-      throw new BadRequestException(
-        getArrayErrors('email', 'Пользователь уже существует'),
-      );
+      throw new BadRequestException(getArrayErrors('email', 'Пользователь уже существует'));
     }
 
     if (oldUserByLogin) {
-      throw new BadRequestException(
-        getArrayErrors('login', 'Пользователь уже существует'),
-      );
+      throw new BadRequestException(getArrayErrors('login', 'Пользователь уже существует'));
     }
 
     const hashPassword = await PasswordService.hashPassword(password);
@@ -68,17 +64,13 @@ export class UsersService {
       banInfo: {
         isBanned: false,
         banDate: null,
-        banReason: null
-      }
+        banReason: null,
+      },
     });
 
     await this.usersRepository.save(createdUser);
 
-    const url = this.emailService.getMessageForSendingEmail(
-      'confirm-email?code',
-      code,
-      'registration',
-    );
+    const url = this.emailService.getMessageForSendingEmail('confirm-email?code', code, 'registration');
 
     // this.emailService.sendEmail(email, url); TO DO DEL COMMIT
     return {
@@ -86,13 +78,11 @@ export class UsersService {
       login: createdUser.login,
       email: createdUser.email,
       createdAt: createdUser.createdAt,
-      banInfo: createdUser.banInfo
+      banInfo: createdUser.banInfo,
     };
   }
 
-  async findUserByEmailOrLogin(
-    payload: FindUserByEmailOrLogin,
-  ): Promise<UserDocument> {
+  async findUserByEmailOrLogin(payload: FindUserByEmailOrLogin): Promise<UserDocument> {
     return this.usersRepository.findUser(payload);
   }
 
@@ -117,11 +107,7 @@ export class UsersService {
   }
 
   async updateConfirmationCode(id: string, code: string, expirationData: Date) {
-    return this.usersRepository.updateConfirmationCode(
-      id,
-      code,
-      expirationData,
-    );
+    return this.usersRepository.updateConfirmationCode(id, code, expirationData);
   }
 
   async updatePassword(id: string, newPassword: string): Promise<boolean> {
@@ -133,7 +119,7 @@ export class UsersService {
   }
 
   async banOrUnbanUse(banUserDto: BanUserDto, userId: string): Promise<boolean> {
-    let foundedUser = await this.usersRepository.findUserById(userId);
+    const foundedUser = await this.usersRepository.findUserById(userId);
 
     if (!foundedUser) {
       throw new NotFoundException();
@@ -141,10 +127,10 @@ export class UsersService {
 
     const updateBanInfo: IBanInfo = banUserDto.isBanned
       ? {
-        isBanned: banUserDto.isBanned,
-        banDate: new Date().toISOString(),
-        banReason: banUserDto.banReason,
-      }
+          isBanned: banUserDto.isBanned,
+          banDate: new Date().toISOString(),
+          banReason: banUserDto.banReason,
+        }
       : { isBanned: banUserDto.isBanned, banDate: null, banReason: null };
 
     await this.usersRepository.banOrUnbanUser(updateBanInfo, userId);
@@ -169,15 +155,15 @@ export class UsersService {
       throw new BadRequestException(errors);
     }
 
-    return this.blogsRepository.bindBlogWithUser(blogsId, userId, foundedUser.login)
+    return this.blogsRepository.bindBlogWithUser(blogsId, userId, foundedUser.login);
   }
 
-  validateDataForBindBlog(foundedBlog: BlogDocument, foundedUser: UserDocument): { field: string, message: string }[] {
+  validateDataForBindBlog(foundedBlog: BlogDocument, foundedUser: UserDocument): { field: string; message: string }[] {
     const errors = [];
 
-    if (!foundedBlog) errors.push({ field: "blog", message: "Blog not exsist" });
-    if (foundedBlog.blogOwnerInfo.ownerId) errors.push({ field: "blog", message: "Blog with bind user" });
-    if (!foundedUser) errors.push({ field: "blog", message: "User not exist" });
+    if (!foundedBlog) errors.push({ field: 'blog', message: 'Blog not exsist' });
+    if (foundedBlog.blogOwnerInfo.userId) errors.push({ field: 'blog', message: 'Blog with bind user' });
+    if (!foundedUser) errors.push({ field: 'blog', message: 'User not exist' });
 
     return errors;
   }

@@ -12,11 +12,11 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) {}
 
-  async findAllBlogs(query: AllEntitiesBlog, ownerId?: string) {
+  async findAllBlogs(query: AllEntitiesBlog, userId?: string) {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
     const filter = {
       isBanned: false,
-      'blogOwnerInfo.ownerId': ownerId,
+      'blogOwnerInfo.userId': userId,
       name: {
         $regex: searchNameTerm,
         $options: 'i',
@@ -74,10 +74,10 @@ export class BlogsRepository {
     return this.BlogModel.findOne({ id, isBanned: false }, DEFAULT_PROJECTION).exec();
   }
 
-  async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string): Promise<BlogDocument> {
+  async createBlog(blog: CreateBlogDto, userId: string, userLogin: string): Promise<BlogDocument> {
     return new this.BlogModel({
       ...blog,
-      blogOwnerInfo: { ownerId, userLogin },
+      blogOwnerInfo: { userId, userLogin },
     });
   }
 
@@ -97,7 +97,7 @@ export class BlogsRepository {
     const result = await this.BlogModel.updateOne(
       { id: blogId },
       {
-        $set: { ownerId: userId, userLogin: login },
+        $set: { userId: userId, userLogin: login },
       },
     );
 

@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 export type BlogDocument = HydratedDocument<Blog>;
 
 export interface IBlogOwnerInfo {
-  ownerId: string;
+  userId: string;
   userLogin: string;
 }
 
@@ -23,13 +23,12 @@ export interface IBlogOwnerInfo {
 })
 export class BlogOwnerInfo {
   @Prop({ required: true })
-  ownerId: string;
+  userId: string;
 
   @Prop()
   userLogin: string;
 }
 export const BlogOwnerInfoSchema = SchemaFactory.createForClass(BlogOwnerInfo);
-
 
 @Schema({
   timestamps: true,
@@ -69,7 +68,7 @@ export class Blog {
   isMembership: boolean;
 
   @Prop({ type: BlogOwnerInfo, required: true })
-  blogOwnerInfo: IBlogOwnerInfo
+  blogOwnerInfo: IBlogOwnerInfo;
 
   @Prop({ default: false })
   isBanned: boolean;

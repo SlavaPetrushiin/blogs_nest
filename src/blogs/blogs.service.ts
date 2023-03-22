@@ -24,8 +24,8 @@ export class BlogsService {
     return this.blogsRepository.findBlog(id);
   }
 
-  async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string) {
-    const cratedBlog = await this.blogsRepository.createBlog(blog, ownerId, userLogin);
+  async createBlog(blog: CreateBlogDto, userId: string, userLogin: string) {
+    const cratedBlog = await this.blogsRepository.createBlog(blog, userId, userLogin);
     await this.blogsRepository.save(cratedBlog);
     return {
       id: cratedBlog.id,
@@ -70,7 +70,7 @@ export class BlogsService {
       content,
       blogId: foundedBlog.id,
       blogName: foundedBlog.name,
-      userId: foundedBlog.blogOwnerInfo.ownerId,
+      userId: foundedBlog.blogOwnerInfo.userId,
     });
     await this.postsRepository.save(cratedPost);
 

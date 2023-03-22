@@ -17,7 +17,7 @@ export class PostsService {
     private blogsRepository: BlogsRepository,
     private commentsRepository: CommentsRepository,
     private likesRepository: LikesRepository,
-  ) { }
+  ) {}
 
   async getPosts(params: AllEntitiesPost, userId: string) {
     return this.postsRepository.findAllPosts(params, userId);
@@ -75,7 +75,7 @@ export class PostsService {
       content,
       blogId,
       blogName: foundedBlog.name,
-      userId: foundedBlog.blogOwnerInfo.ownerId
+      userId: foundedBlog.blogOwnerInfo.userId,
     });
 
     await this.postsRepository.save(cratedPost);
