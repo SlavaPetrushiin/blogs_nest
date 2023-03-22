@@ -120,7 +120,7 @@ export class PostsRepository {
   }
 
   async updateUserBanStatus(userId: string, isBanned: boolean) {
-    return this.PostModel.updateOne(
+    return this.PostModel.updateMany(
       { userId },
       {
         $set: { isBanned },

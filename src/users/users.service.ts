@@ -1,3 +1,4 @@
+import { LikesRepository } from './../likes/likes.repository';
 import { CommentsRepository } from './../comments/comments.repository';
 import { PostsRepository } from './../posts/posts.repository';
 import { AuthRepository } from './../auth/auth.repository';
@@ -29,6 +30,7 @@ export class UsersService {
     private readonly authRepository: AuthRepository,
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
+    private readonly likesRepository: LikesRepository
   ) { }
 
   async getUsers(query: AllEntitiesUser) {
@@ -149,6 +151,7 @@ export class UsersService {
     await this.blogsRepository.updateUserBanStatus(userId, updateBanInfo.isBanned);
     await this.postsRepository.updateUserBanStatus(userId, updateBanInfo.isBanned);
     await this.commentsRepository.updateUserBanStatus(userId, updateBanInfo.isBanned);
+    await this.likesRepository.updateUserBanStatus(userId, updateBanInfo.isBanned);
 
     if (banUserDto.isBanned) {
       await this.authRepository.removeSessionBanedUser(userId);

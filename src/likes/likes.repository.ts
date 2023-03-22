@@ -19,9 +19,19 @@ export class LikesRepository {
 
   async findLikesDislikesByParentsId(parentId: string[], type: TypeParentId): Promise<LikesDocument[]> {
     return this.LikesModel.find({
+      isBanned: false,
       parentId: { $in: [...parentId] },
       type,
     }).exec();
+  }
+
+  async updateUserBanStatus(userId: string, isBanned: boolean) {
+    return this.LikesModel.updateMany(
+      { userId },
+      {
+        $set: { isBanned },
+      },
+    )
   }
 
   async deleteMany() {

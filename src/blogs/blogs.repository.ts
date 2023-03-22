@@ -119,7 +119,7 @@ export class BlogsRepository {
   }
 
   async updateUserBanStatus(userId: string, isBanned: boolean) {
-    return this.BlogModel.updateOne(
+    return this.BlogModel.updateMany(
       { userId },
       {
         $set: { isBanned },

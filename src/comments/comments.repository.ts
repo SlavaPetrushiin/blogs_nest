@@ -76,7 +76,7 @@ export class CommentsRepository {
   }
 
   async updateUserBanStatus(userId: string, isBanned: boolean) {
-    return this.CommentModel.updateOne(
+    return this.CommentModel.updateMany(
       { userId },
       {
         $set: { isBanned },
