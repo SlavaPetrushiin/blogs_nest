@@ -1,3 +1,4 @@
+import { SkipThrottle } from '@nestjs/throttler';
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import {
@@ -23,6 +24,7 @@ import { BlogsService } from './blogs.service';
 import { SortDirectionType } from './../types/types';
 import { CreatePostByBlogIdDto } from './../posts/dto/create-post.dto';
 
+@SkipThrottle()
 @Controller('blogger')
 export class BlogsController {
   constructor(private blogsService: BlogsService) { }

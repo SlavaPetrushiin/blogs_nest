@@ -1,3 +1,4 @@
+import { SkipThrottle } from '@nestjs/throttler';
 import { LikeStatusDto } from './../likes/dto/like.dto';
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { LikesService } from './../likes/likes.service';
@@ -23,6 +24,8 @@ import { Response } from 'express';
 import { CommentsService } from './comments.service';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
+
+@SkipThrottle()
 @Controller('comments')
 export class CommentsController {
   constructor(private commentService: CommentsService, private likesService: LikesService) { }
