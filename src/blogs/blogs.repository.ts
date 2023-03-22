@@ -24,7 +24,7 @@ export class BlogsRepository {
     };
     const skip = (+pageNumber - 1) * +pageSize;
 
-    const result = await this.BlogModel.find(filter, { ...DEFAULT_PROJECTION, blogOwnerInfo: 0 })
+    const result = await this.BlogModel.find(filter, { ...DEFAULT_PROJECTION, blogOwnerInfo: 0, isBanned: 0 })
       .skip(+skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
