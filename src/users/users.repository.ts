@@ -1,3 +1,4 @@
+import { BanStatuses } from './../types/types';
 import { FindUserByEmailOrLogin } from './users.service';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
@@ -12,11 +13,17 @@ export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) { }
 
   async findAllUsers(query: AllEntitiesUser) {
-    const { pageNumber, pageSize, searchEmailTerm, searchLoginTerm, sortBy, sortDirection } = query;
+    const { pageNumber, pageSize, searchEmailTerm, searchLoginTerm, sortBy, sortDirection, banStatus } = query;
+    const filter = {};
+
+    if (banStatus != BanStatuses.all) {
+      filter["banInfo.isBanned"] = banStatus
+    }
 
     const skip = (+pageNumber - 1) * +pageSize;
     const result = await this.UserModel.find(
       {
+        ...filter,
         $or: [{ email: { $regex: searchEmailTerm, $options: 'i' } }, { login: { $regex: searchLoginTerm, $options: 'i' } }],
       },
       { projection: { ...DEFAULT_PROJECTION } },

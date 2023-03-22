@@ -1,3 +1,4 @@
+import { BanStatuses } from './../../types/types';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { SortDirectionType } from '../../types/types';
 import { Type } from 'class-transformer';
@@ -32,4 +33,9 @@ export class AllEntitiesUser {
   @Type(() => String)
   @IsEnum(SortDirectionType)
   sortDirection?: string = SortDirectionType.desc;
+
+  @IsOptional()
+  @Type(() => String)
+  @IsEnum(BanStatuses)
+  banStatus?: string = BanStatuses.all;
 }
