@@ -6,5 +6,5 @@ export enum SortDirectionType {
 export enum BanStatuses {
   all = 'all',
   banned = 'banned',
-  notBanned = 'notBanned'
+  notBanned = 'notBanned',
 }

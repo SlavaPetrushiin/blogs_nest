@@ -10,14 +10,14 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) { }
+  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
 
   async findAllUsers(query: AllEntitiesUser) {
     const { pageNumber, pageSize, searchEmailTerm, searchLoginTerm, sortBy, sortDirection, banStatus } = query;
     const filter = {};
 
     if (banStatus != BanStatuses.all) {
-      filter["banInfo.isBanned"] = banStatus
+      filter['banInfo.isBanned'] = banStatus === BanStatuses.banned ? true : false;
     }
 
     const skip = (+pageNumber - 1) * +pageSize;
@@ -47,7 +47,7 @@ export class UsersRepository {
         login: user.login,
         email: user.email,
         createdAt: user.createdAt,
-        banInfo: user.banInfo
+        banInfo: user.banInfo,
       })),
     };
   }
@@ -106,9 +106,6 @@ export class UsersRepository {
   }
 
   async banOrUnbanUser(updateBanInfo: IBanInfo, userId: string) {
-    return this.UserModel.updateOne(
-      { id: userId },
-      { $set: { banInfo: updateBanInfo } },
-    ).exec();
+    return this.UserModel.updateOne({ id: userId }, { $set: { banInfo: updateBanInfo } }).exec();
   }
 }

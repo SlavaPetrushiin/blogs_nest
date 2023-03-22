@@ -22,14 +22,14 @@ import {
   UseGuards,
   Put,
   DefaultValuePipe,
-  ParseIntPipe
+  ParseIntPipe,
 } from '@nestjs/common';
 
 @SkipThrottle()
 @UseGuards(AuthBasicGuard)
 @Controller('sa')
 export class UsersController {
-  constructor(protected usersService: UsersService, private readonly blogsService: BlogsService) { }
+  constructor(protected usersService: UsersService, private readonly blogsService: BlogsService) {}
 
   @Get('blogs')
   async getBlogsBySA(
@@ -48,15 +48,12 @@ export class UsersController {
       pageSize,
       sortBy,
       sortDirection,
-    })
+    });
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Put('blogs/:id/bind-with-user/:userId')
-  async function(
-    @Param('id') id: string,
-    @Param('userId') userId: string
-  ) {
+  async function(@Param('id') id: string, @Param('userId') userId: string) {
     const isBind = await this.usersService.bindBlogWithUser(id, userId);
     if (!isBind) {
       throw new NotFoundException();
