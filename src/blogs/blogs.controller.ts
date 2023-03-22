@@ -15,7 +15,6 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   NotFoundException,
-  Res
 } from '@nestjs/common';
 import { Body, UseGuards } from '@nestjs/common/decorators';
 import { CreateBlogDto } from './dto/create-blog.dto';
@@ -27,7 +26,7 @@ import { CreatePostByBlogIdDto } from './../posts/dto/create-post.dto';
 @SkipThrottle()
 @Controller('blogger')
 export class BlogsController {
-  constructor(private blogsService: BlogsService) { }
+  constructor(private blogsService: BlogsService) {}
 
   @UseGuards(AccessTokenGuard)
   @Get('blogs')
@@ -40,16 +39,19 @@ export class BlogsController {
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
-    @Request() req
+    @Request() req,
   ) {
     const userId = req.user.id;
-    const result = await this.blogsService.getBlogs({
-      searchNameTerm,
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-    }, userId);
+    const result = await this.blogsService.getBlogs(
+      {
+        searchNameTerm,
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+      },
+      userId,
+    );
 
     return result;
   }

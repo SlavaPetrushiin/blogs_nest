@@ -10,25 +10,21 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) { }
+  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) {}
 
   async findAllBlogs(query: AllEntitiesBlog, ownerId?: string) {
-    const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
-      query;
+    const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
     const filter = {
       isBanned: false,
-      "blogOwnerInfo.ownerId": ownerId,
+      'blogOwnerInfo.ownerId': ownerId,
       name: {
         $regex: searchNameTerm,
-        $options: 'i'
-      }
+        $options: 'i',
+      },
     };
     const skip = (+pageNumber - 1) * +pageSize;
 
-    const result = await this.BlogModel.find(
-      filter,
-      { ...DEFAULT_PROJECTION, blogOwnerInfo: 0 },
-    )
+    const result = await this.BlogModel.find(filter, { ...DEFAULT_PROJECTION, blogOwnerInfo: 0 })
       .skip(+skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
@@ -45,24 +41,19 @@ export class BlogsRepository {
     };
   }
 
-
   async findAllBlogsBySA(query: AllEntitiesBlog) {
-    const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } =
-      query;
+    const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
     const filter = {
       isBanned: false,
       name: {
         $regex: searchNameTerm,
-        $options: 'i'
-      }
+        $options: 'i',
+      },
     };
 
     const skip = (+pageNumber - 1) * +pageSize;
 
-    const result = await this.BlogModel.find(
-      filter,
-      DEFAULT_PROJECTION,
-    )
+    const result = await this.BlogModel.find(filter, DEFAULT_PROJECTION)
       .skip(+skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
@@ -86,7 +77,7 @@ export class BlogsRepository {
   async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string): Promise<BlogDocument> {
     return new this.BlogModel({
       ...blog,
-      blogOwnerInfo: { ownerId, userLogin }
+      blogOwnerInfo: { ownerId, userLogin },
     });
   }
 
@@ -124,7 +115,7 @@ export class BlogsRepository {
       {
         $set: { isBanned },
       },
-    )
+    );
   }
 
   async save(blog: BlogDocument) {

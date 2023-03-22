@@ -10,7 +10,7 @@ import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 
 @Injectable()
 export class BlogsService {
-  constructor(private blogsRepository: BlogsRepository, private postsRepository: PostsRepository) { }
+  constructor(private blogsRepository: BlogsRepository, private postsRepository: PostsRepository) {}
 
   async getBlogs(query: AllEntitiesBlog, userId: string) {
     return this.blogsRepository.findAllBlogs(query, userId);
@@ -24,9 +24,17 @@ export class BlogsService {
     return this.blogsRepository.findBlog(id);
   }
 
-  async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string): Promise<BlogDocument> {
+  async createBlog(blog: CreateBlogDto, ownerId: string, userLogin: string) {
     const cratedBlog = await this.blogsRepository.createBlog(blog, ownerId, userLogin);
-    return this.blogsRepository.save(cratedBlog);
+    await this.blogsRepository.save(cratedBlog);
+    return {
+      id: cratedBlog.id,
+      name: cratedBlog.name,
+      description: cratedBlog.description,
+      websiteUrl: cratedBlog.websiteUrl,
+      createdAt: cratedBlog.createdAt,
+      isMembership: cratedBlog.isMembership,
+    };
   }
 
   async updateBlog(blog: UpdateBlogDto, id: string) {
@@ -62,7 +70,7 @@ export class BlogsService {
       content,
       blogId: foundedBlog.id,
       blogName: foundedBlog.name,
-      userId: foundedBlog.blogOwnerInfo.ownerId
+      userId: foundedBlog.blogOwnerInfo.ownerId,
     });
     await this.postsRepository.save(cratedPost);
 
