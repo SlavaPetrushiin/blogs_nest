@@ -1,5 +1,5 @@
 import { PostsRepository } from './../posts/posts.repository';
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { BlogDocument } from './schemas/blog.schema';
 import { BlogsRepository } from './blogs.repository';
@@ -40,6 +40,10 @@ export class BlogsService {
   async updateBlog(blog: UpdateBlogDto, id: string, userId: string) {
     const foundBlog = await this.blogsRepository.findBlogWithOwnerInfo(id);
 
+    if (!foundBlog) {
+      throw new NotFoundException();
+    }
+
     if (foundBlog.blogOwnerInfo.userId != userId) {
       throw new ForbiddenException();
     }
@@ -49,6 +53,10 @@ export class BlogsService {
 
   async removeBlog(id: string, userId: string): Promise<boolean> {
     const foundBlog = await this.blogsRepository.findBlogWithOwnerInfo(id);
+
+    if (!foundBlog) {
+      throw new NotFoundException();
+    }
 
     if (foundBlog.blogOwnerInfo.userId != userId) {
       throw new ForbiddenException();

@@ -201,6 +201,8 @@ describe('Comments', () => {
     cookie2 = auth_user_2.header['set-cookie'];
     cookie4 = auth_user_4.header['set-cookie'];
 
+    console.log({ tokens });
+
     const blog = await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL);
     const blogID = blog.body.id;
 
