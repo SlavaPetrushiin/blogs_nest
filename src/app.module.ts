@@ -80,7 +80,17 @@ import { BlogsController } from './blogs/blogs.controller';
     }),
     JwtModule.register({}),
   ],
-  controllers: [AuthController, AppController, UsersController, BloggerController, BlogsController, PostsController, CommentsController, TestingController, SecurityController],
+  controllers: [
+    AuthController,
+    AppController,
+    UsersController,
+    BloggerController,
+    BlogsController,
+    PostsController,
+    CommentsController,
+    TestingController,
+    SecurityController,
+  ],
   providers: [
     AuthService,
     AppService,
@@ -108,4 +118,4 @@ import { BlogsController } from './blogs/blogs.controller';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

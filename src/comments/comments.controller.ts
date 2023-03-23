@@ -34,7 +34,6 @@ export class CommentsController {
   async getComment(@Param('commentId', ParseUUIDPipe) commentId: string, @Request() req) {
     const userId = req.user.id;
     const result = await this.commentService.getComment(commentId, userId);
-    console.log({ result });
     if (!result) {
       throw new NotFoundException();
     }

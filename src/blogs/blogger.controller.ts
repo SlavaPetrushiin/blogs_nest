@@ -42,7 +42,7 @@ export class BloggerController {
     @Request() req,
   ) {
     const userId = req.user.id;
-    const result = await this.blogsService.findAllBlogsBySA(
+    const result = await this.blogsService.getBlogs(
       {
         searchNameTerm,
         pageNumber,

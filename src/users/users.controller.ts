@@ -52,9 +52,9 @@ export class UsersController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Put('blogs/:id/bind-with-user/:userId')
-  async function(@Param('id') id: string, @Param('userId') userId: string) {
-    const isBind = await this.usersService.bindBlogWithUser(id, userId);
+  @Put('blogs/:blogId/bind-with-user/:userId')
+  async function(@Param('blogId') blogId: string, @Param('userId') userId: string) {
+    const isBind = await this.usersService.bindBlogWithUser(blogId, userId);
     if (!isBind) {
       throw new NotFoundException();
     }

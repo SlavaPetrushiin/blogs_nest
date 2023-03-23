@@ -252,6 +252,7 @@ describe('Comments', () => {
   it('shoud get my blogs', async () => {
     await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL_TWO).expect(201);
     await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_2}`).send(BLOG_MODEL_THREE).expect(201);
+    await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_4}`).send(BLOG_MODEL_THREE).expect(201);
 
     const blogsFirstUser = await supertest(server).get('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`);
     expect(blogsFirstUser.body.items.length).toBe(2);
@@ -518,8 +519,6 @@ describe('Comments', () => {
   });
 
   it('Should ban fourth user', async () => {
-    console.log({ users });
-
     await supertest(server)
       .put(`/sa/users/${users[0].id}/ban`)
       .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
@@ -580,7 +579,7 @@ describe('Comments', () => {
   // });
 
   // describe('bind blog with user', () => {
-  //   it("Not bind blog with user, if blog binded user", async () => {
+  //   it('Not bind blog with user, if blog binded user', async () => {
   //     //GET USERS
   //     const users = await supertest(server).get('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`);
   //     expect(users.body.items.length).toBe(4);
@@ -592,8 +591,8 @@ describe('Comments', () => {
   //     const blogId = blogsFirstUser.body.items[0].id;
 
   //     await supertest(server).put(`/sa/blogs/${blogId}/bind-with-user/${userId}`).set('Authorization', `Basic YWRtaW46cXdlcnR5`).expect(400);
-  //   })
-  // })
+  //   });
+  // });
 
   // describe('Tokens', () => {
   //   let auth_user_1, cookieWithTokens, cookieWithUpdatedTokens;

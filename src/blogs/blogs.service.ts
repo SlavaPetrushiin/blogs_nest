@@ -12,8 +12,8 @@ import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 export class BlogsService {
   constructor(private blogsRepository: BlogsRepository, private postsRepository: PostsRepository) {}
 
-  async getBlogs(query: AllEntitiesBlog) {
-    return this.blogsRepository.findAllBlogs(query);
+  async getBlogs(query: AllEntitiesBlog, userId?: string) {
+    return this.blogsRepository.findAllBlogs(query, userId);
   }
 
   async findAllBlogsBySA(query: AllEntitiesBlog, userId?: string) {

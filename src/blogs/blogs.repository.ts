@@ -12,7 +12,7 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) {}
 
-  async findAllBlogs(query: AllEntitiesBlog) {
+  async findAllBlogs(query: AllEntitiesBlog, userId?: string) {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
     const filter = {
       isBanned: false,
@@ -21,6 +21,11 @@ export class BlogsRepository {
         $options: 'i',
       },
     };
+
+    if (userId) {
+      filter['blogOwnerInfo.userId'] = userId;
+    }
+
     const skip = (+pageNumber - 1) * +pageSize;
 
     const result = await this.BlogModel.find(filter, { ...DEFAULT_PROJECTION, blogOwnerInfo: 0, isBanned: 0 })
@@ -104,7 +109,7 @@ export class BlogsRepository {
     const result = await this.BlogModel.updateOne(
       { id: blogId },
       {
-        $set: { userId: userId, userLogin: login },
+        $set: { 'blogOwnerInfo.userId': userId, 'blogOwnerInfo.userLogin': login },
       },
     );
 
@@ -118,7 +123,7 @@ export class BlogsRepository {
 
   async updateUserBanStatus(userId: string, isBanned: boolean) {
     return this.BlogModel.updateMany(
-      { userId },
+      { 'blogOwnerInfo.userId': userId },
       {
         $set: { isBanned },
       },

@@ -146,8 +146,8 @@ export class UsersService {
     return true;
   }
 
-  async bindBlogWithUser(blogsId: string, userId: string): Promise<boolean> {
-    const foundedBlog = await this.blogsRepository.findBlog(blogsId);
+  async bindBlogWithUser(blogId: string, userId: string): Promise<boolean> {
+    const foundedBlog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
     const foundedUser = await this.usersRepository.findUserById(userId);
     const errors = this.validateDataForBindBlog(foundedBlog, foundedUser);
 
@@ -155,7 +155,7 @@ export class UsersService {
       throw new BadRequestException(errors);
     }
 
-    return this.blogsRepository.bindBlogWithUser(blogsId, userId, foundedUser.login);
+    return this.blogsRepository.bindBlogWithUser(blogId, userId, foundedUser.login);
   }
 
   validateDataForBindBlog(foundedBlog: BlogDocument, foundedUser: UserDocument): { field: string; message: string }[] {
