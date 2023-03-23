@@ -80,8 +80,9 @@ export class BloggerController {
   @UseGuards(AccessTokenGuard)
   @Put('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateBlog(@Param('id') id: string, @Body() updateBlogDTO: UpdateBlogDto) {
-    const updatedBlog = await this.blogsService.updateBlog(updateBlogDTO, id);
+  async updateBlog(@Param('id') id: string, @Body() updateBlogDTO: UpdateBlogDto, @Request() req) {
+    const userId = req.user.id;
+    const updatedBlog = await this.blogsService.updateBlog(updateBlogDTO, id, userId);
     if (!updatedBlog) {
       throw new NotFoundException();
     }
@@ -92,8 +93,9 @@ export class BloggerController {
   @UseGuards(AccessTokenGuard)
   @Delete('blogs/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async removeBlog(@Param('id') id: string) {
-    const result = await this.blogsService.removeBlog(id);
+  async removeBlog(@Param('id') id: string, @Request() req) {
+    const userId = req.user.id;
+    const result = await this.blogsService.removeBlog(id, userId);
     if (!result) {
       throw new NotFoundException();
     }
