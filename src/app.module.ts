@@ -25,7 +25,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersController } from './users/users.controller';
 import { UsersRepository } from './users/users.repository';
-import { BlogsController } from './blogs/blogs.controller';
+import { BloggerController } from './blogs/blogger.controller';
 import { BlogsService } from './blogs/blogs.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -43,6 +43,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { LikesService } from './likes/likes.service';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { BlogsController } from './blogs/blogs.controller';
 
 @Module({
   imports: [
@@ -79,7 +80,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     }),
     JwtModule.register({}),
   ],
-  controllers: [AuthController, AppController, UsersController, BlogsController, PostsController, CommentsController, TestingController, SecurityController],
+  controllers: [AuthController, AppController, UsersController, BloggerController, BlogsController, PostsController, CommentsController, TestingController, SecurityController],
   providers: [
     AuthService,
     AppService,
@@ -107,4 +108,4 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
