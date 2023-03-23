@@ -10,13 +10,12 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) {}
+  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) { }
 
-  async findAllBlogs(query: AllEntitiesBlog, userId?: string) {
+  async findAllBlogs(query: AllEntitiesBlog) {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
     const filter = {
       isBanned: false,
-      'blogOwnerInfo.userId': userId,
       name: {
         $regex: searchNameTerm,
         $options: 'i',
@@ -41,10 +40,11 @@ export class BlogsRepository {
     };
   }
 
-  async findAllBlogsBySA(query: AllEntitiesBlog) {
+  async findAllBlogsBySA(query: AllEntitiesBlog, userId: string) {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
     const filter = {
       isBanned: false,
+      'blogOwnerInfo.userId': userId,
       name: {
         $regex: searchNameTerm,
         $options: 'i',
@@ -70,8 +70,8 @@ export class BlogsRepository {
     };
   }
 
-  findBlog(id: string): Promise<BlogDocument> {
-    return this.BlogModel.findOne({ id, isBanned: false }, DEFAULT_PROJECTION).exec();
+  async findBlog(id: string): Promise<BlogDocument> {
+    return this.BlogModel.findOne({ id, isBanned: false }, { ...DEFAULT_PROJECTION, isBanned: 0 }).exec();
   }
 
   async createBlog(blog: CreateBlogDto, userId: string, userLogin: string): Promise<BlogDocument> {

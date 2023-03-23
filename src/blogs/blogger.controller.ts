@@ -5,22 +5,31 @@ import {
   Request,
   Controller,
   Get,
+  Post,
+  Put,
+  Delete,
   Param,
+  HttpCode,
   Query,
+  HttpStatus,
   DefaultValuePipe,
   ParseIntPipe,
   NotFoundException,
 } from '@nestjs/common';
-import { UseGuards } from '@nestjs/common/decorators';
+import { Body, UseGuards } from '@nestjs/common/decorators';
+import { CreateBlogDto } from './dto/create-blog.dto';
+import { UpdateBlogDto } from './dto/update-blog.dto';
 import { BlogsService } from './blogs.service';
 import { SortDirectionType } from '../types/types';
+import { CreatePostByBlogIdDto } from '../posts/dto/create-post.dto';
 
 @SkipThrottle()
-@Controller('blogs')
-export class BlogsController {
+@Controller('blogger')
+export class BloggerController {
   constructor(private blogsService: BlogsService) { }
 
-  @Get('')
+  @UseGuards(AccessTokenGuard)
+  @Get('blogs')
   async getBlogs(
     @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm: string,
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
@@ -30,20 +39,24 @@ export class BlogsController {
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
+    @Request() req,
   ) {
-    const result = await this.blogsService.getBlogs(
+    const userId = req.user.id;
+    const result = await this.blogsService.findAllBlogsBySA(
       {
         searchNameTerm,
         pageNumber,
         pageSize,
         sortBy,
         sortDirection,
-      });
+      },
+      userId,
+    );
 
     return result;
   }
 
-  @Get(':id')
+  @Get('blogs/:id')
   async getBlog(@Param('id') id: string) {
     const result = await this.blogsService.getBlog(id);
     if (!result) {
@@ -52,9 +65,44 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Post('blogs')
+  async createBlog(@Body() createBlogDto: CreateBlogDto, @Request() req) {
+    const userId = req.user.id;
+    const login = req.user.login;
+    const createdBlog = await this.blogsService.createBlog(createBlogDto, userId, login);
+    if (!createdBlog) {
+      throw new NotFoundException();
+    }
+    return createdBlog;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Put('blogs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateBlog(@Param('id') id: string, @Body() updateBlogDTO: UpdateBlogDto) {
+    const updatedBlog = await this.blogsService.updateBlog(updateBlogDTO, id);
+    if (!updatedBlog) {
+      throw new NotFoundException();
+    }
+
+    return updatedBlog;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('blogs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeBlog(@Param('id') id: string) {
+    const result = await this.blogsService.removeBlog(id);
+    if (!result) {
+      throw new NotFoundException();
+    }
+    return result;
+  }
+
   /* Get posts by blogId */
   @UseGuards(GetUserIdFromBearerToken)
-  @Get(':blogId/posts')
+  @Get('blogs/:blogId/posts')
   async getPostsByBlogId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
     pageNumber: number,
@@ -74,6 +122,16 @@ export class BlogsController {
       sortDirection,
     };
     const result = await this.blogsService.getPostsByBlogId(query, id, blogId);
+    if (!result) {
+      throw new NotFoundException();
+    }
+    return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('blogs/:blogId/posts')
+  async createPostByBlogId(@Param('blogId') blogId: string, @Body() createPostDto: CreatePostByBlogIdDto) {
+    const result = await this.blogsService.createPostByBlogId(createPostDto, blogId);
     if (!result) {
       throw new NotFoundException();
     }
