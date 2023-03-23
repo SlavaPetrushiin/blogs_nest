@@ -1,16 +1,6 @@
 import { SkipThrottle } from '@nestjs/throttler';
 import { GetUserIdFromBearerToken } from '../guards/get-userId-from-bearer-token';
-import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
-import {
-  Request,
-  Controller,
-  Get,
-  Param,
-  Query,
-  DefaultValuePipe,
-  ParseIntPipe,
-  NotFoundException,
-} from '@nestjs/common';
+import { Request, Controller, Get, Param, Query, DefaultValuePipe, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common/decorators';
 import { BlogsService } from './blogs.service';
 import { SortDirectionType } from '../types/types';
@@ -18,7 +8,7 @@ import { SortDirectionType } from '../types/types';
 @SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
-  constructor(private blogsService: BlogsService) { }
+  constructor(private blogsService: BlogsService) {}
 
   @Get('')
   async getBlogs(
@@ -31,14 +21,13 @@ export class BlogsController {
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
   ) {
-    const result = await this.blogsService.getBlogs(
-      {
-        searchNameTerm,
-        pageNumber,
-        pageSize,
-        sortBy,
-        sortDirection,
-      });
+    const result = await this.blogsService.getBlogs({
+      searchNameTerm,
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    });
 
     return result;
   }

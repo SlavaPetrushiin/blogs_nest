@@ -244,8 +244,7 @@ describe('Comments', () => {
     const responseUsers = await supertest(server).get('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`);
     expect(responseUsers.body.items.length).toBe(4);
     users = responseUsers.body.items;
-  })
-
+  });
 
   it('shoud get my blogs', async () => {
     await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL_TWO).expect(201);
@@ -253,7 +252,7 @@ describe('Comments', () => {
 
     const blogsFirstUser = await supertest(server).get('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`);
     expect(blogsFirstUser.body.items.length).toBe(2);
-  })
+  });
 
   it('should posts length == 2', async () => {
     const response = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);
@@ -401,8 +400,16 @@ describe('Comments', () => {
 
   it('should return all posts after cancel likes', async () => {
     // create dislike for post and comment from first user
-    await supertest(server).put(`/posts/${postId1}/like-status`).set('Authorization', `Bearer ${tokens.token_user_1}`).send({ likeStatus: StatusLike.None }).expect(204);
-    await supertest(server).put(`/posts/${postId1}/like-status`).set('Authorization', `Bearer ${tokens.token_user_2}`).send({ likeStatus: StatusLike.None }).expect(204);
+    await supertest(server)
+      .put(`/posts/${postId1}/like-status`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send({ likeStatus: StatusLike.None })
+      .expect(204);
+    await supertest(server)
+      .put(`/posts/${postId1}/like-status`)
+      .set('Authorization', `Bearer ${tokens.token_user_2}`)
+      .send({ likeStatus: StatusLike.None })
+      .expect(204);
 
     const PostByIdForFirstUser = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);
     expect(PostByIdForFirstUser.body).toStrictEqual({
@@ -513,9 +520,9 @@ describe('Comments', () => {
     await supertest(server)
       .put(`/sa/users/${users[0].id}/ban`)
       .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
-      .send({ isBanned: true, banReason: "Давно выяснено, что при оценке" })
-      .expect(204)
-  })
+      .send({ isBanned: true, banReason: 'Давно выяснено, что при оценке' })
+      .expect(204);
+  });
 
   it('Should didn`t see like fourth banned user', async () => {
     const PostByIdForSecondUser = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_2}`);
@@ -563,7 +570,7 @@ describe('Comments', () => {
         },
       ],
     });
-  })
+  });
 
   // it('should delete current device, if user logout', async () => {
   //   await supertest(server).post('/auth/logout').set('Cookie', cookie1).expect(204);
@@ -838,6 +845,4 @@ describe('Comments', () => {
   //     })
   //   })
   // })
-
 });
-

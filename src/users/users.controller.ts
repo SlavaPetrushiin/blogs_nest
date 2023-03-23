@@ -29,7 +29,7 @@ import {
 @UseGuards(AuthBasicGuard)
 @Controller('sa')
 export class UsersController {
-  constructor(protected usersService: UsersService, private readonly blogsService: BlogsService) { }
+  constructor(protected usersService: UsersService, private readonly blogsService: BlogsService) {}
 
   @Get('blogs')
   async getBlogsBySA(
@@ -42,7 +42,7 @@ export class UsersController {
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
   ) {
-    return this.blogsService.getBlogs({
+    return this.blogsService.findAllBlogsBySA({
       searchNameTerm,
       pageNumber,
       pageSize,

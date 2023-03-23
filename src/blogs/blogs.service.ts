@@ -10,13 +10,13 @@ import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 
 @Injectable()
 export class BlogsService {
-  constructor(private blogsRepository: BlogsRepository, private postsRepository: PostsRepository) { }
+  constructor(private blogsRepository: BlogsRepository, private postsRepository: PostsRepository) {}
 
   async getBlogs(query: AllEntitiesBlog) {
     return this.blogsRepository.findAllBlogs(query);
   }
 
-  async findAllBlogsBySA(query: AllEntitiesBlog, userId: string) {
+  async findAllBlogsBySA(query: AllEntitiesBlog, userId?: string) {
     return this.blogsRepository.findAllBlogsBySA(query, userId);
   }
 
