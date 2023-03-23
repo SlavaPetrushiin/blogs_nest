@@ -59,7 +59,7 @@ export class BlogsService {
   }
 
   async createPostByBlogId(createPostByBlogIdDto: CreatePostByBlogIdDto, blogId: string) {
-    const foundedBlog = await this.blogsRepository.findBlog(blogId);
+    const foundedBlog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
     if (!foundedBlog) {
       return null;
     }

@@ -77,6 +77,10 @@ export class BlogsRepository {
     return this.BlogModel.findOne({ id, isBanned: false }, { ...DEFAULT_PROJECTION, isBanned: 0, blogOwnerInfo: 0 }).exec();
   }
 
+  async findBlogWithOwnerInfo(id: string): Promise<BlogDocument> {
+    return this.BlogModel.findOne({ id, isBanned: false }, { ...DEFAULT_PROJECTION, isBanned: 0 }).exec();
+  }
+
   async createBlog(blog: CreateBlogDto, userId: string, userLogin: string): Promise<BlogDocument> {
     return new this.BlogModel({
       ...blog,

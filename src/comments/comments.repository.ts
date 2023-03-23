@@ -11,7 +11,7 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class CommentsRepository {
-  constructor(@InjectModel(Comment.name) private CommentModel: Model<CommentDocument>, private readonly likesRepository: LikesRepository) { }
+  constructor(@InjectModel(Comment.name) private CommentModel: Model<CommentDocument>, private readonly likesRepository: LikesRepository) {}
 
   async findComment(commentID: string, userId: string) {
     const comment = await this.CommentModel.findOne({ id: commentID, isBanned: false }, DEFAULT_PROJECTION).exec();
@@ -81,7 +81,7 @@ export class CommentsRepository {
       {
         $set: { isBanned },
       },
-    )
+    );
   }
 
   private getLikesInfo(dataArray: LikesDocument[], userId: string, parentId: string): ILikesInfo {

@@ -24,11 +24,10 @@ import { Response } from 'express';
 import { CommentsService } from './comments.service';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
-
 @SkipThrottle()
 @Controller('comments')
 export class CommentsController {
-  constructor(private commentService: CommentsService, private likesService: LikesService) { }
+  constructor(private commentService: CommentsService, private likesService: LikesService) {}
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get(':commentId')

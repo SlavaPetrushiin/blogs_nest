@@ -170,9 +170,9 @@ describe('Comments', () => {
   // postId4 = '',
   // postId5 = '',
   // postId6 = '';
-  let comment_1, comment_2;
-  let commentId1, commentId2;
-  let cookie1, cookie2;
+  let comment_1, comment_2, comment_4;
+  let commentId1, commentId2, commentId4;
+  let cookie1, cookie2, cookie4;
   let users;
 
   it('should delete all data', async () => {
@@ -199,6 +199,7 @@ describe('Comments', () => {
 
     cookie1 = auth_user_1.header['set-cookie'];
     cookie2 = auth_user_2.header['set-cookie'];
+    cookie4 = auth_user_4.header['set-cookie'];
 
     const blog = await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL);
     const blogID = blog.body.id;
@@ -212,8 +213,10 @@ describe('Comments', () => {
     //CREATE  COMMENTS
     comment_1 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(COMMENT_CONTENT_1);
     comment_2 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_2}`).send(COMMENT_CONTENT_2);
+    comment_4 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_4}`).send(COMMENT_CONTENT_2);
     commentId1 = comment_1.body.id;
     commentId2 = comment_2.body.id;
+    commentId4 = comment_4.body.id;
 
     // post_3 = await supertest(server)
     //   .post(`/blogs/${blogID}/posts`)
@@ -260,10 +263,10 @@ describe('Comments', () => {
     expect(posts.totalCount).toBe(2);
   });
 
-  it('should comments by postId length == 2', async () => {
+  it('should comments by postId length == 3', async () => {
     const response = await supertest(server).get(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
     const comments = response.body;
-    expect(comments.totalCount).toBe(2);
+    expect(comments.totalCount).toBe(3);
   });
 
   it('should four likes at first post', async function () {
