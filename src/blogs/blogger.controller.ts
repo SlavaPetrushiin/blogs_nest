@@ -165,4 +165,20 @@ export class BloggerController {
     }
     return;
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePostByBlogId(@Param('blogId') blogId: string, @Param('postId') postId: string, @Request() req) {
+    const userId = req.user.id;
+    const blog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    if (!blog) throw new NotFoundException();
+
+    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException();
+    const isDeleted = await this.postsService.removePost(postId);
+    if (!isDeleted) {
+      throw new NotFoundException();
+    }
+    return;
+  }
 }
