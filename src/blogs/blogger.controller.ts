@@ -1,3 +1,6 @@
+import { BlogsRepository } from './blogs.repository';
+import { PostsService } from './../posts/posts.service';
+import { UpdatePostDto } from './../posts/dto/update-post.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { GetUserIdFromBearerToken } from '../guards/get-userId-from-bearer-token';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
@@ -15,6 +18,7 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Body, UseGuards } from '@nestjs/common/decorators';
 import { CreateBlogDto } from './dto/create-blog.dto';
@@ -24,12 +28,12 @@ import { SortDirectionType } from '../types/types';
 import { CreatePostByBlogIdDto } from '../posts/dto/create-post.dto';
 
 @SkipThrottle()
-@Controller('blogger')
+@Controller('blogger/blogs')
 export class BloggerController {
-  constructor(private blogsService: BlogsService) {}
+  constructor(private blogsService: BlogsService, private postsService: PostsService, private blogsRepository: BlogsRepository) {}
 
   @UseGuards(AccessTokenGuard)
-  @Get('blogs')
+  @Get('')
   async getBlogs(
     @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm: string,
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
@@ -56,7 +60,7 @@ export class BloggerController {
     return result;
   }
 
-  @Get('blogs/:id')
+  @Get(':id')
   async getBlog(@Param('id') id: string) {
     const result = await this.blogsService.getBlog(id);
     if (!result) {
@@ -66,7 +70,7 @@ export class BloggerController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('blogs')
+  @Post('')
   async createBlog(@Body() createBlogDto: CreateBlogDto, @Request() req) {
     const userId = req.user.id;
     const login = req.user.login;
@@ -78,7 +82,7 @@ export class BloggerController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Put('blogs/:id')
+  @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(@Param('id') id: string, @Body() updateBlogDTO: UpdateBlogDto, @Request() req) {
     const userId = req.user.id;
@@ -91,7 +95,7 @@ export class BloggerController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Delete('blogs/:id')
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeBlog(@Param('id') id: string, @Request() req) {
     const userId = req.user.id;
@@ -104,7 +108,7 @@ export class BloggerController {
 
   /* Get posts by blogId */
   @UseGuards(GetUserIdFromBearerToken)
-  @Get('blogs/:blogId/posts')
+  @Get(':blogId/posts')
   async getPostsByBlogId(
     @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
     pageNumber: number,
@@ -131,12 +135,34 @@ export class BloggerController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('blogs/:blogId/posts')
-  async createPostByBlogId(@Param('blogId') blogId: string, @Body() createPostDto: CreatePostByBlogIdDto) {
+  @HttpCode(HttpStatus.CREATED)
+  @Post(':blogId/posts')
+  async createPostByBlogId(@Param('blogId') blogId: string, @Body() createPostDto: CreatePostByBlogIdDto, @Request() req) {
+    const userId = req.user.id;
+    const blog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    if (!blog) throw new NotFoundException();
+    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException();
+
     const result = await this.blogsService.createPostByBlogId(createPostDto, blogId);
     if (!result) {
       throw new NotFoundException();
     }
     return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Put(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePostByBlogId(@Param('blogId') blogId: string, @Param('postId') postId: string, @Body() updatePostDto: UpdatePostDto, @Request() req) {
+    const userId = req.user.id;
+    const blog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    if (!blog) throw new NotFoundException();
+
+    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException();
+    const isUpdated = await this.postsService.updatePost(updatePostDto, postId);
+    if (!isUpdated) {
+      throw new NotFoundException();
+    }
+    return;
   }
 }
