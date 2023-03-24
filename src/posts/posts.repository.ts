@@ -13,12 +13,12 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0, updatedAt: 0 };
 interface INewPostDto extends CreatePostDto {
   blogName: string;
   blogId: string;
-  userId: string
+  userId: string;
 }
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectModel(Post.name) private PostModel: Model<PostDocument>, private likesRepository: LikesRepository) { }
+  constructor(@InjectModel(Post.name) private PostModel: Model<PostDocument>, private likesRepository: LikesRepository) {}
 
   async findAllPosts(params: AllEntitiesPost, userId: string, blogId: string = null) {
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
@@ -98,7 +98,7 @@ export class PostsRepository {
       },
     );
 
-    return !!result.matchedCount;
+    return result.matchedCount > 0;
   }
 
   async removePost(id: string): Promise<boolean> {
@@ -125,7 +125,7 @@ export class PostsRepository {
       {
         $set: { isBanned },
       },
-    )
+    );
   }
 
   public getLikesInfo(dataArray: LikesDocument[], userId: string, parentId: string): ILikesInfo {
