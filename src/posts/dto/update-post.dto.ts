@@ -21,8 +21,8 @@ export class UpdatePostDto {
   @MaxLength(1000)
   content: string;
 
-  @IsString()
-  @IsUUID()
-  @Validate(CheckBlogId, { message: 'Not exist blog' })
-  readonly blogId: string;
+  // @IsString()
+  // @IsUUID()
+  // @Validate(CheckBlogId, { message: 'Not exist blog' })
+  // readonly blogId: string;
 }

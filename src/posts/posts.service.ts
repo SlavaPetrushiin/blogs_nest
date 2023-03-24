@@ -97,7 +97,7 @@ export class PostsService {
     };
   }
 
-  async updatePost(post: Omit<UpdatePostDto, 'blogId'>, id: string) {
+  async updatePost(post: UpdatePostDto, id: string) {
     // const { blogId } = post;
 
     // const foundedBlog = await this.blogsRepository.findBlog(blogId);
