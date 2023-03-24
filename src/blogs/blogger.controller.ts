@@ -153,9 +153,15 @@ export class BloggerController {
   @UseGuards(AccessTokenGuard)
   @Put(':blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePostByBlogId(@Param('blogId') blogId: string, @Param('postId') postId: string, @Body() updatePostDto: UpdatePostDto, @Request() req) {
+  async updatePostByBlogId(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+    @Body() updatePostDto: Omit<UpdatePostDto, 'blogId'>,
+    @Request() req,
+  ) {
     const userId = req.user.id;
     const blog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+
     if (!blog) throw new NotFoundException();
 
     if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException();

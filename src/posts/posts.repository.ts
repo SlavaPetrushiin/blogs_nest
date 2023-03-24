@@ -88,7 +88,7 @@ export class PostsRepository {
     return new this.PostModel({ ...post });
   }
 
-  async updatePost(post: UpdatePostDto, id: string): Promise<boolean> {
+  async updatePost(post: Omit<UpdatePostDto, 'blogId'>, id: string): Promise<boolean> {
     const { title, shortDescription, content } = post;
 
     const result = await this.PostModel.updateOne(

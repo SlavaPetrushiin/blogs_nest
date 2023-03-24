@@ -31,7 +31,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) { }
+  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) {}
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get()
@@ -79,16 +79,16 @@ export class PostsController {
     return createdPost;
   }
 
-  @UseGuards(AccessTokenGuard)
-  @Put(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    const result = await this.postsService.updatePost(updatePostDto, id);
-    if (!result) {
-      throw new NotFoundException();
-    }
-    return result;
-  }
+  // @UseGuards(AccessTokenGuard)
+  // @Put(':id')
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // async updatePost(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  //   const result = await this.postsService.updatePost(updatePostDto, id);
+  //   if (!result) {
+  //     throw new NotFoundException();
+  //   }
+  //   return result;
+  // }
 
   @UseGuards(AccessTokenGuard)
   @Delete(':id')

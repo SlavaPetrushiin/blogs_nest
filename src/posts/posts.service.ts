@@ -97,14 +97,14 @@ export class PostsService {
     };
   }
 
-  async updatePost(post: UpdatePostDto, id: string) {
-    const { blogId } = post;
+  async updatePost(post: Omit<UpdatePostDto, 'blogId'>, id: string) {
+    // const { blogId } = post;
 
-    const foundedBlog = await this.blogsRepository.findBlog(blogId);
+    // const foundedBlog = await this.blogsRepository.findBlog(blogId);
 
-    if (!foundedBlog) {
-      return null;
-    }
+    // if (!foundedBlog) {
+    //   return null;
+    // }
 
     return this.postsRepository.updatePost(post, id);
   }
