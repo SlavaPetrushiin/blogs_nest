@@ -18,7 +18,6 @@ class EmailConfirmation {
 
 const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
 
-
 export interface IBanInfo {
   isBanned: boolean;
   banDate: string;

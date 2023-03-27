@@ -130,6 +130,19 @@ export class BlogsRepository {
     );
   }
 
+  async banOrUnbanBlogByBlogId(blogId: string, isBanned: boolean): Promise<boolean> {
+    const result = await this.BlogModel.updateOne(
+      {
+        id: blogId,
+      },
+      {
+        $set: { isBanned },
+      },
+    );
+
+    return result.matchedCount > 0;
+  }
+
   async save(blog: BlogDocument) {
     return blog.save();
   }

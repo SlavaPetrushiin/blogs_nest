@@ -53,11 +53,23 @@ export class UsersController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Put('blogs/:blogId/bind-with-user/:userId')
-  async function(@Param('blogId') blogId: string, @Param('userId') userId: string) {
+  async bindWithUser(@Param('blogId') blogId: string, @Param('userId') userId: string) {
     const isBind = await this.usersService.bindBlogWithUser(blogId, userId);
     if (!isBind) {
       throw new NotFoundException();
     }
+    return;
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put('blogs/:blogId/ban')
+  async banBlog(@Param('blogId') blogId: string, @Body() banDto: { isBanned: boolean }) {
+    const isBan = this.blogsService.banOrUnbanBlog(blogId, banDto.isBanned);
+
+    if (!isBan) {
+      throw new NotFoundException();
+    }
+
     return;
   }
 

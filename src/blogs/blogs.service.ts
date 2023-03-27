@@ -110,4 +110,11 @@ export class BlogsService {
       },
     };
   }
+
+  async banOrUnbanBlog(blogId: string, isBanned: boolean): Promise<boolean> {
+    const foundBlog = await this.blogsRepository.findBlog(blogId);
+    if (!foundBlog) throw new NotFoundException();
+
+    return this.blogsRepository.banOrUnbanBlogByBlogId(blogId, isBanned);
+  }
 }
