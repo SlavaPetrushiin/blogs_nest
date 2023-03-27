@@ -86,6 +86,10 @@ export class BlogsRepository {
     return this.BlogModel.findOne({ id, isBanned: false }, { ...DEFAULT_PROJECTION, isBanned: 0 }).exec();
   }
 
+  async findAllBannedBlogsIDs(): Promise<{ id: string }[]> {
+    return this.BlogModel.find({ isBanned: true }, { id: 1 });
+  }
+
   async createBlog(blog: CreateBlogDto, userId: string, userLogin: string): Promise<BlogDocument> {
     return new this.BlogModel({
       ...blog,
