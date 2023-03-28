@@ -70,7 +70,7 @@ export class BloggerController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('')
+  @Post()
   async createBlog(@Body() createBlogDto: CreateBlogDto, @Request() req) {
     const userId = req.user.id;
     const login = req.user.login;
