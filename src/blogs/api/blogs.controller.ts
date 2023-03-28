@@ -1,14 +1,15 @@
+import { BlogQueryRepositoryMongodb } from './../infrastructure/blog-query.repository';
 import { SkipThrottle } from '@nestjs/throttler';
-import { GetUserIdFromBearerToken } from '../guards/get-userId-from-bearer-token';
+import { GetUserIdFromBearerToken } from '../../guards/get-userId-from-bearer-token';
 import { Request, Controller, Get, Param, Query, DefaultValuePipe, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common/decorators';
-import { BlogsService } from './blogs.service';
-import { SortDirectionType } from '../types/types';
+import { BlogsService } from '../application/blogs.service';
+import { SortDirectionType } from '../../types/types';
 
 @SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
-  constructor(private blogsService: BlogsService) {}
+  constructor(private blogsService: BlogsService, private blogQueryRepository: BlogQueryRepositoryMongodb) {}
 
   @Get('')
   async getBlogs(
@@ -21,7 +22,7 @@ export class BlogsController {
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
   ) {
-    const result = await this.blogsService.getBlogs({
+    const result = await this.blogQueryRepository.findAllBlogs({
       searchNameTerm,
       pageNumber,
       pageSize,
@@ -34,7 +35,7 @@ export class BlogsController {
 
   @Get(':id')
   async getBlog(@Param('id') id: string) {
-    const result = await this.blogsService.getBlog(id);
+    const result = await this.blogQueryRepository.findBlog(id);
     if (!result) {
       throw new NotFoundException();
     }
@@ -62,6 +63,9 @@ export class BlogsController {
       sortBy,
       sortDirection,
     };
+    const foundBlog = await this.blogQueryRepository.findBlog(blogId);
+    if (!foundBlog) throw new NotFoundException();
+
     const result = await this.blogsService.getPostsByBlogId(query, id, blogId);
     if (!result) {
       throw new NotFoundException();

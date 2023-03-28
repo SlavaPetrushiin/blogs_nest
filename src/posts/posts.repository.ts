@@ -1,4 +1,5 @@
-import { BlogsRepository } from './../blogs/blogs.repository';
+import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
+import { BlogsRepository } from '../blogs/infrastructure/blogs.repository';
 import { LikesRepository } from './../likes/likes.repository';
 import { StatusLike, LikesDocument, ILikesInfo } from './../likes/schemas/likes.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -23,12 +24,13 @@ export class PostsRepository {
     @InjectModel(Post.name) private PostModel: Model<PostDocument>,
     private likesRepository: LikesRepository,
     private blogsRepository: BlogsRepository,
+    private blogQueryRepository: BlogQueryRepositoryMongodb,
   ) {}
 
   async findAllPosts(params: AllEntitiesPost, userId: string, blogId: string = null) {
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
     const skip = (+pageNumber - 1) * +pageSize;
-    const bannedBlogs = (await this.blogsRepository.findAllBannedBlogsIDs()).map((blog) => blog.id);
+    const bannedBlogs = (await this.blogQueryRepository.findAllBannedBlogsIDs()).map((blog) => blog.id);
     const postFilter: any = { isBanned: false, blogId: { $nin: bannedBlogs } };
 
     if (blogId) {
@@ -87,7 +89,7 @@ export class PostsRepository {
   }
 
   async findPost(id: string): Promise<PostDocument> {
-    const bannedBlogs = (await this.blogsRepository.findAllBannedBlogsIDs()).map((blog) => blog.id);
+    const bannedBlogs = (await this.blogQueryRepository.findAllBannedBlogsIDs()).map((blog) => blog.id);
     return this.PostModel.findOne({ id: id, isBanned: false, blogId: { $nin: bannedBlogs } }, DEFAULT_PROJECTION).exec();
   }
 

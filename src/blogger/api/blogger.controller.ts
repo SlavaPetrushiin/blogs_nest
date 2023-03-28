@@ -1,9 +1,10 @@
-import { BlogsRepository } from './blogs.repository';
-import { PostsService } from './../posts/posts.service';
-import { UpdatePostDto } from './../posts/dto/update-post.dto';
+import { BlogQueryRepositoryMongodb } from './../../blogs/infrastructure/blog-query.repository';
+import { BlogsRepository } from '../../blogs/infrastructure/blogs.repository';
+import { PostsService } from '../../posts/posts.service';
+import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { SkipThrottle } from '@nestjs/throttler';
-import { GetUserIdFromBearerToken } from '../guards/get-userId-from-bearer-token';
-import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { GetUserIdFromBearerToken } from '../../guards/get-userId-from-bearer-token';
+import { AccessTokenGuard } from '../../auth/guards/accessToken.guard';
 import {
   Request,
   Controller,
@@ -21,16 +22,21 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Body, UseGuards } from '@nestjs/common/decorators';
-import { CreateBlogDto } from './dto/create-blog.dto';
-import { UpdateBlogDto } from './dto/update-blog.dto';
-import { BlogsService } from './blogs.service';
-import { SortDirectionType } from '../types/types';
-import { CreatePostByBlogIdDto } from '../posts/dto/create-post.dto';
+import { CreateBlogDto } from '../../blogs/dto/create-blog.dto';
+import { UpdateBlogDto } from '../../blogs/dto/update-blog.dto';
+import { BlogsService } from '../../blogs/application/blogs.service';
+import { SortDirectionType } from '../../types/types';
+import { CreatePostByBlogIdDto } from '../../posts/dto/create-post.dto';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
 export class BloggerController {
-  constructor(private blogsService: BlogsService, private postsService: PostsService, private blogsRepository: BlogsRepository) {}
+  constructor(
+    private blogQueryRepository: BlogQueryRepositoryMongodb,
+    private blogsService: BlogsService,
+    private postsService: PostsService,
+    private blogsRepository: BlogsRepository,
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @Get('')
@@ -46,7 +52,7 @@ export class BloggerController {
     @Request() req,
   ) {
     const userId = req.user.id;
-    const result = await this.blogsService.getBlogs(
+    const result = await this.blogQueryRepository.findAllBlogs(
       {
         searchNameTerm,
         pageNumber,
@@ -62,7 +68,7 @@ export class BloggerController {
 
   @Get(':id')
   async getBlog(@Param('id') id: string) {
-    const result = await this.blogsService.getBlog(id);
+    const result = await this.blogQueryRepository.findBlog(id);
     if (!result) {
       throw new NotFoundException();
     }
@@ -127,6 +133,9 @@ export class BloggerController {
       sortBy,
       sortDirection,
     };
+    const foundBlog = await this.blogQueryRepository.findBlog(blogId);
+    if (!foundBlog) throw new NotFoundException();
+
     const result = await this.blogsService.getPostsByBlogId(query, id, blogId);
     if (!result) {
       throw new NotFoundException();
@@ -139,7 +148,7 @@ export class BloggerController {
   @Post(':blogId/posts')
   async createPostByBlogId(@Param('blogId') blogId: string, @Body() createPostDto: CreatePostByBlogIdDto, @Request() req) {
     const userId = req.user.id;
-    const blog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    const blog = await this.blogQueryRepository.findBlogWithOwnerInfo(blogId);
     if (!blog) throw new NotFoundException();
     if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException();
 
@@ -155,7 +164,7 @@ export class BloggerController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePostByBlogId(@Param('blogId') blogId: string, @Param('postId') postId: string, @Body() updatePostDto: UpdatePostDto, @Request() req) {
     const userId = req.user.id;
-    const blog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    const blog = await this.blogQueryRepository.findBlogWithOwnerInfo(blogId);
 
     if (!blog) throw new NotFoundException();
 
@@ -172,7 +181,7 @@ export class BloggerController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePostByBlogId(@Param('blogId') blogId: string, @Param('postId') postId: string, @Request() req) {
     const userId = req.user.id;
-    const blog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    const blog = await this.blogQueryRepository.findBlogWithOwnerInfo(blogId);
     if (!blog) throw new NotFoundException();
 
     if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException();

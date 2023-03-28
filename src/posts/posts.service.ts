@@ -1,9 +1,10 @@
+import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
 import { LikeStatusDto } from './../likes/dto/like.dto';
 import { LikesRepository } from './../likes/likes.repository';
 import { StatusLike } from './../likes/schemas/likes.schema';
 import { AllEntitiesComment } from './../comments/dto/allEntitiesComment';
 import { CommentsRepository } from './../comments/comments.repository';
-import { BlogsRepository } from './../blogs/blogs.repository';
+import { BlogsRepository } from '../blogs/infrastructure/blogs.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AllEntitiesPost } from './dto/allEntitiesPost';
@@ -17,6 +18,7 @@ export class PostsService {
     private blogsRepository: BlogsRepository,
     private commentsRepository: CommentsRepository,
     private likesRepository: LikesRepository,
+    private blogQueryRepository: BlogQueryRepositoryMongodb,
   ) {}
 
   async getPosts(params: AllEntitiesPost, userId: string) {
@@ -64,7 +66,7 @@ export class PostsService {
   async createPost(post: CreatePostDto) {
     const { blogId, content, shortDescription, title } = post;
 
-    const foundedBlog = await this.blogsRepository.findBlog(blogId);
+    const foundedBlog = await this.blogQueryRepository.findBlog(blogId);
     if (!foundedBlog) {
       return null;
     }

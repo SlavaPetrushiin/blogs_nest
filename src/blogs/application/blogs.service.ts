@@ -1,28 +1,21 @@
-import { PostsRepository } from './../posts/posts.repository';
+import { PostsRepository } from '../../posts/posts.repository';
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
-import { CreateBlogDto } from './dto/create-blog.dto';
-import { BlogDocument } from './schemas/blog.schema';
-import { BlogsRepository } from './blogs.repository';
-import { AllEntitiesBlog } from './dto/AllEntitiesBlog';
-import { UpdateBlogDto } from './dto/update-blog.dto';
+import { CreateBlogDto } from '../dto/create-blog.dto';
+import { BlogDocument } from '../models/schemas/blog.schema';
+import { BlogsRepository } from '../infrastructure/blogs.repository';
+import { AllEntitiesBlog } from '../dto/AllEntitiesBlog';
+import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { AllEntitiesPost } from 'src/posts/dto/AllEntitiesPost';
 import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
+import { BlogQueryRepositoryMongodb } from '../infrastructure/blog-query.repository';
 
 @Injectable()
 export class BlogsService {
-  constructor(private blogsRepository: BlogsRepository, private postsRepository: PostsRepository) {}
-
-  async getBlogs(query: AllEntitiesBlog, userId?: string) {
-    return this.blogsRepository.findAllBlogs(query, userId);
-  }
-
-  async findAllBlogsBySA(query: AllEntitiesBlog, userId?: string) {
-    return this.blogsRepository.findAllBlogsBySA(query, userId);
-  }
-
-  async getBlog(id: string): Promise<BlogDocument> {
-    return this.blogsRepository.findBlog(id);
-  }
+  constructor(
+    private blogsRepository: BlogsRepository,
+    private postsRepository: PostsRepository,
+    private readonly blogRepository: BlogQueryRepositoryMongodb,
+  ) {}
 
   async createBlog(blog: CreateBlogDto, userId: string, userLogin: string) {
     const cratedBlog = await this.blogsRepository.createBlog(blog, userId, userLogin);
@@ -38,7 +31,7 @@ export class BlogsService {
   }
 
   async updateBlog(blog: UpdateBlogDto, id: string, userId: string) {
-    const foundBlog = await this.blogsRepository.findBlogWithOwnerInfo(id);
+    const foundBlog = await this.blogRepository.findBlogWithOwnerInfo(id);
 
     if (!foundBlog) {
       throw new NotFoundException();
@@ -52,7 +45,7 @@ export class BlogsService {
   }
 
   async removeBlog(id: string, userId: string): Promise<boolean> {
-    const foundBlog = await this.blogsRepository.findBlogWithOwnerInfo(id);
+    const foundBlog = await this.blogRepository.findBlogWithOwnerInfo(id);
 
     if (!foundBlog) {
       throw new NotFoundException();
@@ -70,16 +63,11 @@ export class BlogsService {
   }
 
   async getPostsByBlogId(query: AllEntitiesPost, userId: string, blogId: string) {
-    const foundedBlog = await this.blogsRepository.findBlog(blogId);
-    if (!foundedBlog) {
-      return null;
-    }
-
     return this.postsRepository.findAllPosts(query, userId, blogId);
   }
 
   async createPostByBlogId(createPostByBlogIdDto: CreatePostByBlogIdDto, blogId: string) {
-    const foundedBlog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    const foundedBlog = await this.blogRepository.findBlogWithOwnerInfo(blogId);
     if (!foundedBlog) {
       return null;
     }
@@ -112,7 +100,7 @@ export class BlogsService {
   }
 
   async banOrUnbanBlog(blogId: string, isBanned: boolean): Promise<boolean> {
-    const foundBlog = await this.blogsRepository.findBlog(blogId);
+    const foundBlog = await this.blogRepository.findBlog(blogId);
     if (!foundBlog) throw new NotFoundException();
 
     return this.blogsRepository.banOrUnbanBlogByBlogId(blogId, isBanned);

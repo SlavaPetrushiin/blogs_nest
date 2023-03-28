@@ -1,10 +1,11 @@
+import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
 import { LikesRepository } from './../likes/likes.repository';
 import { CommentsRepository } from './../comments/comments.repository';
 import { PostsRepository } from './../posts/posts.repository';
 import { AuthRepository } from './../auth/auth.repository';
 import { BanUserDto } from './dto/ban-user.dto';
-import { BlogDocument } from './../blogs/schemas/blog.schema';
-import { BlogsRepository } from './../blogs/blogs.repository';
+import { BlogDocument } from '../blogs/models/schemas/blog.schema';
+import { BlogsRepository } from '../blogs/infrastructure/blogs.repository';
 import { Email } from './../email/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AllEntitiesUser } from './dto/allEntitiesUser.dto';
@@ -31,6 +32,7 @@ export class UsersService {
     private readonly postsRepository: PostsRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly likesRepository: LikesRepository,
+    private blogQueryRepository: BlogQueryRepositoryMongodb,
   ) {}
 
   async getUsers(query: AllEntitiesUser) {
@@ -147,7 +149,7 @@ export class UsersService {
   }
 
   async bindBlogWithUser(blogId: string, userId: string): Promise<boolean> {
-    const foundedBlog = await this.blogsRepository.findBlogWithOwnerInfo(blogId);
+    const foundedBlog = await this.blogQueryRepository.findBlogWithOwnerInfo(blogId);
     const foundedUser = await this.usersRepository.findUserById(userId);
     const errors = this.validateDataForBindBlog(foundedBlog, foundedUser);
 

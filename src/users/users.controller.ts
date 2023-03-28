@@ -1,6 +1,7 @@
+import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
 import { SkipThrottle } from '@nestjs/throttler';
 import { BanUserDto } from './dto/ban-user.dto';
-import { BlogsService } from './../blogs/blogs.service';
+import { BlogsService } from '../blogs/application/blogs.service';
 import { SortDirectionType } from './../types/types';
 import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
 import { AllEntitiesUser } from './dto/allEntitiesUser.dto';
@@ -29,7 +30,7 @@ import {
 @UseGuards(AuthBasicGuard)
 @Controller('sa')
 export class UsersController {
-  constructor(protected usersService: UsersService, private readonly blogsService: BlogsService) {}
+  constructor(protected usersService: UsersService, private readonly blogsService: BlogsService, private blogQueryRepository: BlogQueryRepositoryMongodb) {}
 
   @Get('blogs')
   async getBlogsBySA(
@@ -42,7 +43,7 @@ export class UsersController {
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
     sortDirection: SortDirectionType,
   ) {
-    return this.blogsService.findAllBlogsBySA({
+    return this.blogQueryRepository.findAllBlogsBySA({
       searchNameTerm,
       pageNumber,
       pageSize,
