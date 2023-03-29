@@ -25,12 +25,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersController } from './users/users.controller';
 import { UsersRepository } from './users/users.repository';
-import { BloggerController } from './blogs/blogger.controller';
-import { BlogsService } from './blogs/blogs.service';
+import { BloggerController } from './blogger/api/blogger.controller';
+import { BlogsService } from './blogs/application/blogs.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema, BlogOwnerInfo, BlogOwnerInfoSchema } from './blogs/schemas/blog.schema';
-import { BlogsRepository } from './blogs/blogs.repository';
+import { Blog, BlogSchema, BlogOwnerInfo, BlogOwnerInfoSchema } from './blogs/models/schemas/blog.schema';
+import { BlogsRepository } from './blogs/infrastructure/blogs.repository';
 import { User, UserSchema, BanInfo, BanInfoSchema } from './users/schemas/user.schema';
 import { PostsController } from './posts/posts.controller';
 import { CommentsController } from './comments/comments.controller';
@@ -43,14 +43,15 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { LikesService } from './likes/likes.service';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { BlogsController } from './blogs/blogs.controller';
+import { BlogsController } from './blogs/api/blogs.controller';
+import { BlogQueryRepositoryMongodb } from './blogs/infrastructure/blog-query.repository';
 
 @Module({
   imports: [
     configModule,
     ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
+      ttl: 60,
+      limit: 30,
     }),
     MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
     MongooseModule.forFeature([
@@ -100,6 +101,7 @@ import { BlogsController } from './blogs/blogs.controller';
     UsersService,
     UsersRepository,
     BlogsRepository,
+    BlogQueryRepositoryMongodb,
     BlogsService,
     PostsService,
     PostsRepository,

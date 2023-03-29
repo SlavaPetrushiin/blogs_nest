@@ -3,7 +3,6 @@ import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/commo
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { BlogDocument } from '../models/schemas/blog.schema';
 import { BlogsRepository } from '../infrastructure/blogs.repository';
-import { AllEntitiesBlog } from '../dto/AllEntitiesBlog';
 import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { AllEntitiesPost } from 'src/posts/dto/AllEntitiesPost';
 import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
@@ -30,34 +29,26 @@ export class BlogsService {
     };
   }
 
-  async updateBlog(blog: UpdateBlogDto, id: string, userId: string) {
-    const foundBlog = await this.blogRepository.findBlogWithOwnerInfo(id);
-
-    if (!foundBlog) {
-      throw new NotFoundException();
-    }
+  async updateBlog(blog: UpdateBlogDto, blogId: string, userId: string) {
+    const foundBlog = await this.getExistingBlog(blogId);
 
     if (foundBlog.blogOwnerInfo.userId != userId) {
       throw new ForbiddenException();
     }
 
-    return this.blogsRepository.updateBlog(blog, id);
+    return this.blogsRepository.updateBlog(blog, blogId);
   }
 
-  async removeBlog(id: string, userId: string): Promise<boolean> {
-    const foundBlog = await this.blogRepository.findBlogWithOwnerInfo(id);
-
-    if (!foundBlog) {
-      throw new NotFoundException();
-    }
+  async removeBlog(blogId: string, userId: string): Promise<boolean> {
+    const foundBlog = await this.getExistingBlog(blogId);
 
     if (foundBlog.blogOwnerInfo.userId != userId) {
       throw new ForbiddenException();
     }
 
-    const isDeleted = await this.blogsRepository.removeBlog(id);
+    const isDeleted = await this.blogsRepository.removeBlog(blogId);
     if (isDeleted) {
-      this.postsRepository.removePostByBlogId(id);
+      this.postsRepository.removePostByBlogId(blogId);
     }
     return isDeleted;
   }
@@ -67,18 +58,17 @@ export class BlogsService {
   }
 
   async createPostByBlogId(createPostByBlogIdDto: CreatePostByBlogIdDto, blogId: string) {
-    const foundedBlog = await this.blogRepository.findBlogWithOwnerInfo(blogId);
-    if (!foundedBlog) {
-      return null;
-    }
+    console.log({ blogId });
+    const foundBlog = await this.getExistingBlog(blogId);
+
     const { content, shortDescription, title } = createPostByBlogIdDto;
     const cratedPost = await this.postsRepository.createPost({
       title,
       shortDescription,
       content,
-      blogId: foundedBlog.id,
-      blogName: foundedBlog.name,
-      userId: foundedBlog.blogOwnerInfo.userId,
+      blogId: foundBlog.id,
+      blogName: foundBlog.name,
+      userId: foundBlog.blogOwnerInfo.userId,
     });
     await this.postsRepository.save(cratedPost);
 
@@ -100,9 +90,13 @@ export class BlogsService {
   }
 
   async banOrUnbanBlog(blogId: string, isBanned: boolean): Promise<boolean> {
-    const foundBlog = await this.blogRepository.findBlog(blogId);
-    if (!foundBlog) throw new NotFoundException();
-
+    await this.getExistingBlog(blogId);
     return this.blogsRepository.banOrUnbanBlogByBlogId(blogId, isBanned);
+  }
+
+  async getExistingBlog(blogId: string): Promise<BlogDocument> {
+    const foundBlog = await this.blogRepository.findBlogWithOwnerInfo(blogId);
+    if (!foundBlog) throw new NotFoundException();
+    return foundBlog;
   }
 }
