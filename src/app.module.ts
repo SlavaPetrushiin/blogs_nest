@@ -29,7 +29,7 @@ import { BloggerController } from './blogger/api/blogger.controller';
 import { BlogsService } from './blogs/application/blogs.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema, BlogOwnerInfo, BlogOwnerInfoSchema } from './blogs/models/schemas/blog.schema';
+import { Blog, BlogSchema, BlogOwnerInfo, BlogOwnerInfoSchema, BanBlog, BanBlogSchema } from './blogs/models/schemas/blog.schema';
 import { BlogsRepository } from './blogs/infrastructure/blogs.repository';
 import { User, UserSchema, BanInfo, BanInfoSchema } from './users/schemas/user.schema';
 import { PostsController } from './posts/posts.controller';
@@ -50,8 +50,8 @@ import { BlogQueryRepositoryMongodb } from './blogs/infrastructure/blog-query.re
   imports: [
     configModule,
     ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 30,
+      ttl: 10,
+      limit: 5,
     }),
     MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
     MongooseModule.forFeature([
@@ -64,6 +64,7 @@ import { BlogQueryRepositoryMongodb } from './blogs/infrastructure/blog-query.re
       { name: Likes.name, schema: LikesSchema },
       { name: BlogOwnerInfo.name, schema: BlogOwnerInfoSchema },
       { name: BanInfo.name, schema: BanInfoSchema },
+      { name: BanBlog.name, schema: BanBlogSchema },
     ]),
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({

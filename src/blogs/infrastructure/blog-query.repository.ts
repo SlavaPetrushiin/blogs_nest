@@ -1,3 +1,5 @@
+import { BanBlog, BanBlogDocument } from './../models/schemas/blog.schema';
+import { AllEntitiesBanBlog } from './../dto/allEntitiesBlog';
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument } from '../models/schemas/blog.schema';
 import { Model } from 'mongoose';
@@ -8,7 +10,7 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class BlogQueryRepositoryMongodb {
-  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) {}
+  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>, @InjectModel(BanBlog.name) private BanBlogModel: Model<BanBlogDocument>) {}
 
   async findAllBlogs(query: AllEntitiesBlog, userId?: string) {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
@@ -86,5 +88,44 @@ export class BlogQueryRepositoryMongodb {
 
   async findAllBannedBlogsIDs(): Promise<{ id: string }[]> {
     return this.BlogModel.find({ isBanned: true }, { id: 1 });
+  }
+
+  async findAllBannedUsersForBlog(query: AllEntitiesBanBlog, blogId: string) {
+    const { searchLoginTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
+    const filter = {
+      blogId,
+      isBanned: true,
+      banReason: {
+        $regex: searchLoginTerm,
+        $options: 'i',
+      },
+    };
+
+    const skip = (+pageNumber - 1) * +pageSize;
+
+    const result: BanBlogDocument[] = await this.BanBlogModel.find(filter, { ...DEFAULT_PROJECTION, blogOwnerInfo: 0, isBanned: 0 })
+      .skip(+skip)
+      .limit(+pageSize)
+      .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
+
+    const totalCount = await this.BanBlogModel.countDocuments(filter);
+    const pageCount = Math.ceil(totalCount / +pageSize);
+    const preparedResult = result.map((banBlog) => ({
+      id: banBlog.id,
+      login: banBlog.login,
+      banInfo: {
+        isBanned: banBlog.isBanned,
+        banDate: banBlog.createdAt,
+        banReason: banBlog.banReason,
+      },
+    }));
+
+    return {
+      pagesCount: pageCount,
+      page: +pageNumber,
+      pageSize: +pageSize,
+      totalCount: totalCount,
+      items: preparedResult,
+    };
   }
 }

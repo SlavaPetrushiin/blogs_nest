@@ -1,3 +1,5 @@
+import { BanBlog, BanBlogDocument } from './../models/schemas/blog.schema';
+import { BanBlogDto } from './../../blogger/dto/ban-blog.dto';
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument } from '../models/schemas/blog.schema';
 import { Model } from 'mongoose';
@@ -10,7 +12,7 @@ const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>) {}
+  constructor(@InjectModel(Blog.name) private BlogModel: Model<BlogDocument>, @InjectModel(BanBlog.name) private BanBlogModel: Model<BanBlogDocument>) {}
 
   async createBlog(blog: CreateBlogDto, userId: string, userLogin: string): Promise<BlogDocument> {
     return new this.BlogModel({
@@ -67,6 +69,21 @@ export class BlogsRepository {
     );
 
     return result.matchedCount > 0;
+  }
+
+  async banOrUnbanBlogForUser(dto: BanBlogDto, userId: string, login: string): Promise<boolean> {
+    const query = { blogId: dto.blogId, userId: userId };
+    const options = { upsert: true };
+    const update = {
+      $set: {
+        banReason: dto.banReason,
+        isBanned: dto.isBanned,
+        login,
+      },
+    };
+    const result = await this.BanBlogModel.updateOne(query, update, options);
+
+    return result.acknowledged;
   }
 
   async save(blog: BlogDocument) {

@@ -1,3 +1,4 @@
+import { BanBlogDto } from './../../blogger/dto/ban-blog.dto';
 import { PostsRepository } from '../../posts/posts.repository';
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CreateBlogDto } from '../dto/create-blog.dto';
@@ -52,13 +53,12 @@ export class BlogsService {
     }
     return isDeleted;
   }
-
+  //Move to post query
   async getPostsByBlogId(query: AllEntitiesPost, userId: string, blogId: string) {
     return this.postsRepository.findAllPosts(query, userId, blogId);
   }
 
   async createPostByBlogId(createPostByBlogIdDto: CreatePostByBlogIdDto, blogId: string) {
-    console.log({ blogId });
     const foundBlog = await this.getExistingBlog(blogId);
 
     const { content, shortDescription, title } = createPostByBlogIdDto;
@@ -88,10 +88,15 @@ export class BlogsService {
       },
     };
   }
-
+  //If user ban
   async banOrUnbanBlog(blogId: string, isBanned: boolean): Promise<boolean> {
     await this.getExistingBlog(blogId);
     return this.blogsRepository.banOrUnbanBlogByBlogId(blogId, isBanned);
+  }
+
+  //ban a blog for a specific user
+  async banOrUnbanBlogForUser(dto: BanBlogDto, userId: string, login: string) {
+    return this.blogsRepository.banOrUnbanBlogForUser(dto, userId, login);
   }
 
   async getExistingBlog(blogId: string): Promise<BlogDocument> {

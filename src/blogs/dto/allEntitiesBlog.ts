@@ -7,3 +7,11 @@ export class AllEntitiesBlog {
   sortBy: string;
   sortDirection: SortDirectionType;
 }
+
+export class AllEntitiesBanBlog {
+  searchLoginTerm: string;
+  pageNumber: number;
+  pageSize: number;
+  sortBy: string;
+  sortDirection: SortDirectionType;
+}

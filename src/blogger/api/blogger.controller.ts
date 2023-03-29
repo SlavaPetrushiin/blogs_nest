@@ -31,12 +31,7 @@ import { CreatePostByBlogIdDto } from '../../posts/dto/create-post.dto';
 @SkipThrottle()
 @Controller('blogger/blogs')
 export class BloggerController {
-  constructor(
-    private blogQueryRepository: BlogQueryRepositoryMongodb,
-    private blogsService: BlogsService,
-    private postsService: PostsService,
-    private blogsRepository: BlogsRepository,
-  ) {}
+  constructor(private blogQueryRepository: BlogQueryRepositoryMongodb, private blogsService: BlogsService, private postsService: PostsService) {}
 
   @UseGuards(AccessTokenGuard)
   @Get('')
