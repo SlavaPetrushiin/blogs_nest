@@ -64,7 +64,7 @@ export class BlogsRepository {
         id: blogId,
       },
       {
-        $set: { isBanned },
+        $set: { isBanned, banDate: new Date().toISOString() },
       },
     );
 

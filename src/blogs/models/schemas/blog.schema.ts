@@ -72,6 +72,9 @@ export class Blog {
 
   @Prop({ default: false })
   isBanned: boolean;
+
+  @Prop({ default: '' })
+  banDate: string;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

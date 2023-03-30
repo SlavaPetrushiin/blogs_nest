@@ -61,7 +61,7 @@ export class BlogQueryRepositoryMongodb {
 
     const skip = (+pageNumber - 1) * +pageSize;
 
-    const result = await this.BlogModel.find(filter, { ...DEFAULT_PROJECTION, isBanned: 0 })
+    const result = await this.BlogModel.find(filter, { ...DEFAULT_PROJECTION })
       .skip(+skip)
       .limit(+pageSize)
       .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
@@ -74,7 +74,19 @@ export class BlogQueryRepositoryMongodb {
       page: +pageNumber,
       pageSize: +pageSize,
       totalCount: totalCount,
-      items: result,
+      items: result.map((blog) => ({
+        id: blog.id,
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.createdAt,
+        isMembership: blog.isMembership,
+        blogOwnerInfo: blog.blogOwnerInfo,
+        banInfo: {
+          isBanned: blog.isBanned,
+          banDate: blog.banDate,
+        },
+      })),
     };
   }
 
