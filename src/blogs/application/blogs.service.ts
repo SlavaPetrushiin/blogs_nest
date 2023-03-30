@@ -101,7 +101,10 @@ export class BlogsService {
 
   async getExistingBlog(blogId: string): Promise<BlogDocument> {
     const foundBlog = await this.blogRepository.findBlogWithOwnerInfo(blogId);
-    if (!foundBlog) throw new NotFoundException();
+    if (!foundBlog) {
+      throw new NotFoundException();
+    }
+
     return foundBlog;
   }
 }

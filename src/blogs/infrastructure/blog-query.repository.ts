@@ -95,7 +95,7 @@ export class BlogQueryRepositoryMongodb {
   }
 
   async findBlogWithOwnerInfo(id: string): Promise<BlogDocument> {
-    return this.BlogModel.findOne({ id, isBanned: false }, { ...DEFAULT_PROJECTION, isBanned: 0 }).exec();
+    return this.BlogModel.findOne({ id }, { ...DEFAULT_PROJECTION, isBanned: 0 }).exec();
   }
 
   async findAllBannedBlogsIDs(): Promise<{ id: string }[]> {
