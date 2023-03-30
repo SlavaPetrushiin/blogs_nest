@@ -48,7 +48,7 @@ export class BlogQueryRepositoryMongodb {
   async findAllBlogsBySA(query: AllEntitiesBlog, userId?: string) {
     const { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = query;
     const filter = {
-      isBanned: false,
+      // isBanned: false,
       name: {
         $regex: searchNameTerm,
         $options: 'i',

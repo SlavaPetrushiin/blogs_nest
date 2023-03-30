@@ -7,7 +7,6 @@ const credentials = { secretName: 'admin', secretPassword: 'qwerty' };
 export class AuthBasicGuard {
   async canActivate(context) {
     const request: Request = context.switchToHttp().getRequest();
-
     if (!request.headers.authorization) {
       throw new UnauthorizedException();
     }
@@ -16,15 +15,9 @@ export class AuthBasicGuard {
     const typeAuth = headerAuth.split(' ')[0] || '';
     const params = headerAuth.split(' ')[1] || '';
 
-    const [name, password] = Buffer.from(params, 'base64')
-      .toString()
-      .split(':');
+    const [name, password] = Buffer.from(params, 'base64').toString().split(':');
 
-    if (
-      typeAuth != 'Basic' ||
-      name != credentials.secretName ||
-      password != credentials.secretPassword
-    ) {
+    if (typeAuth != 'Basic' || name != credentials.secretName || password != credentials.secretPassword) {
       throw new UnauthorizedException();
     }
 
