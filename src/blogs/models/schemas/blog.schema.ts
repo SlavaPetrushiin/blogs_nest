@@ -73,7 +73,7 @@ export class Blog {
   @Prop({ default: false })
   isBanned: boolean;
 
-  @Prop({ default: '' })
+  @Prop({ default: null })
   banDate: string;
 }
 
