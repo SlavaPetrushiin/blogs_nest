@@ -93,4 +93,8 @@ export class BlogsRepository {
   async deleteMany() {
     return this.BlogModel.deleteMany({});
   }
+
+  async deleteAllBanned() {
+    return this.BanBlogModel.deleteMany({});
+  }
 }

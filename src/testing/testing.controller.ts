@@ -15,7 +15,7 @@ export class TestingController {
     private usersRepository: UsersRepository,
     private authRepository: AuthRepository,
     private likesRepository: LikesRepository,
-  ) { }
+  ) {}
 
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -27,7 +27,8 @@ export class TestingController {
     const a = await this.authRepository.deleteMany();
     // const bp = badPractice.deleteMany({});
     const l = this.likesRepository.deleteMany();
+    const ban = this.blogsRepository.deleteAllBanned();
 
-    await Promise.all([b, p, u, c, a, l]);
+    await Promise.all([b, p, u, c, a, l, ban]);
   }
 }
