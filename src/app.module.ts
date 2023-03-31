@@ -45,6 +45,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { BlogsController } from './blogs/api/blogs.controller';
 import { BlogQueryRepositoryMongodb } from './blogs/infrastructure/blog-query.repository';
+import { BloggerUserController } from './blogger/api/blogger-user.controller';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { BlogQueryRepositoryMongodb } from './blogs/infrastructure/blog-query.re
     CommentsController,
     TestingController,
     SecurityController,
+    BloggerUserController,
   ],
   providers: [
     AuthService,

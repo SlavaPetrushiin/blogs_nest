@@ -27,8 +27,9 @@ export class PostsService {
 
   async getPost(postId: string, userId: string) {
     const foundedPost = await this.postsRepository.findPost(postId);
+    const bannedBlogsIds = await this.blogQueryRepository.findAllBannedBlogsIDs();
 
-    if (!foundedPost) {
+    if (!foundedPost || bannedBlogsIds.some((b) => b.id === foundedPost.blogId)) {
       throw new NotFoundException();
     }
 
