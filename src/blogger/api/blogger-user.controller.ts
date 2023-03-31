@@ -18,6 +18,7 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  Body,
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 
@@ -29,11 +30,11 @@ export class BloggerUserController {
   @UseGuards(AccessTokenGuard)
   @Put(':userId/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async banBlogForUser(@Param('userId') userId: string, dto: BanBlogDto, @Request() req) {
+  async banBlogForUser(@Param('userId') userId: string, @Body() dto: BanBlogDto, @Request() req) {
     const bloggerId = req.user.id;
     const foundBlog = await this.blogQueryRepository.findBlogWithOwnerInfo(dto.blogId);
     const foundUser = await this.usersService.findUserById(userId);
-
+    // console.log({ foundBlog, foundUser });
     if (!foundBlog) throw new NotFoundException();
     if (!foundUser) throw new NotFoundException();
     if (foundBlog.blogOwnerInfo.userId !== bloggerId) throw new ForbiddenException();
