@@ -107,7 +107,7 @@ export class BlogQueryRepositoryMongodb {
     const filter = {
       blogId,
       isBanned: true,
-      banReason: {
+      login: {
         $regex: searchLoginTerm,
         $options: 'i',
       },
