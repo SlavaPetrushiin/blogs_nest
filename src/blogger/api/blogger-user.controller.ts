@@ -33,10 +33,11 @@ export class BloggerUserController {
   async banBlogForUser(@Param('userId') userId: string, @Body() dto: BanBlogDto, @Request() req) {
     const bloggerId = req.user.id;
     const foundBlog = await this.blogQueryRepository.findBlogWithOwnerInfo(dto.blogId);
-    const foundUser = await this.usersService.findUserById(userId);
-    // console.log({ foundBlog, foundUser });
     if (!foundBlog) throw new NotFoundException();
+
+    const foundUser = await this.usersService.findUserById(userId);
     if (!foundUser) throw new NotFoundException();
+
     if (foundBlog.blogOwnerInfo.userId !== bloggerId) throw new ForbiddenException();
 
     const isUpdated = await this.blogsService.banOrUnbanBlogForUser(dto, userId, foundUser.login);
@@ -58,6 +59,9 @@ export class BloggerUserController {
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc)) sortDirection: SortDirectionType,
   ) {
+    const foundBlog = await this.blogQueryRepository.findBlogWithOwnerInfo(blogId);
+    if (!foundBlog) throw new NotFoundException();
+
     return this.blogQueryRepository.findAllBannedUsersForBlog(
       {
         searchLoginTerm,
