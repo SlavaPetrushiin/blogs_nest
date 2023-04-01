@@ -58,9 +58,12 @@ export class BloggerUserController {
     pageSize: number,
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
     @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc)) sortDirection: SortDirectionType,
+    @Request() req,
   ) {
+    const userId = req.user.id;
     const foundBlog = await this.blogQueryRepository.findBlogWithOwnerInfo(blogId);
     if (!foundBlog) throw new NotFoundException();
+    if (foundBlog.blogOwnerInfo.userId != userId) throw new ForbiddenException();
 
     return this.blogQueryRepository.findAllBannedUsersForBlog(
       {
