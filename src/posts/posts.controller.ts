@@ -1,3 +1,4 @@
+import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
 import { LikeStatusDto } from './../likes/dto/like.dto';
 import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
 import { CreateCommentDto } from './../comments/dto/create-comment.dto';
@@ -19,6 +20,7 @@ import {
   NotFoundException,
   Request,
   ParseUUIDPipe,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Body, Res, UseGuards } from '@nestjs/common/decorators';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -31,7 +33,11 @@ import { SkipThrottle } from '@nestjs/throttler';
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService, private readonly commentsService: CommentsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly commentsService: CommentsService,
+    private readonly blogQueryRepository: BlogQueryRepositoryMongodb,
+  ) {}
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get()
@@ -105,6 +111,12 @@ export class PostsController {
   @Post(':postId/comments')
   async createCommentsByPostId(@Param('postId') postId: string, @Body() contentDto: CreateCommentDto, @Request() req) {
     const { id } = req.user;
+    const foundedPost = await this.postsService.getPost(postId, id);
+    if (!foundedPost) throw new NotFoundException();
+
+    const isBannedUserForBlog = await this.blogQueryRepository.findBannedBlogForUser(foundedPost.blogId, id);
+    if (isBannedUserForBlog) throw new ForbiddenException();
+
     return this.commentsService.createComment({
       userId: id,
       postId,

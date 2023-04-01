@@ -27,11 +27,6 @@ export class CommentsService {
   }
 
   async createComment(params: Omit<IParamsCreateComment, 'userLogin'>) {
-    const foundedPost = await this.postsService.getPost(params.postId, params.userId);
-    if (!foundedPost) {
-      throw new NotFoundException();
-    }
-
     const user = await this.usersService.findUserById(params.userId);
     const newComment = await this.commentsRepository.createComment({
       ...params,

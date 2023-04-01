@@ -140,4 +140,8 @@ export class BlogQueryRepositoryMongodb {
       items: preparedResult,
     };
   }
+
+  async findBannedBlogForUser(blogId: string, userId: string): Promise<BanBlogDocument> {
+    return this.BanBlogModel.findOne({ blogId, userId, isBanned: true });
+  }
 }
