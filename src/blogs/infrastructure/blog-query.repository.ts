@@ -115,10 +115,10 @@ export class BlogQueryRepositoryMongodb {
 
     const skip = (+pageNumber - 1) * +pageSize;
 
-    const result: BanBlogDocument[] = await this.BanBlogModel.find(filter, { ...DEFAULT_PROJECTION, blogOwnerInfo: 0, isBanned: 0 })
+    const result: BanBlogDocument[] = await this.BanBlogModel.find(filter, { ...DEFAULT_PROJECTION, blogOwnerInfo: 0 })
+      .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 })
       .skip(+skip)
-      .limit(+pageSize)
-      .sort({ [sortBy]: sortDirection == 'asc' ? 1 : -1 });
+      .limit(+pageSize);
 
     const totalCount = await this.BanBlogModel.countDocuments(filter);
     const pageCount = Math.ceil(totalCount / +pageSize);
