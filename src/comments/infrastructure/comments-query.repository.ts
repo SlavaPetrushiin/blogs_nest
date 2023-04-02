@@ -13,7 +13,7 @@ export class CommentsQueryRepositoryMongodb {
     const skip = (+pageNumber - 1) * +pageSize;
     const typeSortDirection = sortDirection === 'asc' ? 1 : -1;
 
-    return this.CommentModel.aggregate([
+    const comments = await this.CommentModel.aggregate([
       { $match: { userId } },
       { $sort: { [sortBy]: typeSortDirection } },
       { $skip: skip },
@@ -46,5 +46,16 @@ export class CommentsQueryRepositoryMongodb {
         },
       },
     ]);
+
+    const totalCount = await this.CommentModel.countDocuments();
+    const pageCount = Math.ceil(totalCount / +pageSize);
+
+    return {
+      pagesCount: pageCount,
+      page: +pageNumber,
+      pageSize: +pageSize,
+      totalCount,
+      items: comments,
+    };
   }
 }
