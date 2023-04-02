@@ -66,7 +66,6 @@ export class BloggerController {
     return result;
   }
 
-  @SkipThrottle(false)
   @UseGuards(AccessTokenGuard)
   @Get('comments')
   async getAllCommentsBlogger(
