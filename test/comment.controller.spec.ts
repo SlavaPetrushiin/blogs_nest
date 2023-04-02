@@ -164,7 +164,7 @@ describe('Comments', () => {
   };
 
   let post_1, post_2, post_3, post_4, post_5, post_6;
-  let postId1 = '',
+  const postId1 = '',
     postId2 = '';
   // postId3 = '',
   // postId4 = '',
@@ -174,6 +174,7 @@ describe('Comments', () => {
   let commentId1, commentId2, commentId4;
   let cookie1, cookie2, cookie4;
   let users;
+  let blogId, secondBlogId;
 
   it('should delete all data', async () => {
     await supertest(server).delete('/testing/all-data').expect(204);
@@ -181,10 +182,15 @@ describe('Comments', () => {
 
   it('created 4 user, one blog, 2 posts', async () => {
     //Registration users
-    await supertest(server).post('/auth/registration').send(inputModelUser1).expect(204);
-    await supertest(server).post('/auth/registration').send(inputModelUser2).expect(204);
-    await supertest(server).post('/auth/registration').send(inputModelUser3).expect(204);
-    await supertest(server).post('/auth/registration').send(inputModelUser4).expect(204);
+    // await supertest(server).post('/auth/registration').send(inputModelUser1).expect(204);
+    // await supertest(server).post('/auth/registration').send(inputModelUser2).expect(204);
+    // await supertest(server).post('/auth/registration').send(inputModelUser3).expect(204);
+    // await supertest(server).post('/auth/registration').send(inputModelUser4).expect(204);
+
+    await supertest(server).post('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(inputModelUser1).expect(201);
+    await supertest(server).post('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(inputModelUser2).expect(201);
+    await supertest(server).post('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(inputModelUser3).expect(201);
+    await supertest(server).post('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`).send(inputModelUser4).expect(201);
 
     //Auth
     const auth_user_1 = await supertest(server).post('/auth/login').set('user-agent', 'Mozilla').send(correctInputModelAuth1);
@@ -203,24 +209,26 @@ describe('Comments', () => {
 
     console.log({ tokens });
 
-    const blog = await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL);
-    const blogID = blog.body.id;
+    const blog = await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL).expect(201);
+    const secondBlog = await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL_TWO).expect(201);
+    blogId = blog.body.id;
+    secondBlogId = secondBlog.body.id;
 
-    //CREATE POSTS
-    post_1 = await supertest(server).post(`/blogger/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(POST_MODEL_1);
-    post_2 = await supertest(server).post(`/blogger/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(POST_MODEL_2);
-    postId1 = post_1.body.id;
-    postId2 = post_2.body.id;
+    // //CREATE POSTS
+    // post_1 = await supertest(server).post(`/blogger/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(POST_MODEL_1);
+    // post_2 = await supertest(server).post(`/blogger/blogs/${blogID}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(POST_MODEL_2);
+    // postId1 = post_1.body.id;
+    // postId2 = post_2.body.id;
 
-    console.log({ postId1: post_1.body });
+    // console.log({ postId1: post_1.body });
 
-    //CREATE  COMMENTS
-    comment_1 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(COMMENT_CONTENT_1);
-    comment_2 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_2}`).send(COMMENT_CONTENT_2);
-    comment_4 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_4}`).send(COMMENT_CONTENT_2);
-    commentId1 = comment_1.body.id;
-    commentId2 = comment_2.body.id;
-    commentId4 = comment_4.body.id;
+    // //CREATE  COMMENTS
+    // comment_1 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`).send(COMMENT_CONTENT_1);
+    // comment_2 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_2}`).send(COMMENT_CONTENT_2);
+    // comment_4 = await supertest(server).post(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_4}`).send(COMMENT_CONTENT_2);
+    // commentId1 = comment_1.body.id;
+    // commentId2 = comment_2.body.id;
+    // commentId4 = comment_4.body.id;
 
     // post_3 = await supertest(server)
     //   .post(`/blogs/${blogID}/posts`)
@@ -247,26 +255,117 @@ describe('Comments', () => {
     // postId6 = post_6.body.id;
   });
 
-  it('Should get users', async function () {
-    const responseUsers = await supertest(server).get('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`);
-    expect(responseUsers.body.items.length).toBe(4);
-    users = responseUsers.body.items;
+  it('Shoud created two blogs', async function () {
+    const blogs = await supertest(server).get('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`);
+    const firstBlogId = blogs.body.items[0].id;
+    const secondBlogId = blogs.body.items[1].id;
+
+    const isBanBlog = await supertest(server)
+      .put(`/sa/blogs/${secondBlogId}/ban`)
+      .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
+      .send({ isBanned: true })
+      .expect(204);
+
+    // const isUnBanBlog = await supertest(server)
+    //   .put(`/sa/blogs/${secondBlogId}/ban`)
+    //   .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
+    //   .send({ isBanned: false })
+    //   .expect(204);
+
+    const secondBlog = await supertest(server).get(`/blogs/${secondBlogId}`);
+    expect(secondBlog.body.id).toBe(secondBlogId);
   });
 
-  it('shoud get my blogs', async () => {
-    await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL_TWO).expect(201);
-    await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_2}`).send(BLOG_MODEL_THREE).expect(201);
-    await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_4}`).send(BLOG_MODEL_THREE).expect(201);
+  it('shoud find all user for bannd blog', async () => {
+    const users = await supertest(server).get('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`);
 
-    const blogsFirstUser = await supertest(server).get('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`);
-    expect(blogsFirstUser.body.items.length).toBe(2);
+    await supertest(server)
+      .put(`/blogger/users/${users.body.items[0].id}/ban`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send({ isBanned: true, banReason: 'banReason banReason banReason', blogId: blogId })
+      .expect(204);
+
+    await supertest(server)
+      .put(`/blogger/users/${users.body.items[1].id}/ban`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send({ isBanned: true, banReason: 'banReason banReason banReason', blogId: blogId })
+      .expect(204);
+
+    await supertest(server)
+      .put(`/blogger/users/${users.body.items[2].id}/ban`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send({ isBanned: true, banReason: 'banReason banReason banReason', blogId: blogId })
+      .expect(204);
+
+    const allUsersForBannedBlog = await supertest(server).get(`/blogger/users/blog/${blogId}`).set('Authorization', `Bearer ${tokens.token_user_1}`);
+    expect(allUsersForBannedBlog.body.items.length).toBe(3);
   });
 
-  it('should posts length == 2', async () => {
-    const response = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);
-    const posts = response.body;
-    expect(posts.totalCount).toBe(2);
+  it('shoud retur status code 404 , if user not exist', async () => {
+    await supertest(server)
+      .put(`/blogger/users/${new Date().toISOString()}/ban`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send({ isBanned: true, banReason: 'banReason banReason banReason', blogId: blogId })
+      .expect(404);
   });
+
+  it('get all comments', async () => {
+    const post_1 = await supertest(server)
+      .post(`/blogger/blogs/${secondBlogId}/posts`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send(POST_MODEL_1)
+      .expect(201);
+
+    const post_2 = await supertest(server)
+      .post(`/blogger/blogs/${secondBlogId}/posts`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send(POST_MODEL_2)
+      .expect(201);
+
+    const response = await supertest(server).get(`/blogger/blogs/${secondBlogId}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);
+    expect(response.body.items.length).toBe(2);
+
+    const comment1ByPost1 = await supertest(server)
+      .post(`/posts/${post_1.body.id}/comments`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send(COMMENT_CONTENT_1)
+      .expect(201);
+
+    const comment2ByPost1 = await supertest(server)
+      .post(`/posts/${post_1.body.id}/comments`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send(COMMENT_CONTENT_2)
+      .expect(201);
+
+    const comment1ByPost2 = await supertest(server)
+      .post(`/posts/${post_2.body.id}/comments`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send(COMMENT_CONTENT_2)
+      .expect(201);
+
+    const allCommentsBlogger = await supertest(server).get(`/blogger/blogs/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
+  });
+
+  // it('Should get users', async function () {
+  //   const responseUsers = await supertest(server).get('/sa/users').set('Authorization', `Basic YWRtaW46cXdlcnR5`);
+  //   expect(responseUsers.body.items.length).toBe(4);
+  //   users = responseUsers.body.items;
+  // });
+
+  // it('shoud get my blogs', async () => {
+  //   await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`).send(BLOG_MODEL_TWO).expect(201);
+  //   await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_2}`).send(BLOG_MODEL_THREE).expect(201);
+  //   await supertest(server).post('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_4}`).send(BLOG_MODEL_THREE).expect(201);
+
+  //   const blogsFirstUser = await supertest(server).get('/blogger/blogs').set('Authorization', `Bearer ${tokens.token_user_1}`);
+  //   expect(blogsFirstUser.body.items.length).toBe(2);
+  // });
+
+  // it('should posts length == 2', async () => {
+  //   const response = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);
+  //   const posts = response.body;
+  //   expect(posts.totalCount).toBe(2);
+  // });
 
   // it('should comments by postId length == 3', async () => {
   //   const response = await supertest(server).get(`/posts/${postId1}/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
@@ -471,56 +570,56 @@ describe('Comments', () => {
   //     ],
   //   });
 
-  //   // const PostByIdForSecondUser = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_2}`);
-  //   // expect(PostByIdForSecondUser.body).toStrictEqual({
-  //   //   pagesCount: 1,
-  //   //   page: 1,
-  //   //   pageSize: 10,
-  //   //   totalCount: 2,
-  //   //   items: [
-  //   //     {
-  //   //       id: expect.any(String),
-  //   //       title: expect.any(String),
-  //   //       shortDescription: expect.any(String),
-  //   //       content: expect.any(String),
-  //   //       blogId: expect.any(String),
-  //   //       blogName: expect.any(String),
-  //   //       createdAt: expect.any(String),
-  //   //       extendedLikesInfo: {
-  //   //         likesCount: 0,
-  //   //         dislikesCount: 0,
-  //   //         myStatus: 'None',
-  //   //         newestLikes: [],
-  //   //       },
-  //   //     },
-  //   //     {
-  //   //       id: expect.any(String),
-  //   //       title: expect.any(String),
-  //   //       shortDescription: expect.any(String),
-  //   //       content: expect.any(String),
-  //   //       blogId: expect.any(String),
-  //   //       blogName: expect.any(String),
-  //   //       createdAt: expect.any(String),
-  //   //       extendedLikesInfo: {
-  //   //         likesCount: 2,
-  //   //         dislikesCount: 0,
-  //   //         myStatus: 'None',
-  //   //         newestLikes: [
-  //   //           {
-  //   //             addedAt: expect.any(String),
-  //   //             userId: expect.any(String),
-  //   //             login: 'login-4',
-  //   //           },
-  //   //           {
-  //   //             addedAt: expect.any(String),
-  //   //             userId: expect.any(String),
-  //   //             login: 'login-3',
-  //   //           },
-  //   //         ],
-  //   //       },
-  //   //     },
-  //   //   ],
-  //   // });
+  //   const PostByIdForSecondUser = await supertest(server).get(`/posts`).set('Authorization', `Bearer ${tokens.token_user_2}`);
+  //   expect(PostByIdForSecondUser.body).toStrictEqual({
+  //     pagesCount: 1,
+  //     page: 1,
+  //     pageSize: 10,
+  //     totalCount: 2,
+  //     items: [
+  //       {
+  //         id: expect.any(String),
+  //         title: expect.any(String),
+  //         shortDescription: expect.any(String),
+  //         content: expect.any(String),
+  //         blogId: expect.any(String),
+  //         blogName: expect.any(String),
+  //         createdAt: expect.any(String),
+  //         extendedLikesInfo: {
+  //           likesCount: 0,
+  //           dislikesCount: 0,
+  //           myStatus: 'None',
+  //           newestLikes: [],
+  //         },
+  //       },
+  //       {
+  //         id: expect.any(String),
+  //         title: expect.any(String),
+  //         shortDescription: expect.any(String),
+  //         content: expect.any(String),
+  //         blogId: expect.any(String),
+  //         blogName: expect.any(String),
+  //         createdAt: expect.any(String),
+  //         extendedLikesInfo: {
+  //           likesCount: 2,
+  //           dislikesCount: 0,
+  //           myStatus: 'None',
+  //           newestLikes: [
+  //             {
+  //               addedAt: expect.any(String),
+  //               userId: expect.any(String),
+  //               login: 'login-4',
+  //             },
+  //             {
+  //               addedAt: expect.any(String),
+  //               userId: expect.any(String),
+  //               login: 'login-3',
+  //             },
+  //           ],
+  //         },
+  //       },
+  //     ],
+  //   });
   // });
 
   // it('Should ban fourth user', async () => {

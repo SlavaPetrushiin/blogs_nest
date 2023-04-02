@@ -46,6 +46,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { BlogsController } from './blogs/api/blogs.controller';
 import { BlogQueryRepositoryMongodb } from './blogs/infrastructure/blog-query.repository';
 import { BloggerUserController } from './blogger/api/blogger-user.controller';
+import { CommentsQueryRepositoryMongodb } from './comments/infrastructure/comments-query.repository';
 
 @Module({
   imports: [
@@ -110,6 +111,7 @@ import { BloggerUserController } from './blogger/api/blogger-user.controller';
     PostsRepository,
     CommentsService,
     CommentsRepository,
+    CommentsQueryRepositoryMongodb,
     PassportModule,
     LocalStrategy,
     AccessTokenStrategy,

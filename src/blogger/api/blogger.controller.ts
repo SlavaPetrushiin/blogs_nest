@@ -1,5 +1,5 @@
+import { CommentsQueryRepositoryMongodb } from './../../comments/infrastructure/comments-query.repository';
 import { BlogQueryRepositoryMongodb } from './../../blogs/infrastructure/blog-query.repository';
-import { BlogsRepository } from '../../blogs/infrastructure/blogs.repository';
 import { PostsService } from '../../posts/posts.service';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -31,7 +31,12 @@ import { CreatePostByBlogIdDto } from '../../posts/dto/create-post.dto';
 @SkipThrottle()
 @Controller('blogger/blogs')
 export class BloggerController {
-  constructor(private blogQueryRepository: BlogQueryRepositoryMongodb, private blogsService: BlogsService, private postsService: PostsService) {}
+  constructor(
+    private blogQueryRepository: BlogQueryRepositoryMongodb,
+    private blogsService: BlogsService,
+    private postsService: PostsService,
+    private commentsQueryRepository: CommentsQueryRepositoryMongodb,
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @Get('')
@@ -59,6 +64,30 @@ export class BloggerController {
     );
 
     return result;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('comments')
+  async getAllCommentsBlogger(
+    @Query('pageNumber', new DefaultValuePipe(1), ParseIntPipe)
+    pageNumber: number,
+    @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe)
+    pageSize: number,
+    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
+    @Query('sortDirection', new DefaultValuePipe(SortDirectionType.desc))
+    sortDirection: SortDirectionType,
+    @Request() req,
+  ) {
+    const userId = req.user.id;
+    return this.commentsQueryRepository.findAllCommentsForAllPosts_2(
+      {
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+      },
+      userId,
+    );
   }
 
   @Get(':id')
