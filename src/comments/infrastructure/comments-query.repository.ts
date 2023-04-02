@@ -15,9 +15,6 @@ export class CommentsQueryRepositoryMongodb {
 
     const comments = await this.CommentModel.aggregate([
       //{ $match: { userId } },
-      { $sort: { [sortBy]: typeSortDirection } },
-      { $skip: skip },
-      { $limit: +pageSize },
       {
         $lookup: {
           from: 'posts',
@@ -27,6 +24,9 @@ export class CommentsQueryRepositoryMongodb {
         },
       },
       { $unwind: '$posts' },
+      { $sort: { [sortBy]: typeSortDirection } },
+      { $skip: skip },
+      { $limit: +pageSize },
       {
         $project: {
           _id: 0,
