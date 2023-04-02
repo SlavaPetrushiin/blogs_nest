@@ -14,7 +14,7 @@ export class CommentsQueryRepositoryMongodb {
     const typeSortDirection = sortDirection === 'asc' ? 1 : -1;
 
     const comments = await this.CommentModel.aggregate([
-      { $match: { userId } },
+      //{ $match: { userId } },
       { $sort: { [sortBy]: typeSortDirection } },
       { $skip: skip },
       { $limit: +pageSize },
