@@ -52,8 +52,8 @@ import { CommentsQueryRepositoryMongodb } from './comments/infrastructure/commen
   imports: [
     configModule,
     ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
+      ttl: 60,
+      limit: 30,
     }),
     MongooseModule.forRoot(new ConfigService().get('MONGO_URL')),
     MongooseModule.forFeature([
