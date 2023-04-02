@@ -66,6 +66,7 @@ export class BloggerController {
     return result;
   }
 
+  @SkipThrottle(false)
   @UseGuards(AccessTokenGuard)
   @Get('comments')
   async getAllCommentsBlogger(
@@ -79,7 +80,7 @@ export class BloggerController {
     @Request() req,
   ) {
     const userId = req.user.id;
-    return this.commentsQueryRepository.findAllCommentsForAllPosts_2(
+    return this.commentsQueryRepository.findAllCommentsForAllPosts(
       {
         pageNumber,
         pageSize,
