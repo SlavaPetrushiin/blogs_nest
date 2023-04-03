@@ -28,6 +28,53 @@ export class CommentsQueryRepositoryMongodb {
       { $skip: skip },
       { $limit: +pageSize },
       {
+        $lookup: {
+          from: 'likes',
+          localField: 'id',
+          foreignField: 'parentId',
+          pipeline: [
+            {
+              $match: {
+                status: 'Like',
+                isBanned: false,
+              },
+            },
+          ],
+          as: 'likesCount',
+        },
+      },
+      {
+        $lookup: {
+          from: 'likes',
+          localField: 'id',
+          foreignField: 'parentId',
+          pipeline: [
+            {
+              $match: {
+                status: 'Dislike',
+                isBanned: false,
+              },
+            },
+          ],
+          as: 'dislikesCount',
+        },
+      },
+      {
+        $lookup: {
+          from: 'likes',
+          localField: 'id',
+          foreignField: 'parentId',
+          pipeline: [
+            {
+              $match: {
+                userId: userId ?? '',
+              },
+            },
+          ],
+          as: 'myStatus',
+        },
+      },
+      {
         $project: {
           _id: 0,
           id: 1,
@@ -43,8 +90,20 @@ export class CommentsQueryRepositoryMongodb {
             blogId: '$posts.blogId',
             blogName: '$posts.blogName',
           },
+          'likesInfo.likesCount': { $size: '$likesCount' },
+          'likesInfo.dislikesCount': { $size: '$dislikesCount' },
+          'likesInfo.myStatus': {
+            $cond: {
+              if: { $eq: [{ $size: '$myStatus' }, 0] },
+              then: 'None',
+              else: '$myStatus.status',
+            },
+          },
         },
       },
+      { $unwind: '$likesInfo.likesCount' },
+      { $unwind: '$likesInfo.dislikesCount' },
+      { $unwind: '$likesInfo.myStatus' },
     ]);
 
     const totalCount = await this.CommentModel.countDocuments();
