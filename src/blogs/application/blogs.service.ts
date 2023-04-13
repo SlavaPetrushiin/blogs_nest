@@ -1,5 +1,5 @@
 import { BanBlogDto } from './../../blogger/dto/ban-blog.dto';
-import { PostsRepository } from '../../posts/posts.repository';
+import { PostsRepository } from '../../posts/infrastructure/posts.repository';
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { BlogDocument } from '../models/schemas/blog.schema';
@@ -8,6 +8,7 @@ import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { AllEntitiesPost } from 'src/posts/dto/AllEntitiesPost';
 import { CreatePostByBlogIdDto } from 'src/posts/dto/create-post.dto';
 import { BlogQueryRepositoryMongodb } from '../infrastructure/blog-query.repository';
+import { PostsQueryRepositoryMongodb } from './../../posts/infrastructure/posts-query.repository';
 
 @Injectable()
 export class BlogsService {
@@ -15,6 +16,7 @@ export class BlogsService {
     private blogsRepository: BlogsRepository,
     private postsRepository: PostsRepository,
     private readonly blogRepository: BlogQueryRepositoryMongodb,
+    private readonly postsQueryRepository: PostsQueryRepositoryMongodb,
   ) {}
 
   async createBlog(blog: CreateBlogDto, userId: string, userLogin: string) {
@@ -55,7 +57,7 @@ export class BlogsService {
   }
   //Move to post query
   async getPostsByBlogId(query: AllEntitiesPost, userId: string, blogId: string) {
-    return this.postsRepository.findAllPosts(query, userId, blogId);
+    return this.postsQueryRepository.findAllPosts(query, userId, blogId);
   }
 
   async createPostByBlogId(createPostByBlogIdDto: CreatePostByBlogIdDto, blogId: string) {

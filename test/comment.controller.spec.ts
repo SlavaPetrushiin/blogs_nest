@@ -322,8 +322,14 @@ describe('Comments', () => {
       .send(POST_MODEL_2)
       .expect(201);
 
+    const post_3 = await supertest(server)
+      .post(`/blogger/blogs/${secondBlogId}/posts`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send(POST_MODEL_3)
+      .expect(201);
+
     const response = await supertest(server).get(`/blogger/blogs/${secondBlogId}/posts`).set('Authorization', `Bearer ${tokens.token_user_1}`);
-    expect(response.body.items.length).toBe(2);
+    expect(response.body.items.length).toBe(3);
 
     const comment1ByPost1 = await supertest(server)
       .post(`/posts/${post_1.body.id}/comments`)
@@ -344,6 +350,30 @@ describe('Comments', () => {
       .expect(201);
 
     const allCommentsBlogger = await supertest(server).get(`/blogger/blogs/comments`).set('Authorization', `Bearer ${tokens.token_user_1}`);
+
+    await supertest(server)
+      .put(`/posts/${post_1.body.id}/like-status`)
+      .set('Authorization', `Bearer ${tokens.token_user_1}`)
+      .send({ likeStatus: StatusLike.Like })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await supertest(server)
+      .put(`/posts/${post_2.body.id}/like-status`)
+      .set('Authorization', `Bearer ${tokens.token_user_2}`)
+      .send({ likeStatus: StatusLike.Dislike })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await supertest(server)
+      .put(`/posts/${post_3.body.id}/like-status`)
+      .set('Authorization', `Bearer ${tokens.token_user_3}`)
+      .send({ likeStatus: StatusLike.Like })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await supertest(server)
+      .put(`/posts/${post_1.body.id}/like-status`)
+      .set('Authorization', `Bearer ${tokens.token_user_4}`)
+      .send({ likeStatus: StatusLike.Like })
+      .expect(HttpStatus.NO_CONTENT);
   });
 
   // it('Should get users', async function () {

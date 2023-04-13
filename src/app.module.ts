@@ -17,9 +17,9 @@ import { LocalStrategy } from './auth/strategies/local.strategy';
 import { AuthService } from './auth/auth.service';
 import { TestingController } from './testing/testing.controller';
 import { CommentsService } from './comments/comments.service';
-import { Post, PostSchema } from './posts/schemas/post.schema';
-import { PostsRepository } from './posts/posts.repository';
-import { PostsService } from './posts/posts.service';
+import { Post, PostSchema } from './posts/models/schemas/post.schema';
+import { PostsRepository } from './posts/infrastructure/posts.repository';
+import { PostsService } from './posts/application/posts.service';
 import { UsersService } from './users/users.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -32,7 +32,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema, BlogOwnerInfo, BlogOwnerInfoSchema, BanBlog, BanBlogSchema } from './blogs/models/schemas/blog.schema';
 import { BlogsRepository } from './blogs/infrastructure/blogs.repository';
 import { User, UserSchema, BanInfo, BanInfoSchema } from './users/schemas/user.schema';
-import { PostsController } from './posts/posts.controller';
+import { PostsController } from './posts/api/posts.controller';
 import { CommentsController } from './comments/comments.controller';
 import { CommentsRepository } from './comments/comments.repository';
 import { Comment, CommentSchema } from './comments/schemas/comment.schema';
@@ -47,6 +47,7 @@ import { BlogsController } from './blogs/api/blogs.controller';
 import { BlogQueryRepositoryMongodb } from './blogs/infrastructure/blog-query.repository';
 import { BloggerUserController } from './blogger/api/blogger-user.controller';
 import { CommentsQueryRepositoryMongodb } from './comments/infrastructure/comments-query.repository';
+import { PostsQueryRepositoryMongodb } from './posts/infrastructure/posts-query.repository';
 
 @Module({
   imports: [
@@ -109,6 +110,7 @@ import { CommentsQueryRepositoryMongodb } from './comments/infrastructure/commen
     BlogsService,
     PostsService,
     PostsRepository,
+    PostsQueryRepositoryMongodb,
     CommentsService,
     CommentsRepository,
     CommentsQueryRepositoryMongodb,

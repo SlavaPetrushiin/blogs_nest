@@ -1,6 +1,5 @@
 import { Transform } from 'class-transformer';
-import { CheckBlogId } from './../validators/checkBlogId';
-import { IsString, IsUUID, MaxLength, Validate, IsNotEmpty } from 'class-validator';
+import { IsString, MaxLength, IsNotEmpty } from 'class-validator';
 
 export class UpdatePostDto {
   @IsString()
@@ -20,9 +19,4 @@ export class UpdatePostDto {
   @IsNotEmpty()
   @MaxLength(1000)
   content: string;
-
-  // @IsString()
-  // @IsUUID()
-  // @Validate(CheckBlogId, { message: 'Not exist blog' })
-  // readonly blogId: string;
 }

@@ -1,7 +1,7 @@
 import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
 import { LikesRepository } from './../likes/likes.repository';
 import { CommentsRepository } from './../comments/comments.repository';
-import { PostsRepository } from './../posts/posts.repository';
+import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { AuthRepository } from './../auth/auth.repository';
 import { BanUserDto } from './dto/ban-user.dto';
 import { BlogDocument } from '../blogs/models/schemas/blog.schema';

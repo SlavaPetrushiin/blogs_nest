@@ -1,6 +1,6 @@
 import { CommentsQueryRepositoryMongodb } from './../../comments/infrastructure/comments-query.repository';
 import { BlogQueryRepositoryMongodb } from './../../blogs/infrastructure/blog-query.repository';
-import { PostsService } from '../../posts/posts.service';
+import { PostsService } from '../../posts/application/posts.service';
 import { UpdatePostDto } from '../../posts/dto/update-post.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { GetUserIdFromBearerToken } from '../../guards/get-userId-from-bearer-token';

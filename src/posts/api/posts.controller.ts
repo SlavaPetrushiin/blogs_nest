@@ -1,10 +1,10 @@
-import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
-import { LikeStatusDto } from './../likes/dto/like.dto';
-import { GetUserIdFromBearerToken } from './../guards/get-userId-from-bearer-token';
-import { CreateCommentDto } from './../comments/dto/create-comment.dto';
-import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
-import { CommentsService } from './../comments/comments.service';
-import { AuthBasicGuard } from '../auth/guards/auth_basic.guard';
+import { BlogQueryRepositoryMongodb } from '../../blogs/infrastructure/blog-query.repository';
+import { LikeStatusDto } from '../../likes/dto/like.dto';
+import { GetUserIdFromBearerToken } from '../../guards/get-userId-from-bearer-token';
+import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
+import { AccessTokenGuard } from '../../auth/guards/accessToken.guard';
+import { CommentsService } from '../../comments/comments.service';
+import { AuthBasicGuard } from '../../auth/guards/auth_basic.guard';
 import {
   Controller,
   Get,
@@ -23,12 +23,13 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Body, Res, UseGuards } from '@nestjs/common/decorators';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { PostsService } from './posts.service';
-import { SortDirectionType } from './../types/types';
+import { CreatePostDto } from '../dto/create-post.dto';
+import { UpdatePostDto } from '../dto/update-post.dto';
+import { PostsService } from '../application/posts.service';
+import { SortDirectionType } from '../../types/types';
 import { Response } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
+import { PostsQueryRepositoryMongodb } from '../infrastructure/posts-query.repository';
 
 @SkipThrottle()
 @Controller('posts')
@@ -37,6 +38,7 @@ export class PostsController {
     private readonly postsService: PostsService,
     private readonly commentsService: CommentsService,
     private readonly blogQueryRepository: BlogQueryRepositoryMongodb,
+    private readonly postsQueryRepository: PostsQueryRepositoryMongodb,
   ) {}
 
   @UseGuards(GetUserIdFromBearerToken)
@@ -52,7 +54,7 @@ export class PostsController {
     @Request() req,
   ) {
     const { id } = req.user;
-    return this.postsService.getPosts(
+    return this.postsQueryRepository.findAllPosts(
       {
         pageNumber,
         pageSize,

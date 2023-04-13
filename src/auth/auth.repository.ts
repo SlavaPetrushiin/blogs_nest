@@ -20,7 +20,7 @@ export interface IUserDataSession {
 
 @Injectable()
 export class AuthRepository {
-  constructor(@InjectModel(Auth.name) private AuthModel: Model<AuthDocument>) { }
+  constructor(@InjectModel(Auth.name) private AuthModel: Model<AuthDocument>) {}
 
   async createSession(dataSession) {
     return new this.AuthModel(dataSession);
@@ -32,7 +32,7 @@ export class AuthRepository {
 
   async findAllSessions(userId: string): Promise<IUserDataSession[]> {
     const result = await this.AuthModel.find({ userId }, { projection: { ...DEFAULT_PROJECTION, exp: false, userId: false } }).exec();
-    return result.map(item => ({ ip: item.ip, title: item.title, lastActiveDate: item.lastActiveDate, deviceId: item.deviceId }))
+    return result.map((item) => ({ ip: item.ip, title: item.title, lastActiveDate: item.lastActiveDate, deviceId: item.deviceId }));
   }
 
   public async removeSession(userId: string, deviceId: string): Promise<boolean> {

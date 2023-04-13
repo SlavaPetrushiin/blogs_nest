@@ -1,32 +1,27 @@
-import { BlogQueryRepositoryMongodb } from './../blogs/infrastructure/blog-query.repository';
-import { LikeStatusDto } from './../likes/dto/like.dto';
-import { LikesRepository } from './../likes/likes.repository';
-import { StatusLike } from './../likes/schemas/likes.schema';
-import { AllEntitiesComment } from './../comments/dto/allEntitiesComment';
-import { CommentsRepository } from './../comments/comments.repository';
-import { BlogsRepository } from '../blogs/infrastructure/blogs.repository';
+import { BlogQueryRepositoryMongodb } from '../../blogs/infrastructure/blog-query.repository';
+import { LikesRepository } from '../../likes/likes.repository';
+import { StatusLike } from '../../likes/schemas/likes.schema';
+import { AllEntitiesComment } from '../../comments/dto/allEntitiesComment';
+import { CommentsRepository } from '../../comments/comments.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
-import { AllEntitiesPost } from './dto/allEntitiesPost';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { PostsRepository } from './posts.repository';
+import { CreatePostDto } from '../dto/create-post.dto';
+import { AllEntitiesPost } from '../dto/allEntitiesPost';
+import { UpdatePostDto } from '../dto/update-post.dto';
+import { PostsRepository } from '../infrastructure/posts.repository';
+import { PostsQueryRepositoryMongodb } from '../infrastructure/posts-query.repository';
 
 @Injectable()
 export class PostsService {
   constructor(
     private postsRepository: PostsRepository,
-    private blogsRepository: BlogsRepository,
     private commentsRepository: CommentsRepository,
     private likesRepository: LikesRepository,
     private blogQueryRepository: BlogQueryRepositoryMongodb,
+    private postsQueryRepository: PostsQueryRepositoryMongodb,
   ) {}
 
-  async getPosts(params: AllEntitiesPost, userId: string) {
-    return this.postsRepository.findAllPosts(params, userId);
-  }
-
   async getPost(postId: string, userId: string) {
-    const foundedPost = await this.postsRepository.findPost(postId);
+    const foundedPost = await this.postsQueryRepository.findPost(postId);
     const bannedBlogsIds = await this.blogQueryRepository.findAllBannedBlogsIDs();
 
     if (!foundedPost || bannedBlogsIds.some((b) => b.id === foundedPost.blogId)) {
@@ -34,7 +29,7 @@ export class PostsService {
     }
 
     const likesAndDislikes = await this.likesRepository.findLikesDislikesByParentsId([postId], 'post');
-    const likesInfo = this.postsRepository.getLikesInfo(likesAndDislikes, userId, foundedPost.id);
+    const likesInfo = this.postsQueryRepository.getLikesInfo(likesAndDislikes, userId, foundedPost.id);
     const onlyLikes = likesAndDislikes.filter((item) => item.status === StatusLike.Like);
     const lastThreeLikes = JSON.parse(JSON.stringify(onlyLikes));
     lastThreeLikes.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -117,7 +112,7 @@ export class PostsService {
   }
 
   async getCommentsByPostId(query: AllEntitiesComment, postId: string, userId: string) {
-    const foundedPost = await this.postsRepository.findPost(postId);
+    const foundedPost = await this.postsQueryRepository.findPost(postId);
     if (!foundedPost) {
       return null;
     }

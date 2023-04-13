@@ -7,7 +7,7 @@ import { Param, UseGuards } from '@nestjs/common/decorators';
 @SkipThrottle()
 @Controller('security')
 export class SecurityController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @UseGuards(RefreshTokenCustomGuard)
   @Get('devices')

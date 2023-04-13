@@ -3,7 +3,7 @@ import { AuthRepository } from './../auth/auth.repository';
 import { UsersRepository } from './../users/users.repository';
 import { BlogsRepository } from '../blogs/infrastructure/blogs.repository';
 import { CommentsRepository } from './../comments/comments.repository';
-import { PostsRepository } from './../posts/posts.repository';
+import { PostsRepository } from '../posts/infrastructure/posts.repository';
 import { Controller, Delete, HttpStatus, HttpCode } from '@nestjs/common';
 
 @Controller('testing')

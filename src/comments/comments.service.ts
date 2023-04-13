@@ -2,7 +2,7 @@ import { LikesRepository } from './../likes/likes.repository';
 import { CreateOrUpdateLikeDto } from './../likes/likes.service';
 import { UsersService } from './../users/users.service';
 import { StatusLike } from './../likes/schemas/likes.schema';
-import { PostsService } from './../posts/posts.service';
+import { PostsService } from '../posts/application/posts.service';
 import { CommentsRepository } from './comments.repository';
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
